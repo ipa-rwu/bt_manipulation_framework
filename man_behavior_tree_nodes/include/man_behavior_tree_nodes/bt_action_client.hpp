@@ -3,10 +3,12 @@
 
 #include <memory>
 #include <string>
+#include <boost.h>
 
 #include "behaviortree_cpp_v3/action_node.h"
 #include "ros/ros.h"
 #include <actionlib/client/simple_action_client.h>
+#include <moveit/moveit_core.h>
 
 namespace man_behavior_tree_nodes
 {
@@ -29,6 +31,7 @@ public:
     {
         // get nodehandle from blackboard
         pnh_ = config().blackboard->get<ros::NodeHandle>("private_node_handle");
+        arm_state_ = config().blackboard->get<robot_state::RobotStatePtr>("arm_state");
 
         // Initialize the input and output messages
         goal_ = typename ActionGoalT();
@@ -295,6 +298,7 @@ protected:
         double allotted_time_;
     // The node that will be used for any ROS operations
         ros::NodeHandle pnh_;
+        robot_state::RobotStatePtr arm_state_;
 };
 
 }  // namespace nav2_behavior_tree

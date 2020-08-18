@@ -1,4 +1,4 @@
-#include "manipulator_skills/skills/compute_path_skill.h"
+#include "manipulator_skills/skills/compute_path_skill.hpp"
 #include <string>
 
 // int main(int argc, char** argv) {
@@ -35,16 +35,7 @@ int main(int argc, char** argv)
   while (ros::ok() && create_client == false) 
   {
     ROS_INFO("started!");
-    goal.pose.header.frame_id = "base_link";
-    goal.pose.pose.orientation.w = 1.0;
-    goal.pose.pose.position.x = 0.28;
-    goal.pose.pose.position.y = -0.2;
-    goal.pose.pose.position.z = 0.5;
 
-    std::vector<double> tolerance_pose(3, 0.01);
-    std::vector<double> tolerance_angle(3, 0.01);
-    goal.position_tolerances = tolerance_pose;
-    goal.orientation_tolerances = tolerance_angle;
     ac.sendGoal(goal);
     bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
     if (finished_before_timeout)

@@ -2,13 +2,14 @@
 #define MANIPULATOR_SKILLS_COMPUTER_PATH_SKILL_
 
 #include "ros/ros.h"
-#include "manipulator_skills/skill.h"
+#include "manipulator_skills/skill.hpp"
 #include <actionlib/server/simple_action_server.h>
 #include <man_msgs/ComputePathSkillAction.h>
-#include <moveit_msgs/GetMotionPlan.h>
-#include <moveit_msgs/PlanningScene.h>
+
 #include <moveit/move_group_interface/move_group_interface.h>
-#include <moveit/kinematic_constraints/utils.h>
+
+#include <geometry_msgs/Pose.h>
+
 
 namespace manipulator_skills
 {
@@ -18,16 +19,20 @@ typedef actionlib::SimpleActionServer<man_msgs::ComputePathSkillAction> ComputeP
 class ArmComputePathSkill  : public ManipulatorSkill
 {
 public:
-  ArmComputePathSkill(std::string);
+  ArmComputePathSkill(std::string group_name);
   ~ArmComputePathSkill();
 
   void initialize() override;
 
 private:
   void computePathCallback(const man_msgs::ComputePathSkillGoalConstPtr& goal);
-  bool computePath(const man_msgs::ComputePathSkillGoalConstPtr& goal,
-                   man_msgs::ComputePathSkillResult& action_res,
-                   moveit_msgs::MotionPlanResponse &res);
+  moveit_msgs::MoveItErrorCodes computePath(const man_msgs::ComputePathSkillGoalConstPtr& goal,
+                                         moveit::planning_interface::MoveGroupInterface::Plan& plan,
+                                         moveit_msgs::MoveItErrorCodes error_code);
+
+  void executeCB(const man_msgs::ComputePathSkillGoalConstPtr &goal);
+  void AdjustTrajectoryToFixTimeSequencing(moveit_msgs::RobotTrajectory &trajectory);
+
   // void preemptComputerPathCallback();
   // void setComputerPathState(MoveGroupState state);
 
@@ -35,6 +40,9 @@ private:
 
   ComputePathActionServer* as_;
 
+  moveit::planning_interface::MoveGroupInterface *move_group_;
+
+  std::string group_name_;
   std::string action_name_;
   ros::ServiceClient motion_plan_client_;
   
@@ -43,7 +51,8 @@ private:
   // private ros node handle
   ros::NodeHandle pnh_;
 
-  void executeCB(const man_msgs::ComputePathSkillGoalConstPtr &goal);
+  bool isCartesianPath_;
+  int replan_time_;
 };
 } //namespace manipulator_skills
 

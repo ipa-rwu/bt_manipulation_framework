@@ -1,0 +1,5 @@
+# req
+bool isattached
+---
+#res
+moveit_msgs/RobotState arm_state

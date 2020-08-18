@@ -19,7 +19,9 @@ set(dependencies
 find_package(catkin REQUIRED COMPONENTS ${dependencies}
 )
 
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
+
+
 find_package(Eigen3 REQUIRED)
 add_definitions(${EIGEN3_DEFINITIONS})
 
@@ -39,37 +41,55 @@ include_directories(
 )
 
 
-set(base_library_name ${PROJECT_NAME})
+#set(base_library_name ${PROJECT_NAME}_all)
 
-add_library(${base_library_name} SHARED
-  src/skill.cpp
-)
+#add_library(${base_library_name} SHARED
+#  src/skill.cpp
+#)
 
-target_link_libraries(${base_library_name} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+#target_link_libraries(${base_library_name} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
-set(skills_library_name ${PROJECT_NAME}_subskills)
+#set(skills_library_name ${PROJECT_NAME}_subskills)
 
 add_library(compute_path_skill SHARED
-  src/skills/compute_path_skill.cpp
+  src/skills/action_servers/compute_path_skill/compute_path_skill.cpp
 )
-
 target_link_libraries(compute_path_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(compute_path_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_executable(compute_path_skill_server 
+  src/skills/action_servers/compute_path_skill/main.cpp)
+target_link_libraries(compute_path_skill_server compute_path_skill)
+add_dependencies(compute_path_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(compute_path_skill_node 
+
+
+add_library(update_arm_state_skill SHARED
+  src/skills/service_server/update_arm_state_skill/update_arm_state.cpp
+)
+target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_dependencies(update_arm_state_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
+add_executable(update_arm_state_skill_server 
+  src/skills/service_server/update_arm_state_skill/main.cpp)
+target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
+
+add_dependencies(update_arm_state_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(test_ompute_path_skill_node 
   src/skills/test_compute_path.cpp)
-add_dependencies(compute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(test_ompute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(compute_path_skill_node compute_path_skill)
+target_link_libraries(test_ompute_path_skill_node compute_path_skill)
 
 
- install(TARGETS ${base_library_name} compute_path_skill
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
- )
+install(TARGETS compute_path_skill
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
