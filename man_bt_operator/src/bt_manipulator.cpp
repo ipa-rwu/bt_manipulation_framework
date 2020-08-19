@@ -54,7 +54,7 @@ bool BT_Manipulator::loadBehaviorTree(const std::string & bt_xml_filename)
   std::ifstream xml_file(bt_xml_filename);
 
   if (!xml_file.good()) {
-    // ROSINFO(get_logger(), "Couldn't open input XML file: %s", bt_xml_filename.c_str());
+    ROS_ERROR( "Couldn't open input XML file: %s", bt_xml_filename.c_str());
     return false;
   }
 
