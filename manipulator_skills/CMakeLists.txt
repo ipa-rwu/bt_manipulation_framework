@@ -65,6 +65,9 @@ add_library(update_arm_state_skill SHARED
 add_library(update_arm_goal_skill SHARED
   src/skills/service_server/update_arm_goal_skill/update_arm_goal.cpp)
 
+add_library(update_param_skill SHARED
+  src/skills/service_server/update_param_skill/update_param.cpp)
+
 #### add_executable
 add_executable(compute_path_skill_server 
   src/skills/action_servers/compute_path_skill/main.cpp)
@@ -75,35 +78,39 @@ add_executable(update_arm_state_skill_server
 add_executable(update_arm_goal_skill_server 
   src/skills/service_server/update_arm_goal_skill/main.cpp)
 
+add_executable(update_param_skill_server 
+  src/skills/service_server/update_param_skill/main.cpp)
+
 add_executable(test_compute_path_skill_node 
   src/skills/test_compute_path.cpp)
 
 #### target_link_libraries
 target_link_libraries(compute_path_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
 target_link_libraries(compute_path_skill_server compute_path_skill)
 
 target_link_libraries(update_arm_goal_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
-target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
-target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
-
 target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
 
+target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
+
+
+target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_param_skill_server update_param_skill)
 
 target_link_libraries(test_compute_path_skill_node compute_path_skill)
 
 #### add_dependencies
 add_dependencies(compute_path_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 add_dependencies(compute_path_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 add_dependencies(update_arm_state_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(update_arm_state_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
 
 add_dependencies(test_compute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
