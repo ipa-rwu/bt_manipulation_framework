@@ -1,0 +1,8 @@
+#req
+geometry_msgs/PoseStamped pose
+geometry_msgs/Pose param
+string frame_id
+---
+#res
+geometry_msgs/PoseStamped pose
+string frame_id

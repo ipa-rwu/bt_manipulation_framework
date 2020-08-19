@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 
     manipulator_skills::ArmComputePathSkill ArmComputePathSkill(group_name);
 
-    ros::AsyncSpinner spinner(1);
+    ros::AsyncSpinner spinner(2);
     spinner.start();
 
     while (ros::ok())

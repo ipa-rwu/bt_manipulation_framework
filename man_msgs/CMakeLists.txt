@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation ${MSG_DEPS})
 
 set(SRV_FILES
 UpdateArmState.srv
+UpdateArmGoal.srv
 )
 
 set(ACT_FILES

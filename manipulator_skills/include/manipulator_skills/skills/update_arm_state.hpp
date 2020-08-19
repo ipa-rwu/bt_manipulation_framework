@@ -33,7 +33,8 @@ private:
 
   ros::ServiceServer service_;
 
- moveit::planning_interface::MoveGroupInterface *move_group_;
+//  moveit::planning_interface::MoveGroupInterface *move_group_;
+std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
 //   std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
 
   std::string group_name_;

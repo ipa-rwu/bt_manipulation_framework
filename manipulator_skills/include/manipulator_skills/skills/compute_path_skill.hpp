@@ -52,7 +52,7 @@ private:
   ros::NodeHandle pnh_;
 
   bool isCartesianPath_;
-  int replan_time_;
+  int replan_times_;
 };
 } //namespace manipulator_skills
 
