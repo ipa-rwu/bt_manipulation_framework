@@ -2,18 +2,20 @@ cmake_minimum_required(VERSION 3.5)
 project(man_bt_operator)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED COMPONENTS
+set(dependencies
+  behaviortree_cpp_v3
   roscpp
-  std_msgs
-  man_behavior_tree
+  man_behavior_tree_nodes
+  #std_msgs
+  #geometry_msgs
+  #tf2_ros
+  #tf2_geometry_msgs
 )
 
-find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(catkin REQUIRED COMPONENTS ${dependencies})
 
-
-set(library_name ${PROJECT_NAME})
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -21,8 +23,8 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES ${library_name}
-   CATKIN_DEPENDS roscpp std_msgs
-  DEPENDS Boost
+   CATKIN_DEPENDS ${dependencies}
+   DEPENDS system_lib Boost
 )
 
 
@@ -32,24 +34,15 @@ include_directories(
 )
 
 
-add_library(${library_name}
-   src/bt_operator.cpp
- )
+add_library(bt_manipulator src/bt_manipulator.cpp)
+add_dependencies(bt_manipulator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( bt_manipulator   ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-set(dependencies
-  behaviortree_cpp_v3
-  man_behavior_tree
-)
+add_executable(bt_manipulator_node src/main.cpp)
+add_dependencies(bt_manipulator_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bt_manipulator_node bt_manipulator)
 
-target_link_libraries(${library_name}
-  ${dependencies}
-)
-target_link_libraries(${library_name}
-                      ${catkin_LIBRARIES}
-                      ${Boost_LIBRARIES}
-                      ${GSTREAMER_LIBRARIES})
-
- install(TARGETS ${PROJECT_NAME}
+ install(TARGETS bt_manipulator
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
@@ -59,5 +52,5 @@ target_link_libraries(${library_name}
  install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
  )
-

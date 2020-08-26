@@ -6,10 +6,10 @@
 
 namespace man_behavior_tree_nodes
 {
-class UpdateParamclient : public btServiceClient<man_msgs::UpdateParam>
+class UpdateParamServiceClient : public btServiceClient<man_msgs::UpdateParam>
 {
     public:
-    ComputePathActionClient(
+    UpdateParamServiceClient(
         const std::string & xml_tag_name,
         const std::string & service_name,
         const BT::NodeConfiguration & conf);
@@ -22,27 +22,20 @@ class UpdateParamclient : public btServiceClient<man_msgs::UpdateParam>
     {
         return providedBasicPorts(
         {
-            BT::OutputPort<moveit::planning_interface::MoveGroupInterface::Plan>("plan", "Plan created by ComputePathActionClient node"),
-            BT::InputPort<geometry_msgs::msg::PoseStamped>("goal", "Destination to plan to"),
-            BT::InputPort<robot_state::RobotStatePtr>("arm_state", "arm state"),
-            BT::InputPort<int>("replan_times", "times for replan"),
-            BT::InputPort<std::string>("end_effector", "robot end effector link"),
-            BT::InputPort<std::string>("group_name", ""),
-            BT::InputPort<std::string>("planner_id", ""),
+            BT::InputPort<std::string>("topic", "parameter topic"),
+            BT::InputPort<std::string>("data_type", "parameter data type"),
+
         });
     }
 
 private:
-  bool first_time_{true};
-  geometry_msgs::msg::PoseStamped posestamp_;
-  std::string active_target_;
-  double goal_joint_tolerance_;
-  double goal_position_tolerance_;
-  double goal_orientation_tolerance_;
+    bool first_time_{true};
 
-  // joint state goal
-  robot_state::RobotStatePtr joint_state_target_;
-  const robot_model::JointModelGroup* joint_model_group_;
+    std::map<std::string, _Float32> param_float_;
+    std::map<std::string, std::string> param_string_;
+    std::map<std::string, int8_t> param_int_;
+    std::map<std::string, bool> param_bool_;
+
 };
 } // namespace
 

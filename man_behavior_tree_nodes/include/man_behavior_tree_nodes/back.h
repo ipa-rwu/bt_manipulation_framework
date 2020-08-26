@@ -7,10 +7,7 @@
 #include "behaviortree_cpp_v3/action_node.h"
 #include "ros/ros.h"
 #include <actionlib/client/simple_action_client.h>
-#include "actionlib/client/simple_goal_state.h"
 #include <moveit/move_group_interface/move_group_interface.h>
-#include "man_behavior_tree_nodes/bt_conversions.hpp"
-
 
 namespace man_behavior_tree_nodes
 {
@@ -75,7 +72,7 @@ namespace man_behavior_tree_nodes
 // ActionT moveit_msgs::ExecuteTrajectoryAction
 // ActionGoalT moveit_msgs::ExecuteTrajectoryGoal
 
-template<class ActionT, class ActionGoalT, class ActionResultT>
+template<class ActionT, class ActionGoalT>
 class btActionClient : public BT::ActionNodeBase
 {
 public:
@@ -85,16 +82,17 @@ public:
         const BT::NodeConfiguration & conf,
         float time_for_wait)
     : BT::ActionNodeBase(xml_tag_name, conf), 
-    action_name_(action_name),
+    action_name_(action_name), 
+    pnh_("~"),
+    done_(true),
     wait_for_servers_(ros::WallDuration(time_for_wait))
     {
         // get nodehandle from blackboard
-        pnh_ = config().blackboard->get<ros::NodeHandle>("node_handle");
-        done_ = true;
+        // pnh_ = config().blackboard->get<ros::NodeHandle>("private_node_handle");
         // arm_state_ = config().blackboard->get<robot_state::RobotStatePtr>("arm_state");
 
         // Initialize the input and output messages
-        // goal_state_ =  actionlib::SimpleGoalState::PENDING;
+        action_state_ =  actionlib::SimpleClientGoalState::PENDING;
 
         std::string remapped_action_name;
         if (getInput("server_name", remapped_action_name)) {
@@ -181,7 +179,7 @@ public:
 
         // Now that we have the ROS node to use, create the action client for this BT action
         action_client_.reset(new actionlib::SimpleActionClient<ActionT>(pnh_, action_name_, false));
-        waitForAction(action_name_, timeout_for_servers_, allotted_time_);
+        waitForAction(action_client_, action_name_, timeout_for_servers_, allotted_time_);
         // Make sure the server is actually there before continuing        
     }
 
@@ -267,12 +265,12 @@ public:
             // user defined callback. May modify the value of "goal_updated_"
             on_wait_for_result();
 
-            auto client_status = action_client_->getState();
+            auto goal_status = action_client_->getState();
 
             // if a new goal coming
             if (goal_updated_ && 
-            (client_status == actionlib::SimpleClientGoalState::ACTIVE ||
-               client_status == actionlib::SimpleClientGoalState::PENDING)
+            (goal_status == actionlib::SimpleClientGoalState::ACTIVE ||
+               goal_status == actionlib::SimpleClientGoalState::PENDING)
                )
             {
                  goal_updated_ = false;
@@ -281,27 +279,27 @@ public:
 
 
             // check if, after invoking spin_some(), we finally received the result
-            if (client_status == actionlib::SimpleClientGoalState::ACTIVE ||
-               client_status == actionlib::SimpleClientGoalState::PENDING) 
+            if (goal_status == actionlib::SimpleClientGoalState::ACTIVE ||
+               goal_status == actionlib::SimpleClientGoalState::PENDING) 
             {
                 // Yield this Action, returning RUNNING
                 return BT::NodeStatus::RUNNING;
             }
         }
 
-        auto client_status = action_client_->getState();
+        auto goal_status = action_client_->getState();
 
-        if (client_status == actionlib::SimpleClientGoalState::SUCCEEDED)
+        if (goal_status == actionlib::SimpleClientGoalState::SUCCEEDED)
         {
             return on_success();
         }
 
-        if (client_status == actionlib::SimpleClientGoalState::ABORTED)
+        if (goal_status == actionlib::SimpleClientGoalState::ABORTED)
         {
             return on_aborted();
         }
 
-        if (client_status == actionlib::SimpleClientGoalState::PREEMPTED)
+        if (goal_status == actionlib::SimpleClientGoalState::PREEMPTED)
         {
             return on_cancelled();
         }
@@ -390,22 +388,15 @@ protected:
 
         goal_result_available_ = true;
 
-
-        auto client_status = action_client_->getState();
-        if (client_status == actionlib::SimpleClientGoalState::REJECTED)
-        {
-            throw std::runtime_error("Goal was rejected by the action server");
-        }
-
         if (!action_client_->waitForResult())
         {
             ROS_INFO_STREAM_NAMED("btActionNode", action_name_.c_str()<< "MoveGroup action returned early");
         }
-        else
+        action_state_ = action_client_->getState();
+        if (action_state_ == actionlib::SimpleClientGoalState::REJECTED)
         {
-            result_ = action_client_->getResult();
+            throw std::runtime_error("Goal was rejected by the action server");
         }
-        
     }
 
 
@@ -413,11 +404,8 @@ protected:
         ros::WallDuration wait_for_servers_;
         typename std::unique_ptr<actionlib::SimpleActionClient<ActionT> > action_client_;
 
-        ActionGoalT goal_;
-        ActionResultT result_;
-
-        // actionlib::SimpleGoalState goal_state_;
-        // std::unique_ptr<actionlib::SimpleClientGoalState> action_state_;
+         ActionGoalT goal_;
+        actionlib::SimpleClientGoalState action_state_;
         // bool goal_updated_{false};
         bool goal_result_available_{false};
 

@@ -28,8 +28,12 @@ void UpdateParam::initialize()
 bool UpdateParam::executeCB(man_msgs::UpdateParam::Request  &req,
                         man_msgs::UpdateParam::Response &res)
 {
+    ROS_INFO("get request");
     std::string topic_name = req.topic;
     std::string data_type = req.data_type;
+
+    std::cout << "topic: " << topic_name; 
+    std::cout << " data_type: " << data_type<<std::endl;
     std::vector<float_t> value_double;
     std::vector<int8_t> value_int;
     std::vector<std::string> value_string;
@@ -59,6 +63,8 @@ bool UpdateParam::executeCB(man_msgs::UpdateParam::Request  &req,
 
                 label = all_params.at(i).substr(found + topic_name.size()+1);
                 labels.push_back(label); 
+                std::cout <<" "<< label;
+                std::cout << '\n';
             }
 
             if(data_type.compare("bool") == 0)

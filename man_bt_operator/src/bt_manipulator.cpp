@@ -1,6 +1,6 @@
 #include "man_bt_operator/bt_manipulator.hpp"
 
-namespace bt_manipulator
+namespace man_bt_operator
 {
 
 BT_Manipulator::BT_Manipulator(
@@ -24,17 +24,31 @@ void BT_Manipulator::initialize()
 
   if(!pnh_.getParam(namespace_param_ + "/bt_xml_file_name", default_bt_xml_filename_))
   {
-    ROS_ERROR("Please provide bt_xml_file")
+    ROS_ERROR("Please provide bt_xml_file");
+    ros::shutdown();
   }
 
     // wrap bt_engine
-    bt_ = std::make_unique<man_behavior_tree::BT_Engine>(plugin_lib_names_);
+    bt_ = std::make_unique<man_behavior_tree_nodes::BT_Engine>(plugin_lib_names_);
+
+    // add items to blackboard
+    // Create the blackboard that will be shared by all of the nodes in the tree
+    blackboard_ = BT::Blackboard::create();
+
+    // Put items on the blackboard
+    blackboard_->set<std::map<std::string, _Float32>>("param_float", param_float_);  // NOLINT
+    blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
+
     
     // load bt xml file
     if(!loadBehaviorTree(default_bt_xml_filename_))
     {
       ROS_ERROR("Error loading XML file: %s", default_bt_xml_filename_.c_str());
+      ros::shutdown();
+
     }
+    bt_->run(&tree_);
+    
 }
 
 
@@ -42,6 +56,8 @@ BT_Manipulator::~BT_Manipulator()
 {
 
 }
+
+
 
 bool BT_Manipulator::loadBehaviorTree(const std::string & bt_xml_filename)
 {
@@ -72,4 +88,6 @@ bool BT_Manipulator::loadBehaviorTree(const std::string & bt_xml_filename)
   return true;
 }
 
-}
+
+
+} //namespace

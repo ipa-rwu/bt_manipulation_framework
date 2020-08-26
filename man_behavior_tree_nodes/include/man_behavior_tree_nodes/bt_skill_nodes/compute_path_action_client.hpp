@@ -1,4 +1,8 @@
-#include "man_behavior_tree_nodes/bt_service.h"
+#ifndef MAN_BEHAVIOR_TREE_NODES_COMPUTER_PATH_CLIENT_
+#define MAN_BEHAVIOR_TREE_NODES_COMPUTER_PATH_CLIENT_
+
+
+#include "man_behavior_tree_nodes/bt_action_client.h"
 #include "man_msgs/ComputePathSkillAction.h"
 #include <moveit_msgs/GetMotionPlan.h>
 
@@ -43,3 +47,5 @@ private:
   const robot_model::JointModelGroup* joint_model_group_;
 };
 } // namespace
+
+#endif

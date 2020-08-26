@@ -29,6 +29,7 @@ UpdateParam.srv
 
 set(ACT_FILES
 ComputePathSkill.action
+FindObjects.action
 )
 
 add_action_files(DIRECTORY action FILES ${ACT_FILES})

@@ -17,6 +17,7 @@ set(dependencies
   tf2
   tf2_geometry_msgs
   tf2_ros
+  ar_marker_detector
 )
 
 find_package(catkin REQUIRED COMPONENTS ${dependencies}
@@ -59,6 +60,9 @@ include_directories(
 add_library(compute_path_skill SHARED
   src/skills/action_servers/compute_path_skill/compute_path_skill.cpp)
 
+add_library(find_objects_skill SHARED
+  src/skills/action_servers/find_objects_skill/find_objects.cpp)
+
 add_library(update_arm_state_skill SHARED
   src/skills/service_server/update_arm_state_skill/update_arm_state.cpp)
 
@@ -69,6 +73,9 @@ add_library(update_param_skill SHARED
   src/skills/service_server/update_param_skill/update_param.cpp)
 
 #### add_executable
+add_executable(find_objects_skill_server 
+  src/skills/action_servers/find_objects_skill/main.cpp)
+
 add_executable(compute_path_skill_server 
   src/skills/action_servers/compute_path_skill/main.cpp)
 
@@ -88,6 +95,9 @@ add_executable(test_compute_path_skill_node
 target_link_libraries(compute_path_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(compute_path_skill_server compute_path_skill)
 
+target_link_libraries(find_objects_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(find_objects_skill_server find_objects_skill)
+
 target_link_libraries(update_arm_goal_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
 
@@ -104,13 +114,15 @@ target_link_libraries(test_compute_path_skill_node compute_path_skill)
 add_dependencies(compute_path_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(compute_path_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+
 add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(update_arm_state_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
+add_dependencies(find_objects_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(find_objects_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(test_compute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

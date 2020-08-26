@@ -1,0 +1,15 @@
+ <!-- <root main_tree_to_execute = "MainTree" >
+     <BehaviorTree ID="MainTree">
+        <UpdateParameter topic="/arm_param_server" data_type="double">
+     </BehaviorTree>
+ </root> -->
+ <root main_tree_to_execute = "MainTree" >
+
+     <BehaviorTree ID="MainTree">
+        <Sequence name="root_sequence">
+            <UpdateParameter service_name="update_param" topic="/gripper_param_server" data_type="string"/>
+            <FindObjects container_A="1;1598421590;camera;-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="1;1598421590;camera;0.35;0.55;0.78;0;0.707;0;0.707" marker_id="2" frame_id="/camera" marker="{marker}" container="{container}"/>
+        </Sequence>
+     </BehaviorTree>
+
+ </root>

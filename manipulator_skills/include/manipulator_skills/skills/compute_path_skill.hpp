@@ -25,7 +25,6 @@ public:
   void initialize() override;
 
 private:
-  void computePathCallback(const man_msgs::ComputePathSkillGoalConstPtr& goal);
   moveit_msgs::MoveItErrorCodes computePath(const man_msgs::ComputePathSkillGoalConstPtr& goal,
                                          moveit::planning_interface::MoveGroupInterface::Plan& plan,
                                          moveit_msgs::MoveItErrorCodes error_code);

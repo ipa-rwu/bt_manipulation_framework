@@ -1,1 +1,2 @@
-plugin_lib_names: [man_update_param_service_client_node]
+plugin_lib_names: [man_update_param_service_client_node, man_find_objects_action_client_node]
+bt_xml_file_name: /home/rachel/kogrob/manbt_ws/src/manipulator_bt/man_bringup/config/bt_xml/try.xml

@@ -2,7 +2,7 @@
 
 <launch>
   <!-- bt control node -->
-<node pkg="manipulator_skills" type="update_param_skill_server" name="update_param_skill_server" output="screen" required="true">
+<node pkg="man_bt_operator" type="bt_manipulator_node" name="bt_manipulator_node" output="screen" required="true">
   <!-- <node pkg="man_bt_operator" type="bt_manipulator_node" name="bt_manipulator_node" output="screen" required="true"> -->
     <rosparam command="load" file="$(find man_bringup)/config/plugin/pick_place.yaml" ns="/bt_param"/>
 </node>

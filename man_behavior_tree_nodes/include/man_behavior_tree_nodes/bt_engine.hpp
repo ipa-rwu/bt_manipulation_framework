@@ -4,23 +4,30 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "ros/ros.h"
 #include "behaviortree_cpp_v3/behavior_tree.h"
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "behaviortree_cpp_v3/xml_parsing.h"
 
-namespace man_behavior_tree
+namespace man_behavior_tree_nodes
 {
 
+enum class BtStatus { SUCCEEDED, FAILED, CANCELED };
 class BT_Engine
 {
-explicit BT_Engine(const std::vector<std::string> & plugin_libraries);
-virtual ~BT_Engine() {}
 
 public:
-  BT::Tree buildTreeFromText(
-    const std::string & xml_string,
-    BT::Blackboard::Ptr blackboard);
+  explicit BT_Engine(const std::vector<std::string> & plugin_libraries);
+  virtual ~BT_Engine() {}
+
+  BT::Tree buildTreeFromText(const std::string & xml_string,
+                              BT::Blackboard::Ptr blackboard);
+
+  BtStatus run(BT::Tree * tree );
+  // ,std::function<void()> onLoop,
+  // std::function<bool()> cancelRequested
+  // ,std::chrono::milliseconds loopTimeout
+ 
 
   // In order to re-run a Behavior Tree, we must be able to reset all nodes to the initial state
   void haltAllActions(BT::TreeNode * root_node)
@@ -36,6 +43,8 @@ public:
       };
     BT::applyRecursiveVisitor(root_node, visitor);
     }
+
+
 
 protected:
   // The factory that will be used to dynamically construct the behavior tree

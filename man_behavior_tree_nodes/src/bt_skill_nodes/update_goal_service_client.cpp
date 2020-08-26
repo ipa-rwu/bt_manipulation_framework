@@ -1,12 +1,9 @@
-#include <string>
-#include <memory>
-
-#include "man_behavior_tree_nodes/bt_skill_nodes/update_param_service_client.hpp"
+#include "man_behavior_tree_nodes/bt_skill_nodes/update_goal_service_client.hpp"
 
 namespace man_behavior_tree_nodes
 {
 
-UpdateParamServiceClient::UpdateParamServiceClient(
+UpdateGoalServiceClient::UpdateGoalServiceClient(
     const std::string & xml_tag_name,
     const std::string & service_name,
     const BT::NodeConfiguration & conf)
@@ -14,7 +11,7 @@ UpdateParamServiceClient::UpdateParamServiceClient(
 {
 }
 
-void UpdateParamServiceClient::on_tick()
+void UpdateGoalServiceClient::on_tick()
 {
   getInput("topic", service_.request.topic);
   
@@ -23,7 +20,7 @@ void UpdateParamServiceClient::on_tick()
 
 }  // namespace man_behavior_tree_nodes
 
-BT::NodeStatus UpdateParamServiceClient::on_success()
+BT::NodeStatus UpdateGoalServiceClient::on_success()
 {
     ROS_INFO("get result");
 
@@ -109,10 +106,10 @@ BT_REGISTER_NODES(factory)
   BT::NodeBuilder builder =
     [](const std::string & name, const BT::NodeConfiguration & config)
     {
-      return std::make_unique<man_behavior_tree_nodes::UpdateParamServiceClient>(
-        name, "update_param", config);
+      return std::make_unique<man_behavior_tree_nodes::UpdateGoalServiceClient>(
+        name, "update_goal", config);
     };
 
-  factory.registerBuilder<man_behavior_tree_nodes::UpdateParamServiceClient>(
-    "UpdateParameter", builder);
+  factory.registerBuilder<man_behavior_tree_nodes::UpdateGoalServiceClient>(
+    "UpdateGoal", builder);
 }
