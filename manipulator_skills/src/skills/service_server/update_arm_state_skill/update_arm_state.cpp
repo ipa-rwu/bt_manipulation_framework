@@ -24,7 +24,7 @@ ArmUpdateState::~ArmUpdateState()
 
 void ArmUpdateState::initialize()
 {
-    move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
+    move_group_.reset(new moveit::planning_interface::MoveGroupInterface(group_name_));
 
     service_ = pnh_.advertiseService(UPDATE_ARM_STATE, &ArmUpdateState::executeCB, this);
     ROS_INFO_STREAM_NAMED(getName(), "start service" );

@@ -79,14 +79,14 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::computePath(const man_msgs::C
 //   geometry_msgs::PoseStamped p;
 //   p.header.frame_id = cfg.WORLD_FRAME_ID;
 //   p.pose = pose_target;
-    replan_time_ = goal->num_planning_attempts;
+    replan_times_ = goal->num_planning_attempts;
     moveit_msgs::RobotState start_state = goal->start_state;
     geometry_msgs::Pose target_pose = goal->pose;
     geometry_msgs::Pose current_pose = goal->current_pose;
 
     move_group_->setPlanningTime(goal->allowed_planning_time);
     move_group_->setMaxVelocityScalingFactor(goal->max_velocity_scaling_factor);
-    move_group_->setNumPlanningAttempts(replan_time_);
+    move_group_->setNumPlanningAttempts(replan_times_);
 
 
     if (goal->target_type == "Name")
@@ -122,14 +122,14 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::computePath(const man_msgs::C
       std::vector<geometry_msgs::Pose> waypoints;
       waypoints.push_back(current_pose);
       waypoints.push_back(target_pose); 
-      while (fraction < 0.5 && trytimes < replan_time_)
+      while (fraction < 0.5 && trytimes < replan_times_)
       {
         fraction = move_group_->computeCartesianPath(waypoints, goal->eef_step, goal->jump_threshold, trajectory);
         AdjustTrajectoryToFixTimeSequencing(trajectory);
         trytimes ++;
       }
     
-    if (fraction < 0.5 && trytimes >= replan_time_)
+    if (fraction < 0.5 && trytimes >= replan_times_)
       {
         error_code.val = moveit::planning_interface::MoveItErrorCode::FAILURE;
         return error_code;

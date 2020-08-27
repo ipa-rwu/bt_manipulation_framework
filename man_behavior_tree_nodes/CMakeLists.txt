@@ -4,12 +4,18 @@ project(man_behavior_tree_nodes)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED COMPONENTS
+set(dependencies
+  behaviortree_cpp_v3
   roscpp
   std_msgs
+  geometry_msgs
+  tf2_ros
+  tf2_geometry_msgs
 )
 
-find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(catkin REQUIRED COMPONENTS ${dependencies})
+
+#find_package(behaviortree_cpp_v3 REQUIRED)
 
 set(library_name ${PROJECT_NAME})
 
@@ -34,9 +40,7 @@ add_library(${library_name}
    src/bt_engine.cpp
  )
 
-set(dependencies
-  behaviortree_cpp_v3
-)
+
 
 target_link_libraries(${library_name}
   ${dependencies}
