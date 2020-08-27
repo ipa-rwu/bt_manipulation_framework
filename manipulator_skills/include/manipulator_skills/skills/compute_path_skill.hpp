@@ -37,8 +37,9 @@ private:
 
   // std::unique_ptr<actionlib::SimpleActionServer<man_msgs::ComputePathSkillAction> > compute_path_action_server_;
   std::unique_ptr<ComputePathActionServer> as_;
+  std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
 
-  moveit::planning_interface::MoveGroupInterface *move_group_;
+  // moveit::planning_interface::MoveGroupInterface *move_group_;
 
   std::string group_name_;
   std::string action_name_;

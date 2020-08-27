@@ -26,8 +26,8 @@ ArmComputePathSkill::~ArmComputePathSkill()
 
 void ArmComputePathSkill::initialize()
 {
-    move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
-
+    // move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
+    move_group_.reset(new moveit::planning_interface::MoveGroupInterface(group_name_));
     // start the move action server
     as_.reset(new ComputePathActionServer(root_node_handle_, FIND_OBJECTS_NAME, 
     boost::bind(&ArmComputePathSkill::executeCB, this, _1), false));
