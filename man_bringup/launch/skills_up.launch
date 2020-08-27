@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+<!-- tf_static base_link to camera -->
+<include file="$(find man_bringup)/launch/tf_camera_to_base_link.launch">
+</include>
+
+<!-- dynamic_parameter -->
+<include file="$(find dynamic_parameter)/launch/parameter_server.launch">
+</include>
+
+<!-- detect marker -->
+<node pkg="ar_marker_detector" type="get_marker_pose_fake.py" name="get_marker_pose_fake_node" output="screen" required="true">
+</node>
+
+<!-- skills -->
+<node pkg="manipulator_skills" type="find_objects_skill_server" name="find_objects_skill_server_node" output="screen" required="true">
+</node>
+
+<node pkg="manipulator_skills" type="update_param_skill_server" name="update_param_skill_server_node" output="screen" required="true">
+</node>
+
+<node pkg="manipulator_skills" type="update_arm_goal_skill_server" name="update_arm_goal_skill_server_node" output="screen" required="true">
+</node>
+
+</launch>

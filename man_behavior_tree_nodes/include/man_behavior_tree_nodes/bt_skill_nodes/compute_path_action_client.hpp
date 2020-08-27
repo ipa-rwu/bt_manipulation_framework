@@ -1,4 +1,8 @@
-#include "man_behavior_tree_nodes/bt_service.h"
+#ifndef MAN_BEHAVIOR_TREE_NODES_COMPUTER_PATH_CLIENT_
+#define MAN_BEHAVIOR_TREE_NODES_COMPUTER_PATH_CLIENT_
+
+
+#include "man_behavior_tree_nodes/bt_action_client.h"
 #include "man_msgs/ComputePathSkillAction.h"
 #include <moveit_msgs/GetMotionPlan.h>
 
@@ -20,13 +24,15 @@ class ComputePathActionClient : public btActionClient<moveit_msgs::MoveGroupActi
     {
         return providedBasicPorts(
         {
-            BT::OutputPort<moveit::planning_interface::MoveGroupInterface::Plan>("plan", "Plan created by ComputePathActionClient node"),
             BT::InputPort<geometry_msgs::msg::PoseStamped>("goal", "Destination to plan to"),
             BT::InputPort<robot_state::RobotStatePtr>("arm_state", "arm state"),
             BT::InputPort<int>("replan_times", "times for replan"),
             BT::InputPort<std::string>("end_effector", "robot end effector link"),
             BT::InputPort<std::string>("group_name", ""),
             BT::InputPort<std::string>("planner_id", ""),
+
+            BT::OutputPort<moveit::planning_interface::MoveGroupInterface::Plan>("plan", "Plan created by ComputePathActionClient node"),
+
         });
     }
 
@@ -43,3 +49,5 @@ private:
   const robot_model::JointModelGroup* joint_model_group_;
 };
 } // namespace
+
+#endif

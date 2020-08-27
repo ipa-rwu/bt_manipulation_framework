@@ -16,12 +16,14 @@ class btServiceClient : public BT::SyncActionNode
 {
 public:
   btServiceClient(
-    const std::string & service_client_name,
+    const std::string & xml_tag_name,
+    const std::string & service_name,
     const BT::NodeConfiguration & conf)
-  : BT::SyncActionNode(service_client_name, conf), service_client_name_(service_client_name)
+  : BT::SyncActionNode(xml_tag_name, conf), 
+  service_client_name_(service_name+"_client")
   {
     // ** share nodehandle in blackboard
-    pnh_ = config().blackboard->get<ros::NodeHandle>("private_node_handle");
+    nh_ = config().blackboard->get<ros::NodeHandle>("node_handle");
 
     // Get the required items from the blackboard
     // server_timeout_ =
@@ -29,24 +31,34 @@ public:
     // getInput<std::chrono::milliseconds>("server_timeout", server_timeout_);
 
     // create the service client for this BT service
-    getInput("service_name", service_name_);
+    std::string remapped_server_name;
+    if (getInput("service_name", remapped_server_name)) 
+    {
+        service_name_ = remapped_server_name;
+        ROS_INFO( "get service name: \"%s\"", service_name_.c_str());
+    }
+
     service_client_ = pnh_.serviceClient<ServiceT>(service_name_);
 
     // Make a request for the service without parameter
-    request_ = typename ServiceT::Request();
+    // request_ =  std::make_shared<typename ServiceT::Request>();
 
     // Make sure the server is actually there before continuing
     ROS_INFO( "Waiting for \"%s\" service", service_name_.c_str());
-    ros::service::waitForService(service_name_);
+    if (ros::service::waitForService(service_name_))
+    {
+      ROS_INFO( "service: \"%s\" available", service_name_.c_str());
+    }
 
-    ROS_INFO("\"%s\" BtServiceNode initialized",
-    service_client_name_.c_str());
+    ROS_INFO("\"%s\"  initialized", service_client_name_.c_str());
+
+    // auto success_ = service_client_.call(service_);
 
   }
 
-  btServiceNode() = delete;
+  btServiceClient() = delete;
 
-  virtual ~btServiceNode()
+  virtual ~btServiceClient()
   {
   }
 
@@ -72,8 +84,12 @@ public:
   BT::NodeStatus tick() override
   {
     on_tick();
-    auto success = service_client_.call(service_name_, request_, result_);
-    return check_result(success);
+    ROS_INFO("\"%s\" call service", service_client_name_.c_str());
+    // sauto success_ = service_client_.call(service_, request_, response_);
+    auto success_ = service_client_.call(service_);
+
+    // get feedback from service server
+    return check_result(success_);
   }
 
   // Fill in service request with information if necessary
@@ -81,12 +97,20 @@ public:
   {
   }
 
+  virtual BT::NodeStatus on_success()
+  {
+    return BT::NodeStatus::SUCCESS;
+  }
+
   // Check the future and decide the status of Behaviortree
   virtual BT::NodeStatus check_result(bool success)
   {
+    ROS_INFO_STREAM_NAMED("bt_service_client", service_client_name_.c_str() << "Check result");
     if (success == true) {
-      return BT::NodeStatus::SUCCESS;
+      ROS_INFO_STREAM_NAMED("bt_service_client", service_client_name_.c_str()<< " call" << service_name_.c_str() << " succeeded");
+      return on_success();
     } 
+    ROS_INFO("service call failed");
     return BT::NodeStatus::FAILURE;
   }
 
@@ -101,10 +125,15 @@ protected:
     ros::ServiceClient service_client_;
     
     // declare service will be used
-    typename ServiceT service_;
+    ServiceT service_;
 
-    typename ServiceT::Request request_;
-    typename ServiceT::Result result_;
+    // typename ServiceT::Request request_;
+    // typename ServiceT::Response response_;
+    // std::shared_ptr<typename ServiceT::Request> request_;
+    // std::shared_ptr<typename ServiceT::Response> response_;
+
+    // typename ServiceT::Request request_;
+    // typename ServiceT::Result result_;
 
     // public ros node handle
     ros::NodeHandle nh_;
@@ -114,6 +143,8 @@ protected:
     // The timeout value while to use in the tick loop while waiting for
     // a result from the server
     std::chrono::milliseconds server_timeout_;
+
+    bool success_;
 };
 
 }  // namespace nav2_behavior_tree

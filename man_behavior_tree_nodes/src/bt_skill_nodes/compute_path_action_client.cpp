@@ -6,8 +6,11 @@ namespace man_behavior_tree_nodes
 ComputePathActionClient::ComputePathActionClient(
   const std::string & xml_tag_name,
   const std::string & action_name,
-  const BT::NodeConfiguration & conf)
-: btActionClient<moveit_msgs::MoveGroupAction, moveit_msgs::MoveGroupGoal>(xml_tag_name, action_name, conf)
+  const BT::NodeConfiguration & conf,
+  float time_for_wait)
+: btActionClient<moveit_msgs::MoveGroupAction, 
+                  moveit_msgs::MoveGroupGoal>
+                  (xml_tag_name, action_name, conf, time_for_wait)
 {
 }
 
