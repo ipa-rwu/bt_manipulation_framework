@@ -24,13 +24,15 @@ class ComputePathActionClient : public btActionClient<moveit_msgs::MoveGroupActi
     {
         return providedBasicPorts(
         {
-            BT::OutputPort<moveit::planning_interface::MoveGroupInterface::Plan>("plan", "Plan created by ComputePathActionClient node"),
             BT::InputPort<geometry_msgs::msg::PoseStamped>("goal", "Destination to plan to"),
             BT::InputPort<robot_state::RobotStatePtr>("arm_state", "arm state"),
             BT::InputPort<int>("replan_times", "times for replan"),
             BT::InputPort<std::string>("end_effector", "robot end effector link"),
             BT::InputPort<std::string>("group_name", ""),
             BT::InputPort<std::string>("planner_id", ""),
+
+            BT::OutputPort<moveit::planning_interface::MoveGroupInterface::Plan>("plan", "Plan created by ComputePathActionClient node"),
+
         });
     }
 

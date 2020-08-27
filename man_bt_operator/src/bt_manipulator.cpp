@@ -1,33 +1,49 @@
-
 #include "man_bt_operator/bt_manipulator.hpp"
+
 
 namespace man_bt_operator
 {
 
 BT_Manipulator::BT_Manipulator(
   const ros::NodeHandle &private_node_handle,
-  std::string namespace_param):
+  std::string bt_namespace_param,
+  std::string robot_namespace_param):
   pnh_(private_node_handle),
-  namespace_param_(namespace_param)
+  bt_namespace_param_(bt_namespace_param),
+  robot_namespace_param_(robot_namespace_param)
 {
   this->initialize();
 }
 
 void BT_Manipulator::initialize()
 {
-  if(!pnh_.getParam(namespace_param_ + "/plugin_lib_names", plugin_lib_names_))
-  {
-    const std::vector<std::string> plugin_libs = {
-    "man_update_param_service_client_node"
-    };
-    plugin_lib_names_ = plugin_libs;
-  }
+    if(!pnh_.getParam(bt_namespace_param_ + "/plugin_lib_names", plugin_lib_names_))
+    {
+      const std::vector<std::string> plugin_libs = {
+      "man_update_param_service_client_node"
+      };
+      plugin_lib_names_ = plugin_libs;
+    }
 
-  if(!pnh_.getParam(namespace_param_ + "/bt_xml_file_name", default_bt_xml_filename_))
-  {
-    ROS_ERROR("Please provide bt_xml_file");
-    ros::shutdown();
-  }
+    if(!pnh_.getParam(bt_namespace_param_ + "/bt_xml_file_name", default_bt_xml_filename_))
+    {
+      ROS_ERROR("Please provide bt_xml_file");
+      ros::shutdown();
+    }
+
+    if(!pnh_.getParam(robot_namespace_param_ + "/arm_group_name", group_name_arm_))
+    {
+      ROS_ERROR("Please provide arm_group_name");
+      ros::shutdown();
+    }
+    
+    if(!pnh_.getParam(robot_namespace_param_ + "/gripper_group_name", group_name_gripper_))
+    {
+      ROS_ERROR("Please provide gripper_group_name");
+      ros::shutdown();
+    }
+
+    initialize_robot();
 
     // wrap bt_engine
     bt_ = std::make_unique<man_behavior_tree_nodes::BT_Engine>(plugin_lib_names_);
@@ -37,9 +53,15 @@ void BT_Manipulator::initialize()
     blackboard_ = BT::Blackboard::create();
 
     // Put items on the blackboard
-    blackboard_->set<std::map<std::string, _Float32>>("param_float", param_float_);  // NOLINT
-    blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
+    blackboard_->set<std::map<std::string, float>>("param_float", param_float_);  // NOLINT
+    blackboard_->set<std::map<std::string, int8_t>>("param_int", param_int_);
+    blackboard_->set<std::map<std::string, std::string>>("param_float", param_string_);
+    blackboard_->set<std::map<std::string, bool>>("param_float", param_bool_);
 
+    blackboard_->set<std::string>("arm_group_name", group_name_arm_);
+    blackboard_->set<std::string>("gripper_group_name", group_name_gripper_);
+    blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
+    blackboard_->set<moveit::core::RobotStatePtr>("kinematic_state", kinematic_state_);
     
     // load bt xml file
     if(!loadBehaviorTree(default_bt_xml_filename_))
@@ -61,6 +83,28 @@ void BT_Manipulator::initialize()
     
 }
 
+void BT_Manipulator::initialize_robot()
+{
+  // get infomation from robot
+    robot_model_loader_ = std::make_unique<robot_model_loader::RobotModelLoader>("robot_description");
+    kinematic_model_ = robot_model_loader_->getModel();
+    base_frame_ = kinematic_model_->getModelFrame();
+    ROS_INFO_NAMED("BT_Manipulator", "[BT_Manipulator] Model frame: %s", base_frame_.c_str());  
+
+    kinematic_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
+    
+    // const moveit::core::JointModelGroup* joint_model_group = kinematic_model_->getJointModelGroup("manipulator");
+
+    // const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
+
+    // std::vector<double> joint_values;
+    // kinematic_state_->copyJointGroupPositions(joint_model_group, joint_values);
+    // for (std::size_t i = 0; i < joint_names.size(); ++i)
+    // {
+    //   ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+    // }
+
+}
 
 BT_Manipulator::~BT_Manipulator()
 {
