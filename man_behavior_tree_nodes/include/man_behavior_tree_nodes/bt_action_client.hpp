@@ -107,7 +107,7 @@ public:
         last_exec_ = ExecutionStatus::SUCCEEDED;
 
         // Give the derive class a chance to do any initialization
-        ROS_INFO_STREAM_NAMED("btActionClient", xml_tag_name.c_str()<< "btActionClient initialized");
+        ROS_INFO_STREAM_NAMED("btActionClient", xml_tag_name.c_str()<< " btActionClient initialized");
     }
 
     btActionClient() = delete;

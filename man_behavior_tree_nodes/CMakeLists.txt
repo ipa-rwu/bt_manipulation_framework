@@ -55,6 +55,12 @@ add_dependencies(man_find_objects_action_client_node ${${PROJECT_NAME}_EXPORTED_
 target_link_libraries( man_find_objects_action_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(man_find_objects_action_client_node  PRIVATE BT_PLUGIN_EXPORT)
 
+add_library(man_update_goal_for_arm_service_client_node SHARED src/bt_skill_nodes/update_arm_goal_service_client.cpp)
+list(APPEND plugin_libs man_update_goal_for_arm_service_client_node)
+add_dependencies(man_update_goal_for_arm_service_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( man_update_goal_for_arm_service_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(man_update_goal_for_arm_service_client_node  PRIVATE BT_PLUGIN_EXPORT)
+
 
  install(TARGETS ${library_name} ${plugin_libs}
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

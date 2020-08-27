@@ -44,49 +44,72 @@ bool ArmUpdateGoal::executeCB(man_msgs::UpdateArmGoal::Request  &req,
 
     // robot_state::robotStateToRobotStateMsg(*current_state,robot_state);
     // std::cout<< robot_state << std::endl;
-    if (req.frame_id.compare(req.pose.header.frame_id) != 0)
+    if (req.frame_id.compare(req.target.header.frame_id) != 0)
     {
-        if (coordination_transform(req.frame_id, req.pose.header.frame_id))
+        try
         {
-
-            tf2::Transform pose_to_tf;
-            tf2::convert(transformStamped_.transform, pose_to_tf);
-            tf2::Transform pose_old, pose_new;
-            tf2::convert(req.pose.pose, pose_old);
-            pose_new = pose_old * pose_to_tf;
-            
-            // tf2::fromMsg(req.pose.pose, pose_to_tf);
-            // tf2::Transform after_transfer_tf = pose_to_tf * transformStamped_;
-            geometry_msgs::Transform current_msg = tf2::toMsg(pose_new);
-
-            res.pose.header.frame_id = req.pose.header.frame_id;
-            res.pose.header.stamp = req.pose.header.stamp;
-            res.pose.pose.orientation.w = current_msg.rotation.w;
-            res.pose.pose.orientation.x = current_msg.rotation.x;
-            res.pose.pose.orientation.y = current_msg.rotation.y;
-            res.pose.pose.orientation.z = current_msg.rotation.z;
-            res.pose.pose.position.x = current_msg.translation.x;
-            res.pose.pose.position.y = current_msg.translation.y;
-            res.pose.pose.position.z = current_msg.translation.z;
+            transformStamped_ = tf_->lookupTransform(req.frame_id, 
+                                        req.target.header.frame_id,
+                                        ros::Time(0));
         }
+        catch (tf2::TransformException &ex) 
+        {
+            ROS_WARN("%s",ex.what());
+            return false;
+        }
+
+
+
+        tf2::Transform pose_to_tf;
+        tf2::convert(transformStamped_.transform, pose_to_tf);
+        tf2::Transform pose_old, pose_new;
+        tf2::convert(req.target.pose, pose_old);
+        pose_new = pose_old * pose_to_tf;
+        
+        // tf2::fromMsg(req.pose.pose, pose_to_tf);
+        // tf2::Transform after_transfer_tf = pose_to_tf * transformStamped_;
+        geometry_msgs::Transform current_msg = tf2::toMsg(pose_new);
+
+        res.goal.header.frame_id = req.frame_id;
+        res.goal.header.stamp = req.target.header.stamp;
+        res.goal.pose.orientation.w = current_msg.rotation.w;
+        res.goal.pose.orientation.x = current_msg.rotation.x;
+        res.goal.pose.orientation.y = current_msg.rotation.y;
+        res.goal.pose.orientation.z = current_msg.rotation.z;
+        res.goal.pose.position.x = current_msg.translation.x;
+        res.goal.pose.position.y = current_msg.translation.y;
+        res.goal.pose.position.z = current_msg.translation.z;
+
     }
+    else
+    {
+        res.goal.header.frame_id = req.frame_id;
+        res.goal.header.stamp = req.target.header.stamp;
+        res.goal.pose.orientation.w = req.target.pose.orientation.w;
+        res.goal.pose.orientation.x = req.target.pose.orientation.x ;
+        res.goal.pose.orientation.y = req.target.pose.orientation.y;
+        res.goal.pose.orientation.z = req.target.pose.orientation.z;
+        res.goal.pose.position.x = req.target.pose.position.x;
+        res.goal.pose.position.y = req.target.pose.position.y;
+        res.goal.pose.position.z = req.target.pose.position.z;
+    }
+
+    if (req.param != 0)
+    {
+        res.goal.pose.position.z += req.param;
+    }
+
+    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] frame_id: "<< req.frame_id<< "param: "<< req.param);
+    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] target: "<< req.target);
+
+    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[res] goal: "<< res.goal);
+
+
     return true;
 }
 
 
-bool ArmUpdateGoal::coordination_transform(std::string target_frame, std::string source_frame)
-{
-    try{
-    transformStamped_ = tf_->lookupTransform(target_frame, 
-                                source_frame,
-                                ros::Time(0));
-    }
-    catch (tf2::TransformException &ex) {
-    ROS_WARN("%s",ex.what());
-    return false;
-    }
-    return true;
-}
+
 
 
 } // namespace

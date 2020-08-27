@@ -15,7 +15,7 @@
 
 namespace manipulator_skills
 {
-
+// tf transform, update with param
 class ArmUpdateGoal  : public ManipulatorSkill
 {
 public:

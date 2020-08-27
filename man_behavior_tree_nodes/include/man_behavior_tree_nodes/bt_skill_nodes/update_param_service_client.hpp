@@ -31,7 +31,7 @@ class UpdateParamServiceClient : public btServiceClient<man_msgs::UpdateParam>
 private:
     bool first_time_{true};
 
-    std::map<std::string, _Float32> param_float_;
+    std::map<std::string, float> param_float_;
     std::map<std::string, std::string> param_string_;
     std::map<std::string, int8_t> param_int_;
     std::map<std::string, bool> param_bool_;

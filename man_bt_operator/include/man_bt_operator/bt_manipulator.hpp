@@ -10,6 +10,11 @@
 #include "behaviortree_cpp_v3/behavior_tree.h"
 #include "ros/ros.h"
 #include "man_behavior_tree_nodes/bt_engine.hpp"
+#include "behaviortree_cpp_v3/loggers/bt_cout_logger.h"
+
+#ifdef ZMQ_FOUND
+    #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
+#endif
 
 namespace man_bt_operator
 {

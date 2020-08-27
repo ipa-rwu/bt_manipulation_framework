@@ -31,7 +31,7 @@ BtStatus BT_Engine::run(
   )
 {
   BT::NodeStatus result = BT::NodeStatus::RUNNING;
-
+  ros::Rate r(1);
   // Loop until something happens with ROS or the node completes
   while (ros::ok()&& result == BT::NodeStatus::RUNNING) 
   {
@@ -41,7 +41,7 @@ BtStatus BT_Engine::run(
     // }
 
     result = tree->rootNode()->executeTick();
-
+    r.sleep();
     // onLoop();
 
     // loopRate.sleep();

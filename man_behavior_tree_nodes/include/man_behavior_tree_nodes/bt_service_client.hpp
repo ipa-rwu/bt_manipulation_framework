@@ -53,7 +53,6 @@ public:
     ROS_INFO("\"%s\"  initialized", service_client_name_.c_str());
 
     // auto success_ = service_client_.call(service_);
-    ROS_INFO("\"%s\" call service", service_client_name_.c_str());
 
   }
 
@@ -85,6 +84,7 @@ public:
   BT::NodeStatus tick() override
   {
     on_tick();
+    ROS_INFO("\"%s\" call service", service_client_name_.c_str());
     // sauto success_ = service_client_.call(service_, request_, response_);
     auto success_ = service_client_.call(service_);
 
@@ -105,9 +105,9 @@ public:
   // Check the future and decide the status of Behaviortree
   virtual BT::NodeStatus check_result(bool success)
   {
-    ROS_INFO("Check result");
+    ROS_INFO_STREAM_NAMED("bt_service_client", service_client_name_.c_str() << "Check result");
     if (success == true) {
-      ROS_INFO("service call succeeded");
+      ROS_INFO_STREAM_NAMED("bt_service_client", service_client_name_.c_str()<< " call" << service_name_.c_str() << " succeeded");
       return on_success();
     } 
     ROS_INFO("service call failed");

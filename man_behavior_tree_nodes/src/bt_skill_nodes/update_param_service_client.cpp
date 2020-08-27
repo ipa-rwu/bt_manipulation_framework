@@ -73,7 +73,8 @@ BT::NodeStatus UpdateParamServiceClient::on_success()
       {
           std::cout << it->first << " " << it->second << " "  << "\n";
       }
-      config().blackboard->set<std::map<std::string, _Float32>>("param_float", param_float_);
+      config().blackboard->set<std::map<std::string, float>>("param_float", param_float_);
+
       return BT::NodeStatus::SUCCESS;
     }
 
@@ -96,8 +97,6 @@ BT::NodeStatus UpdateParamServiceClient::on_success()
       config().blackboard->set<std::map<std::string, int8_t>>("param_int", param_int_);
       return BT::NodeStatus::SUCCESS;
     }
-
-
 
 }
 } //namespace

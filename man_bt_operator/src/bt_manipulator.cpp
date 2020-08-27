@@ -1,3 +1,4 @@
+
 #include "man_bt_operator/bt_manipulator.hpp"
 
 namespace man_bt_operator
@@ -47,6 +48,15 @@ void BT_Manipulator::initialize()
       ros::shutdown();
 
     }
+
+    #ifdef ZMQ_FOUND
+      BT::PublisherZMQ publisher_zmq(tree_);
+    #endif
+
+    // This logger prints state changes on console
+    BT::StdCoutLogger logger_cout(tree_);
+    printTreeRecursively(tree_.rootNode());  
+
     bt_->run(&tree_);
     
 }
@@ -83,6 +93,7 @@ bool BT_Manipulator::loadBehaviorTree(const std::string & bt_xml_filename)
 
   // Create the Behavior Tree from the XML input
   tree_ = bt_->buildTreeFromText(xml_string, blackboard_);
+
   current_bt_xml_filename_ = bt_xml_filename;
 
   return true;
