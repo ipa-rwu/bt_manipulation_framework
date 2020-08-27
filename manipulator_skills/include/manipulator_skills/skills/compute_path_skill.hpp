@@ -36,8 +36,7 @@ private:
   // void setComputerPathState(MoveGroupState state);
 
   // std::unique_ptr<actionlib::SimpleActionServer<man_msgs::ComputePathSkillAction> > compute_path_action_server_;
-
-  ComputePathActionServer* as_;
+  std::unique_ptr<ComputePathActionServer> as_;
 
   moveit::planning_interface::MoveGroupInterface *move_group_;
 

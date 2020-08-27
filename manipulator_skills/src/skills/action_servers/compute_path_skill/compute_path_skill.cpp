@@ -9,9 +9,8 @@ ArmComputePathSkill::ArmComputePathSkill(std::string group_name) :
     ManipulatorSkill(COMPUTE_PATH_NAME),
     action_name_(COMPUTE_PATH_NAME),
     group_name_(group_name),
-    isCartesianPath_(false),
-    as_(NULL)
-  {
+    isCartesianPath_(false)
+    {
     // compute_path_action_server_ = new ComputePathActionServer(ros::NodeHandle(), COMPUTE_PATH_NAME, 
     // boost::bind(&ArmComputePathSkill::executeCB, this, _1), false);
 
@@ -21,8 +20,6 @@ ArmComputePathSkill::ArmComputePathSkill(std::string group_name) :
 
 ArmComputePathSkill::~ArmComputePathSkill()
 {
-    if(as_ != NULL)
-        delete as_;
     if(move_group_ != NULL)
     delete move_group_;
 }
@@ -32,9 +29,9 @@ void ArmComputePathSkill::initialize()
     move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
 
     // start the move action server
-    as_ = new ComputePathActionServer(root_node_handle_, COMPUTE_PATH_NAME, 
-    boost::bind(&ArmComputePathSkill::executeCB, this, _1), false);
-
+    as_.reset(new ComputePathActionServer(root_node_handle_, FIND_OBJECTS_NAME, 
+    boost::bind(&ArmComputePathSkill::executeCB, this, _1), false));
+    
     as_->start();
     ROS_INFO_STREAM_NAMED(getName(), "start action" );
 }
