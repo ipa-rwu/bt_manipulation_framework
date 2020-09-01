@@ -52,7 +52,7 @@ inline geometry_msgs::PoseStamped convertFromString(const StringView key)
   auto parts = BT::splitString(key, ';');
   if (parts.size() != 10) 
   {
-    throw std::runtime_error("invalid number of fields for orientation attribute)");
+    throw std::runtime_error("invalid number of fields for PoseStamped attribute)");
   } 
   else
   {
@@ -68,6 +68,29 @@ inline geometry_msgs::PoseStamped convertFromString(const StringView key)
     poseStamped.pose.orientation.z = convertFromString<double>(parts[8]);
     poseStamped.pose.orientation.w = convertFromString<double>(parts[9]);
     return poseStamped;
+  }    
+}
+
+
+template <> 
+inline geometry_msgs::Pose convertFromString(const StringView key)
+{
+  auto parts = BT::splitString(key, ';');
+  if (parts.size() != 7) 
+  {
+    throw std::runtime_error("invalid number of fields for Pose attribute)");
+  } 
+  else
+  {
+    geometry_msgs::Pose pose;
+    pose.position.x = convertFromString<double>(parts[0]);
+    pose.position.y = convertFromString<double>(parts[1]);
+    pose.position.z = convertFromString<double>(parts[2]);
+    pose.orientation.x = convertFromString<double>(parts[3]);
+    pose.orientation.y = convertFromString<double>(parts[4]);
+    pose.orientation.z = convertFromString<double>(parts[5]);
+    pose.orientation.w = convertFromString<double>(parts[6]);
+    return pose;
   }    
 }
 

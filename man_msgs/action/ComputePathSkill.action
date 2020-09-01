@@ -1,16 +1,24 @@
 #goal definition
-moveit_msgs/RobotState start_state
+int32 is_attached
+
+float32[] position_tolerances
+
+float32[] orientation_tolerances
+
+string end_effector
+
+string group_name
 
 string target_type
 
-geometry_msgs/Pose pose
-geometry_msgs/Pose current_pose
+
+geometry_msgs/PoseStamped goal
 
 # The name of the motion planner to use. If no name is specified,
 # a default motion planner will be used
 string planner_id
 
-string named_target
+string named_goal
 
 # The number of times this plan is to be computed. Shortest solution
 # will be reported.
@@ -32,15 +40,16 @@ float32 eef_step
 float32 jump_threshold
 ---
 #result definition
-moveit_msgs/RobotState trajectory_start
+man_msgs/Plan plan
+# moveit_msgs/RobotState trajectory_start
 
-# The group used for planning (usually the same as in the request)
-string group_name
+# # The group used for planning (usually the same as in the request)
+# string group_name
 
-# A solution trajectory, if found
-moveit_msgs/RobotTrajectory trajectory
+# # A solution trajectory, if found
+# moveit_msgs/RobotTrajectory trajectory
 
-# Planning time (seconds)
-float64 planning_time
+# # Planning time (seconds)
+# float64 planning_time
 ---
 #feedback

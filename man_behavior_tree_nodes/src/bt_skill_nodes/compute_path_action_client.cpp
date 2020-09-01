@@ -8,188 +8,87 @@ ComputePathActionClient::ComputePathActionClient(
   const std::string & action_name,
   const BT::NodeConfiguration & conf,
   float time_for_wait)
-: btActionClient<moveit_msgs::MoveGroupAction, 
-                  moveit_msgs::MoveGroupGoal>
+: btActionClient<man_msgs::ComputePathSkillAction,
+                  man_msgs::ComputePathSkillGoal,
+                  man_msgs::ComputePathSkillResultConstPtr>
                   (xml_tag_name, action_name, conf, time_for_wait)
 {
 }
 
-void ComputePathToPoseAction::on_tick()
+void ComputePathActionClient::on_tick()
 {
     // PoseStamped "goal"
     // moveit_msgs::MotionPlanRequest& request;
 
-    getInput("goal", posestamp_);
-    getInput("group_name", goal_.request.group_name);
-    getInput("replan_times", goal_.request.num_planning_attempts);
-    getInput("planner_id", goal_.request.planner_id);
-    getInput("workspace_parameters_", goal_.request.workspace_parameters);
-    getInput("allowed_planning_time_", goal_.request.allowed_planning_time);
-    getInput("max_acceleration_scaling_factor_", goal_.request.max_acceleration_scaling_factor);
-    getInput("max_velocity_scaling_factor", goal_.request.max_velocity_scaling_factor);
-    getInput("active_target", active_target_);
-    getInput("goal_joint_tolerance", goal_joint_tolerance_);
-    getInput("joint_model_group", joint_model_group_);
+    getInput("goal", goal_.goal);
+
+    config().blackboard->get<std::string>("group_name_arm", goal_.group_name);
+    config().blackboard->get<std::string>("end_effector", goal_.end_effector);
 
 
-    // Todo: get tolerances
-    std::vector<double> position_tolerances(3,0.01f);
-    std::vector<double> orientation_tolerances(3,0.01f);
+    
+    if(!getInput("target_type", goal_.target_type))
+       throw BT::RuntimeError("ComputePath Action missing required input [target_type]");
 
-    moveit_msgs::Constraints pose_goal = kinematic_constraints::constructGoalConstraints(cfg.WRIST_LINK_NAME,posestamp_, position_tolerances,
-                                         orientation_tolerances);
+    if(!getInput("goal_name", goal_.named_goal))
+      goal_.named_goal = named_goal_;
+        
+    if(!getInput("replan_times", goal_.num_planning_attempts))
+      goal_.num_planning_attempts = replan_times_;
 
-    if (!get("arm_state", goal.request.start_state))
-        request.start_state.is_diff = true;
-        ROS_INFO("No ARM State")
+    if(!getInput("planner_id", goal_.planner_id))
+      goal_.planner_id = planner_id_;
+    
+    if(!getInput("allowed_planning_time", goal_.allowed_planning_time))
+      goal_.allowed_planning_time = allowed_planning_time_;
+    
+    if(!getInput("max_acceleration_scaling_factor", goal_.max_acceleration_scaling_factor))
+      goal_.max_acceleration_scaling_factor = max_acceleration_scaling_factor_;
 
-    if (active_target_ == JOINT)
-    {
-      goal_.request.goal_constraints.resize(1);
-      goal_.request.goal_constraints[0] = kinematic_constraints::constructGoalConstraints(
-          getTargetRobotState(), joint_model_group_, goal_joint_tolerance_);
-    }
-    else if (active_target_ == POSE || active_target_ == POSITION || active_target_ == ORIENTATION)
-    {
-      // find out how many goals are specified
-      std::size_t goal_count = 0;
-      for (std::map<std::string, std::vector<geometry_msgs::PoseStamped> >::const_iterator it = pose_targets_.begin();
-           it != pose_targets_.end(); ++it)
-        goal_count = std::max(goal_count, it->second.size());
+    if(!getInput("max_velocity_scaling_factor", goal_.max_velocity_scaling_factor))
+      goal_.max_velocity_scaling_factor = max_velocity_scaling_factor_;
 
-      // start filling the goals;
-      // each end effector has a number of possible poses (K) as valid goals
-      // but there could be multiple end effectors specified, so we want each end effector
-      // to reach the goal that corresponds to the goals of the other end effectors
-      request.goal_constraints.resize(goal_count);
+    if(!getInput("eef_step", goal_.eef_step))
+      goal_.eef_step = eef_step_;
 
-      for (std::map<std::string, std::vector<geometry_msgs::PoseStamped> >::const_iterator it = pose_targets_.begin();
-           it != pose_targets_.end(); ++it)
-      {
-        for (std::size_t i = 0; i < it->second.size(); ++i)
-        {
-          moveit_msgs::Constraints c = kinematic_constraints::constructGoalConstraints(
-              it->first, it->second[i], goal_position_tolerance_, goal_orientation_tolerance_);
-          if (active_target_ == ORIENTATION)
-            c.position_constraints.clear();
-          if (active_target_ == POSITION)
-            c.orientation_constraints.clear();
-          request.goal_constraints[i] = kinematic_constraints::mergeConstraints(request.goal_constraints[i], c);
-        }
-      }
-    }
-    else
-      ROS_ERROR_NAMED("move_group_interface", "Unable to construct MotionPlanRequest representation");
+    if(!getInput("jump_threshold", goal_.jump_threshold))
+      goal_.jump_threshold = jump_threshold_;
+    
+    if(!getInput("position_tolerances", goal_.position_tolerances))
+      goal_.position_tolerances = position_tolerances_;
+    
+    if(!getInput("orientation_tolerances", goal_.orientation_tolerances))
+      goal_.orientation_tolerances = orientation_tolerances_;
 
-    if (path_constraints_)
-      request.path_constraints = *path_constraints_;
-    if (trajectory_constraints_)
-      request.trajectory_constraints = *trajectory_constraints_;
-  }
-    constructMotionPlanRequest(goal_.request)
+    if(!getInput("is_attached", goal_.is_attached))
+      goal_.is_attached = is_attached_;
+}
   
-
-  void constructMotionPlanRequest(moveit_msgs::MotionPlanRequest& request)
-  {
-
-    request.max_velocity_scaling_factor = max_velocity_scaling_factor_;
-    request.max_acceleration_scaling_factor = max_acceleration_scaling_factor_;
-    request.allowed_planning_time = allowed_planning_time_;
-
-    request.workspace_parameters = workspace_parameters_;
-
-    if (considered_start_state_)
-      robot_state::robotStateToRobotStateMsg(*considered_start_state_, request.start_state);
-    else
-      request.start_state.is_diff = true;
-
-    if (active_target_ == JOINT)
-    {
-      request.goal_constraints.resize(1);
-      request.goal_constraints[0] = kinematic_constraints::constructGoalConstraints(
-          getTargetRobotState(), joint_model_group_, goal_joint_tolerance_);
-    }
-    else if (active_target_ == POSE || active_target_ == POSITION || active_target_ == ORIENTATION)
-    {
-      // find out how many goals are specified
-      std::size_t goal_count = 0;
-      for (std::map<std::string, std::vector<geometry_msgs::PoseStamped> >::const_iterator it = pose_targets_.begin();
-           it != pose_targets_.end(); ++it)
-        goal_count = std::max(goal_count, it->second.size());
-
-      // start filling the goals;
-      // each end effector has a number of possible poses (K) as valid goals
-      // but there could be multiple end effectors specified, so we want each end effector
-      // to reach the goal that corresponds to the goals of the other end effectors
-      request.goal_constraints.resize(goal_count);
-
-      for (std::map<std::string, std::vector<geometry_msgs::PoseStamped> >::const_iterator it = pose_targets_.begin();
-           it != pose_targets_.end(); ++it)
-      {
-        for (std::size_t i = 0; i < it->second.size(); ++i)
-        {
-          moveit_msgs::Constraints c = kinematic_constraints::constructGoalConstraints(
-              it->first, it->second[i], goal_position_tolerance_, goal_orientation_tolerance_);
-          if (active_target_ == ORIENTATION)
-            c.position_constraints.clear();
-          if (active_target_ == POSITION)
-            c.orientation_constraints.clear();
-          request.goal_constraints[i] = kinematic_constraints::mergeConstraints(request.goal_constraints[i], c);
-        }
-      }
-    }
-    else
-      ROS_ERROR_NAMED("move_group_interface", "Unable to construct MotionPlanRequest representation");
-
-    if (path_constraints_)
-      request.path_constraints = *path_constraints_;
-    if (trajectory_constraints_)
-      request.trajectory_constraints = *trajectory_constraints_;
-  }
-
-
-  void constructGoal(moveit_msgs::PickupGoal& goal_out, const std::string& object)
-  {
-    moveit_msgs::PickupGoal goal;
-    goal.target_name = object;
-    goal.group_name = opt_.group_name_;
-    goal.end_effector = getEndEffector();
-    goal.allowed_planning_time = allowed_planning_time_;
-    goal.support_surface_name = support_surface_;
-    goal.planner_id = planner_id_;
-    if (!support_surface_.empty())
-      goal.allow_gripper_support_collision = true;
-
-    if (path_constraints_)
-      goal.path_constraints = *path_constraints_;
-
-    goal_out = goal;
-  }
-
-BT::NodeStatus ComputePathToPoseAction::on_success()
+BT::NodeStatus ComputePathActionClient::on_success()
 {
-  setOutput("path", result_.result->path);
+  setOutput("plan", result_->plan);
+  // setOutput("trajectory_start", result_.result->trajectory_start);
+  // setOutput("trajectory", result_.result->trajectory);
+  // setOutput("planning_time", result_.result->planning_time);
+  // setOutput("group_name", result_.result->group_name);
 
-  if (first_time_) {
-    first_time_ = false;
-  } else {
-    config().blackboard->set("path_updated", true);
-  }
   return BT::NodeStatus::SUCCESS;
 }
 
 }  // namespace nav2_behavior_tree
 
+
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
+  float time_for_wait = 20.0;
   BT::NodeBuilder builder =
-    [](const std::string & name, const BT::NodeConfiguration & config)
+    [&time_for_wait](const std::string & name, const BT::NodeConfiguration & config)
     {
-      return std::make_unique<nav2_behavior_tree::ComputePathToPoseAction>(
-        name, "compute_path_to_pose", config);
+      return std::make_unique<man_behavior_tree_nodes::ComputePathActionClient>(
+        name, "compute_path", config, time_for_wait);
     };
 
-  factory.registerBuilder<nav2_behavior_tree::ComputePathToPoseAction>(
-    "ComputePathToPose", builder);
+  factory.registerBuilder<man_behavior_tree_nodes::ComputePathActionClient>(
+    "ComputePath", builder);
 }
