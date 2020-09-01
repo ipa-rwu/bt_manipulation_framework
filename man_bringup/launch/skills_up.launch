@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 <!-- tf_static base_link to camera -->
-<include file="$(find man_bringup)/launch/tf_camera_to_base_link.launch">
+<include file="$(find man_bringup)/launch/tf_camera_to_world.launch">
 </include>
 
 <!-- dynamic_parameter -->
@@ -20,6 +20,15 @@
 </node>
 
 <node pkg="manipulator_skills" type="update_arm_goal_skill_server" name="update_arm_goal_skill_server_node" output="screen" required="true">
+</node>
+
+<node pkg="manipulator_skills" type="compute_path_skill_server" name="compute_path_skill_server_node" output="screen" required="true">
+</node>
+
+<node pkg="manipulator_skills" type="execute_trajectory_skill_server" name="execute_trajectory_skill_server_node" output="screen" required="true">
+</node>
+
+<node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
 </node>
 
 </launch>

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(manipulator_skills)
 
-add_compile_options(-std=c++11)
-set(CMAKE_CXX_STANDARD 11)
+add_compile_options(-std=c++14)
+set(CMAKE_CXX_STANDARD 14)
 
 set(dependencies
   roscpp
@@ -59,71 +59,67 @@ include_directories(
 #### add_library
 add_library(compute_path_skill SHARED
   src/skills/action_servers/compute_path_skill/compute_path_skill.cpp)
-
-add_library(find_objects_skill SHARED
-  src/skills/action_servers/find_objects_skill/find_objects.cpp)
-
-add_library(update_arm_state_skill SHARED
-  src/skills/service_server/update_arm_state_skill/update_arm_state.cpp)
-
-add_library(update_arm_goal_skill SHARED
-  src/skills/service_server/update_arm_goal_skill/update_arm_goal.cpp)
-
-add_library(update_param_skill SHARED
-  src/skills/service_server/update_param_skill/update_param.cpp)
-
 #### add_executable
-add_executable(find_objects_skill_server 
-  src/skills/action_servers/find_objects_skill/main.cpp)
-
 add_executable(compute_path_skill_server 
   src/skills/action_servers/compute_path_skill/main.cpp)
-
-add_executable(update_arm_state_skill_server 
-  src/skills/service_server/update_arm_state_skill/main.cpp)
-
-add_executable(update_arm_goal_skill_server 
-  src/skills/service_server/update_arm_goal_skill/main.cpp)
-
-add_executable(update_param_skill_server 
-  src/skills/service_server/update_param_skill/main.cpp)
-
-add_executable(test_compute_path_skill_node 
-  src/skills/test_compute_path.cpp)
-
 #### target_link_libraries
 target_link_libraries(compute_path_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(compute_path_skill_server compute_path_skill)
-
-target_link_libraries(find_objects_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(find_objects_skill_server find_objects_skill)
-
-target_link_libraries(update_arm_goal_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
-
-target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
-
-
-target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(update_param_skill_server update_param_skill)
-
-target_link_libraries(test_compute_path_skill_node compute_path_skill)
-
 #### add_dependencies
 add_dependencies(compute_path_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(compute_path_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
-add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+add_library(find_objects_skill SHARED
+  src/skills/action_servers/find_objects_skill/find_objects.cpp)
+add_executable(find_objects_skill_server 
+  src/skills/action_servers/find_objects_skill/main.cpp)
+target_link_libraries(find_objects_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(find_objects_skill_server find_objects_skill)
 add_dependencies(find_objects_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(find_objects_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+
+add_library(update_arm_state_skill SHARED
+  src/skills/service_server/update_arm_state_skill/update_arm_state.cpp)
+add_executable(update_arm_state_skill_server 
+  src/skills/service_server/update_arm_state_skill/main.cpp)
+target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
+
+
+add_library(update_arm_goal_skill SHARED
+  src/skills/service_server/update_arm_goal_skill/update_arm_goal.cpp)
+add_executable(update_arm_goal_skill_server 
+  src/skills/service_server/update_arm_goal_skill/main.cpp)
+target_link_libraries(update_arm_goal_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
+add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_library(execute_trajectory_skill SHARED
+  src/skills/action_servers/execute_trajectory_skill/execute_trajectory_skill.cpp)
+add_executable(execute_trajectory_skill_server 
+  src/skills/action_servers/execute_trajectory_skill/main.cpp)
+target_link_libraries(execute_trajectory_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(execute_trajectory_skill_server execute_trajectory_skill)
+add_dependencies(execute_trajectory_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(execute_trajectory_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_library(execute_gripper_trajectory_skill SHARED
+  src/skills/action_servers/execute_gripper_trajectory/execute_gripper_trajectory.cpp)
+add_executable(execute_gripper_trajectory_skill_server 
+  src/skills/action_servers/execute_gripper_trajectory/main.cpp)
+target_link_libraries(execute_gripper_trajectory_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(execute_gripper_trajectory_skill_server execute_gripper_trajectory_skill)
+add_dependencies(execute_gripper_trajectory_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(execute_gripper_trajectory_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
+
+
+add_executable(test_compute_path_skill_node 
+  src/skills/test_compute_path.cpp)
+target_link_libraries(test_compute_path_skill_node compute_path_skill)
 add_dependencies(test_compute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 

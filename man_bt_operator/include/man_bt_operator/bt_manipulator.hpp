@@ -62,11 +62,12 @@ protected:
 
     // get info from robot
     std::unique_ptr<robot_model_loader::RobotModelLoader> robot_model_loader_;
-    moveit::core::RobotModelPtr kinematic_model_;
-    moveit::core::RobotStatePtr kinematic_state_;
+    moveit::core::RobotModelPtr robot_model_;
+    moveit::core::RobotStatePtr robot_state_;
     std::string base_frame_;
     std::string group_name_gripper_;
     std::string group_name_arm_;
+    std::string end_effector_name_;
 };
 
 
