@@ -1,8 +1,8 @@
 #goal
 int32 marker_id
 string frame_id
-geometry_msgs/PoseStamped container_a
-geometry_msgs/PoseStamped container_b
+geometry_msgs/Pose container_a
+geometry_msgs/Pose container_b
 ---
 #result
 geometry_msgs/PoseStamped marker_pose

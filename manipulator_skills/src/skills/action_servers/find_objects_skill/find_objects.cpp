@@ -53,24 +53,26 @@ void FindObjectsSkill::executeCB(const man_msgs::FindObjectsGoalConstPtr& goal)
     if(getPose(goal, marker_posestamped_))
     {
       ROS_INFO_STREAM_NAMED(getName(), "[goal] marker_id: "<< goal->marker_id);
-      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_a.pose: "<< goal->container_a.pose);
-      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_b.pose: "<< goal->container_b.pose);
+      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_a.pose: "<< goal->container_a);
+      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_b.pose: "<< goal->container_b);
 
       ROS_INFO_STREAM_NAMED(getName(), "[response] marker_pose: "<< marker_posestamped_.pose);
       // get container pose
       // assume frame_id = /camera
       // true: am >bm
-      if(ComparePose(marker_posestamped_.pose, goal->container_a.pose, goal->container_b.pose))
+      if(ComparePose(marker_posestamped_.pose, goal->container_a, goal->container_b))
       {
-        action_res_.container_pose = goal->container_a;
+        action_res_.container_pose.pose = goal->container_a;
       }
       else
       {
-        action_res_.container_pose = goal->container_b;
+        action_res_.container_pose.pose = goal->container_b;
       }
       ROS_INFO_STREAM_NAMED(getName(), "[response] container_pose: "<< action_res_.container_pose);
       action_res_.marker_pose = marker_posestamped_;
       action_res_.marker_pose.header.frame_id = goal->frame_id;
+
+      action_res_.container_pose.header.frame_id = goal->frame_id;
       const std::string response = "SUCCESS";
       as_->setSucceeded(action_res_, response);
     }

@@ -55,12 +55,14 @@ void BT_Manipulator::initialize()
     // Put items on the blackboard
     blackboard_->set<std::map<std::string, float>>("param_float", param_float_);  // NOLINT
     blackboard_->set<std::map<std::string, int8_t>>("param_int", param_int_);
-    blackboard_->set<std::map<std::string, std::string>>("param_float", param_string_);
-    blackboard_->set<std::map<std::string, bool>>("param_float", param_bool_);
+    blackboard_->set<std::map<std::string, std::string>>("param_string", param_string_);
+    blackboard_->set<std::map<std::string, bool>>("param_bool", param_bool_);
 
-    blackboard_->set<std::string>("arm_group_name", group_name_arm_);
-    blackboard_->set<std::string>("gripper_group_name", group_name_gripper_);
+    blackboard_->set<std::string>("group_name_arm", group_name_arm_);
+    blackboard_->set<std::string>("group_name_gripper", group_name_gripper_);
     blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
+    blackboard_->set<std::string>("end_effector", end_effector_name_);
+
     // shouldn't share state in heap
     // blackboard_->set<moveit::core::RobotStatePtr>("kinematic_state", kinematic_state_);
     
@@ -88,14 +90,13 @@ void BT_Manipulator::initialize_robot()
 {
   // get infomation from robot
     robot_model_loader_ = std::make_unique<robot_model_loader::RobotModelLoader>("robot_description");
-    kinematic_model_ = robot_model_loader_->getModel();
-    base_frame_ = kinematic_model_->getModelFrame();
+    robot_model_ = robot_model_loader_->getModel();
+    base_frame_ = robot_model_->getModelFrame();
     ROS_INFO_NAMED("BT_Manipulator", "[BT_Manipulator] Model frame: %s", base_frame_.c_str());  
 
-    kinematic_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
-    
-    // const moveit::core::JointModelGroup* joint_model_group = kinematic_model_->getJointModelGroup("manipulator");
-
+    robot_state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
+    const moveit::core::JointModelGroup* joint_model_group = robot_model_->getJointModelGroup(group_name_arm_);
+    end_effector_name_ = joint_model_group->getLinkModelNames().back();
     // const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
     // std::vector<double> joint_values;
