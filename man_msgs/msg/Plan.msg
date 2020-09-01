@@ -1,0 +1,3 @@
+moveit_msgs/RobotState start_state
+moveit_msgs/RobotTrajectory trajectory
+float32 planning_time
