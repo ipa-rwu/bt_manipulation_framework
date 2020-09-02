@@ -25,6 +25,7 @@ set(SRV_FILES
 UpdateArmState.srv
 UpdateArmGoal.srv
 UpdateParam.srv
+Help.srv
 )
 
 set(ACT_FILES
