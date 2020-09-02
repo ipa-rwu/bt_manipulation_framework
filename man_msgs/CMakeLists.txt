@@ -26,6 +26,7 @@ UpdateArmState.srv
 UpdateArmGoal.srv
 UpdateParam.srv
 Help.srv
+SetFlagTask.srv
 )
 
 set(ACT_FILES

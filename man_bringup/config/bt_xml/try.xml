@@ -4,7 +4,8 @@
         <Sequence name="root_sequence">
             <UpdateParameter service_name="update_param" topic="/arm_param_server" data_type="double"/>
             <UpdateParameter service_name="update_param" topic="/gripper_param_server" data_type="string"/>
-
+            <UpdateParameter service_name="update_param" topic="/flag_param_server" data_type="bool"/>
+            <SetFlagTask param_topic="flag_param_server" task_name="FPlaced" success="true"/>       
             <FindObjects container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" marker_id="2" frame_id="world" marker="{marker}" container="{container}"/>
             <ComputePath goal_name="home" target_type="Name" replan_times="3" plan="{plan}"/>
             <ExecuteGripperTrajectory action_name="open" result="{gripper_exection_result}"/>
@@ -17,7 +18,7 @@
             <ComputePath goal="{arm_goal}" target_type="Cartesian" planner_id ="RRTConnectkConfigDefault" replan_times="3" plan="{plan}"/>
             <ExecuteTrajectory plan="{plan}" result="{exection_result}"/>
             <ExecuteGripperTrajectory step="T2S2gripper" result="{gripper_exection_result}"/>
-
+            <SetFlagTask param_topic="flag_param_server" task_name="FPicked" success="true"/>
         </Sequence>
      </BehaviorTree>
 

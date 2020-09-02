@@ -100,6 +100,25 @@ target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
 add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_library(update_param_skill SHARED
+  src/skills/service_server/update_param_skill/update_param.cpp)
+add_executable(update_param_skill_server 
+  src/skills/service_server/update_param_skill/main.cpp)
+target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_param_skill_server update_param_skill)
+add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})#
+
+add_library(set_flag_for_task SHARED
+  src/skills/service_server/set_flag_for_task/set_flag_for_task.cpp)
+add_executable(set_flag_for_task_server 
+  src/skills/service_server/set_flag_for_task/main.cpp)
+target_link_libraries(set_flag_for_task ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(set_flag_for_task_server set_flag_for_task)
+add_dependencies(set_flag_for_task ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(set_flag_for_task_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
 add_library(execute_trajectory_skill SHARED
   src/skills/action_servers/execute_trajectory_skill/execute_trajectory_skill.cpp)
 add_executable(execute_trajectory_skill_server 
