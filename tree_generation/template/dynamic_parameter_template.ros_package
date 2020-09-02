@@ -1,0 +1,5 @@
+<package author="RWU" author_email="rwu@ipa.fraunhofer.de" description="arm_parameter_server" license="todo" name="arm_parameter_server" copyright="todo" template="python_node_update" package_name="arm_parameter_server">
+  <component frequency="1" name="first_try">
+  </component>
+  <depend>rospy</depend>
+</package>

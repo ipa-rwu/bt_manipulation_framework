@@ -1,0 +1,6 @@
+man_update_param_service_client_node, 
+                    man_find_objects_action_client_node,
+                    man_update_goal_for_arm_service_client_node,
+                    man_compute_path_action_client_node,
+                    man_execute_trajectory_action_client_node,
+                    man_execute_gripper_trajectory_action_client_node

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Sequence name="root_sequence">
+            <Action ID="UpdateParameter" data_type="double" service_name="update_param" topic="/arm_param_server"/>
+            <Action ID="UpdateParameter" data_type="string" service_name="update_param" topic="/gripper_param_server"/>
+            <Action ID="FindObjects" container="{container}" container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" frame_id="world" marker="{marker}" marker_id="2"/>
+            <Action ID="ComputePath" goal="" goal_name="home" plan="{plan}" replan_times="3" target_type="Name"/>
+            <Action ID="ExecuteGripperTrajectory" action_name="open" result="{gripper_exection_result}" step=""/>
+            <Action ID="ExecuteTrajectory" plan="{plan}" result="{exection_result}"/>
+            <Action ID="UpdateGoalForArm" goal="{arm_goal}" goal_frame_id="world" service_name="update_arm_goal" step="T2S1arm" target="{container}"/>
+            <Action ID="ComputePath" goal="{arm_goal}" goal_name="" plan="{plan}" replan_times="3" target_type="Pose"/>
+            <Action ID="ExecuteTrajectory" plan="{plan}" result="{exection_result}"/>
+            <Action ID="ExecuteGripperTrajectory" action_name="" result="{gripper_exection_result}" step="T2S1gripper"/>
+            <Action ID="UpdateGoalForArm" goal="{arm_goal}" goal_frame_id="world" service_name="update_arm_goal" step="T2S2arm" target="{container}"/>
+            <Action ID="ComputePath" goal="{arm_goal}" goal_name="" plan="{plan}" replan_times="3" target_type="Cartesian"/>
+            <Action ID="ExecuteTrajectory" plan="{plan}" result="{exection_result}"/>
+            <Action ID="ExecuteGripperTrajectory" action_name="" result="{gripper_exection_result}" step="T2S2gripper"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="ComputePath">
+            <input_port name="goal"/>
+            <inout_port name="goal_name"/>
+            <inout_port name="plan"/>
+            <inout_port name="replan_times"/>
+            <inout_port name="target_type"/>
+        </Action>
+        <Action ID="ExecuteGripperTrajectory">
+            <inout_port name="action_name"/>
+            <inout_port name="result"/>
+            <input_port name="step"/>
+        </Action>
+        <Action ID="ExecuteTrajectory">
+            <inout_port name="plan"/>
+            <inout_port name="result"/>
+        </Action>
+        <Action ID="FindObjects">
+            <inout_port name="container"/>
+            <inout_port name="container_A"/>
+            <inout_port name="container_B"/>
+            <inout_port name="frame_id"/>
+            <inout_port name="marker"/>
+            <inout_port name="marker_id"/>
+        </Action>
+        <Action ID="UpdateGoalForArm">
+            <inout_port name="goal"/>
+            <inout_port name="goal_frame_id"/>
+            <inout_port name="service_name"/>
+            <inout_port name="step"/>
+            <inout_port name="target"/>
+        </Action>
+        <Action ID="UpdateParameter">
+            <inout_port name="data_type"/>
+            <inout_port name="service_name"/>
+            <inout_port name="topic"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

@@ -1,0 +1,62 @@
+job:
+  task1:
+    name: detect
+    steps: 
+      step1:
+        1:
+          objetc: camera:
+          marker_id: 1
+  task2:
+    name: pick
+    steps:
+      step1:
+        1: 
+          object: arm
+          action: move
+          location: marker + 0.3
+        2: 
+          object: gripper
+          action: open
+      step2:
+        1: 
+          object: arm
+          action: move
+          location: marker
+        2: 
+          object: gripper
+          action: close
+      Step3:
+        1: 
+          object: arm
+          action: move
+          location: marker + 0.4
+        2: 
+          object: gripper
+          action: close
+  task3:
+    name: place
+    steps:
+      step1:
+        1: 
+          object: arm
+          action: move
+          location: container + 0.2
+        2: 
+          object: gripper
+          action: close
+      step2:
+        1: 
+          object: arm
+          action: move
+          location: container
+        2: 
+          object: gripper
+          action: open
+      Step3:
+        1: 
+          object: arm
+          action: move
+          location: container + 0.4
+        2: 
+          object: gripper
+          action: open
