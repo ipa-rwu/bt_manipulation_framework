@@ -31,4 +31,7 @@
 <node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
 </node>
 
+<node pkg="manipulator_skills" type="set_flag_for_task_server" name="set_flag_for_task_server_node" output="screen" required="true">
+</node>
+
 </launch>

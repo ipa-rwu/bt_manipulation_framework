@@ -5,6 +5,7 @@ add_compile_options(-std=c++14)
 set(CMAKE_CXX_STANDARD 14)
 
 set(dependencies
+  rospy
   roscpp
   geometry_msgs
   std_msgs
@@ -36,6 +37,9 @@ catkin_package(
    CATKIN_DEPENDS ${dependencies}
    DEPENDS system_lib
 )
+
+catkin_python_setup()
+
 
 
 include_directories(
@@ -96,6 +100,25 @@ target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
 add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_library(update_param_skill SHARED
+  src/skills/service_server/update_param_skill/update_param.cpp)
+add_executable(update_param_skill_server 
+  src/skills/service_server/update_param_skill/main.cpp)
+target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(update_param_skill_server update_param_skill)
+add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})#
+
+add_library(set_flag_for_task SHARED
+  src/skills/service_server/set_flag_for_task/set_flag_for_task.cpp)
+add_executable(set_flag_for_task_server 
+  src/skills/service_server/set_flag_for_task/main.cpp)
+target_link_libraries(set_flag_for_task ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(set_flag_for_task_server set_flag_for_task)
+add_dependencies(set_flag_for_task ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(set_flag_for_task_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
 add_library(execute_trajectory_skill SHARED
   src/skills/action_servers/execute_trajectory_skill/execute_trajectory_skill.cpp)
 add_executable(execute_trajectory_skill_server 
@@ -138,51 +161,14 @@ install(DIRECTORY include/${PROJECT_NAME}/
  )
 
 
-
-
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/manipulator_skills.cpp
-# )
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-## With catkin_make all packages are built within a single CMake context
-## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/manipulator_skills_node.cpp)
-
-## Rename C++ executable without prefix
-## The above recommended prefix causes long target names, the following renames the
-## target back to the shorter version for ease of user use
-## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
-
 #############
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+catkin_install_python(PROGRAMS 
+                      scripts/service_server/help_extern_server/help
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html

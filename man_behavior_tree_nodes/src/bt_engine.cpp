@@ -33,8 +33,8 @@ BtStatus BT_Engine::run(
   BT::NodeStatus result = BT::NodeStatus::RUNNING;
   ros::Rate r(1);
   // Loop until something happens with ROS or the node completes
-  while (ros::ok()) 
-  // while (ros::ok()&& result == BT::NodeStatus::RUNNING) 
+  //  while (ros::ok()) 
+ while (ros::ok()&& result == BT::NodeStatus::RUNNING) 
   {
     // if (cancelRequested()) {
     //   tree->rootNode()->halt();
