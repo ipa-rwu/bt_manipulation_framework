@@ -61,6 +61,11 @@ add_dependencies(man_set_flag_task_condition_node ${${PROJECT_NAME}_EXPORTED_TAR
 target_link_libraries( man_set_flag_task_condition_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(man_set_flag_task_condition_node  PRIVATE BT_PLUGIN_EXPORT)
 
+add_library(man_check_task_result_condition_node SHARED src/bt_skill_nodes/condition/check_task_result.cpp)
+list(APPEND plugin_libs man_check_task_result_condition_node)
+add_dependencies(man_check_task_result_condition_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( man_check_task_result_condition_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(man_check_task_result_condition_node  PRIVATE BT_PLUGIN_EXPORT)
 
 add_library(man_find_objects_action_client_node SHARED src/bt_skill_nodes/find_objects_action_client.cpp)
 list(APPEND plugin_libs man_find_objects_action_client_node)
