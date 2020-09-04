@@ -68,6 +68,8 @@ protected:
     std::string group_name_gripper_;
     std::string group_name_arm_;
     std::string end_effector_name_;
+
+    bool first_time_{true};
 };
 
 

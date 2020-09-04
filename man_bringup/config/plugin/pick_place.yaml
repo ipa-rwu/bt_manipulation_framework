@@ -4,5 +4,9 @@ plugin_lib_names: [man_update_param_service_client_node,
                     man_compute_path_action_client_node,
                     man_execute_trajectory_action_client_node,
                     man_execute_gripper_trajectory_action_client_node,
-                    man_set_flag_task_condition_node]
-bt_xml_file_name: /home/rachel/kogrob/manbt_ws/src/manipulator_bt/man_bringup/config/bt_xml/try.xml
+                    man_set_flag_task_condition_node,
+                    man_check_task_result_condition_node,
+                    man_call_extern_help_service_client_node]
+bt_xml_file_name: /home/rachel/kogrob/manbt_ws/src/manipulator_bt/tree_generation/try/1.xml
+    # /home/rachel/kogrob/manbt_ws/src/manipulator_bt/tree_generation/try/1.xml
+    #/home/rachel/kogrob/manbt_ws/src/manipulator_bt/man_bringup/config/bt_xml/try.xml

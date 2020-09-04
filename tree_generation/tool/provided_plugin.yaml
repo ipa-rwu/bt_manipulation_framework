@@ -7,6 +7,7 @@ plugin_lib:
     - man_execute_gripper_trajectory_action_client_node
     - man_set_flag_task_condition_node
     - man_check_task_result_condition_node
+    - man_call_extern_help_service_client_node
 
 man_update_param_service_client_node:
     name: UpdateParameter
@@ -72,3 +73,6 @@ man_check_task_result_condition_node:
     name: CheckTaskResult
     input:
         task_name:
+
+man_call_extern_help_service_client_node:
+    name: CallExternHelp

@@ -44,14 +44,16 @@ public:
   void initialize()
   {
     getInput("task_name", task_name_);
+    config().blackboard->get<bool>("first_time", first_time_);
+    param_bool_.clear();
+    config().blackboard->get<std::map<std::string, bool>>("param_bool", param_bool_);
     initialized_ = true;
   }
 
   bool isTaskSuccess()
   {
-    param_bool_.clear();
-    config().blackboard->get<std::map<std::string, bool>>("param_bool", param_bool_);
-
+    if(first_time_)
+      return false;
     if (param_bool_.at(task_name_))
         return true;
     else
@@ -75,6 +77,7 @@ private:
   std::map<std::string, bool> param_bool_;
   std::string task_name_;
   bool initialized_;
+  bool first_time_;
 };
 
 }   //namespace

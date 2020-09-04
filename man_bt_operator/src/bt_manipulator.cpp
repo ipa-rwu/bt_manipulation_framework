@@ -62,6 +62,7 @@ void BT_Manipulator::initialize()
     blackboard_->set<std::string>("group_name_gripper", group_name_gripper_);
     blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
     blackboard_->set<std::string>("end_effector", end_effector_name_);
+    blackboard_->set<bool>("first_time", first_time_);
 
     // shouldn't share state in heap
     // blackboard_->set<moveit::core::RobotStatePtr>("kinematic_state", kinematic_state_);

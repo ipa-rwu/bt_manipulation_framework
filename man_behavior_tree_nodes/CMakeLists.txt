@@ -43,6 +43,7 @@ add_library(${library_name} src/bt_engine.cpp)
 add_dependencies(${library_name} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries( ${library_name}   ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+#### Service Client####
 add_library(man_update_param_service_client_node SHARED src/bt_skill_nodes/update_param_service_client.cpp)
 list(APPEND plugin_libs man_update_param_service_client_node)
 add_dependencies(man_update_param_service_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -55,6 +56,21 @@ add_dependencies(man_set_flag_task_service_client_node ${${PROJECT_NAME}_EXPORTE
 target_link_libraries( man_set_flag_task_service_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(man_set_flag_task_service_client_node  PRIVATE BT_PLUGIN_EXPORT)
 
+add_library(man_update_goal_for_arm_service_client_node SHARED src/bt_skill_nodes/update_arm_goal_service_client.cpp)
+list(APPEND plugin_libs man_update_goal_for_arm_service_client_node)
+add_dependencies(man_update_goal_for_arm_service_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( man_update_goal_for_arm_service_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(man_update_goal_for_arm_service_client_node  PRIVATE BT_PLUGIN_EXPORT)
+
+
+add_library(man_call_extern_help_service_client_node SHARED src/bt_skill_nodes/call_extern_help_service_client.cpp)
+list(APPEND plugin_libs man_call_extern_help_service_client_node)
+add_dependencies(man_call_extern_help_service_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( man_call_extern_help_service_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(man_call_extern_help_service_client_node  PRIVATE BT_PLUGIN_EXPORT)
+
+
+#### Condition ####
 add_library(man_set_flag_task_condition_node SHARED src/bt_skill_nodes/condition/set_flag_task_condition.cpp)
 list(APPEND plugin_libs man_set_flag_task_condition_node)
 add_dependencies(man_set_flag_task_condition_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -67,18 +83,8 @@ add_dependencies(man_check_task_result_condition_node ${${PROJECT_NAME}_EXPORTED
 target_link_libraries( man_check_task_result_condition_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(man_check_task_result_condition_node  PRIVATE BT_PLUGIN_EXPORT)
 
-add_library(man_find_objects_action_client_node SHARED src/bt_skill_nodes/find_objects_action_client.cpp)
-list(APPEND plugin_libs man_find_objects_action_client_node)
-add_dependencies(man_find_objects_action_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries( man_find_objects_action_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_compile_definitions(man_find_objects_action_client_node  PRIVATE BT_PLUGIN_EXPORT)
 
-add_library(man_update_goal_for_arm_service_client_node SHARED src/bt_skill_nodes/update_arm_goal_service_client.cpp)
-list(APPEND plugin_libs man_update_goal_for_arm_service_client_node)
-add_dependencies(man_update_goal_for_arm_service_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries( man_update_goal_for_arm_service_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_compile_definitions(man_update_goal_for_arm_service_client_node  PRIVATE BT_PLUGIN_EXPORT)
-
+#### Action Client####
 add_library(man_compute_path_action_client_node SHARED src/bt_skill_nodes/compute_path_action_client.cpp)
 list(APPEND plugin_libs man_compute_path_action_client_node)
 add_dependencies(man_compute_path_action_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -90,6 +96,12 @@ list(APPEND plugin_libs man_execute_trajectory_action_client_node)
 add_dependencies(man_execute_trajectory_action_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries( man_execute_trajectory_action_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(man_execute_trajectory_action_client_node  PRIVATE BT_PLUGIN_EXPORT)
+
+add_library(man_find_objects_action_client_node SHARED src/bt_skill_nodes/find_objects_action_client.cpp)
+list(APPEND plugin_libs man_find_objects_action_client_node)
+add_dependencies(man_find_objects_action_client_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries( man_find_objects_action_client_node PRIVATE ${BEHAVIOR_TREE_LIBRARY}  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(man_find_objects_action_client_node  PRIVATE BT_PLUGIN_EXPORT)
 
 
 add_library(man_execute_gripper_trajectory_action_client_node SHARED src/bt_skill_nodes/execute_gripper_trajectory_action_client.cpp)

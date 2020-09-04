@@ -1,0 +1,30 @@
+task:
+  name: pick
+  steps:
+    step1:
+      1: 
+        object: arm
+        action: move
+        base: marker
+        param: 0.3
+      2: 
+        object: gripper
+        action: open
+    step2:
+      1: 
+        object: arm
+        action: move
+        base: marker
+        param: -0.01
+      2: 
+        object: gripper
+        action: close
+    step3:
+      1: 
+        object: arm
+        action: move
+        base: marker
+        param: 0.4
+      2: 
+        object: gripper
+        action: close
