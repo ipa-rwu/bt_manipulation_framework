@@ -24,7 +24,8 @@
                 <SubTree ID="Initialization" __shared_blackboard="true"/>
             </Fallback>
             <Fallback name="Task1">
-                <Action ID="CheckTaskResult" task_name="FPick"/>
+                <SetBlackboard name="setTaskName" output_key="task_name" value="task2pick"/>
+                <Action ID="CheckTaskResult" task_name="{task_name}"/>
                 <SubTree ID="T1Detect" __shared_blackboard="true"/>
                 <SubTree ID="NeedHelp" __shared_blackboard="true"/>
             </Fallback>
@@ -52,7 +53,7 @@
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="T2Pick">
-        <Sequence name="T2Steps">
+        <Sequence name="T2Steps">       
             <Sequence name="T2Step1">
                 <Action ID="UpdateGoalForArm" step="T2S1arm" goal_frame_id="world" target="{container}" goal="{arm_goal}"/>
                 <Action ID="ComputePath" goal_name="" plan="" replan_times="" target_type=""/>

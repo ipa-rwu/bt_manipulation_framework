@@ -20,6 +20,13 @@ class Create_BT_Module():
         return (False, None)
 
 # Todo: auto generate code according to plugin
+    # <SetBlackboard name="setTaskName" output_key="task_name" value="task2pick"/>
+    def set_balkboard_module(self, name, output_key, value):
+        attrib = {"name": name, "output_key": output_key, "value": value}
+        tag = "SetBlackboard"
+        return tag, attrib
+
+
     # <Condition ID="CheckTaskResult" task_name="FHelp"/>
     def check_result_module(self, task_name):    
         data_loaded = self.plugin_data_loaded
@@ -33,10 +40,24 @@ class Create_BT_Module():
       
         tag = "Condition"
         return tag, attrib
-    
 
+        # <Condition ID="SetFlagTask" success="true" task_name=""/>
+    def set_flag_condition_module(self, task_name, issuccess):    
+        data_loaded = self.plugin_data_loaded
+        (result, plugin_name) = self.find_plugin(["Set", "Flag"])
+        if result:
+            plugin_info = data_loaded[plugin_name]
+        else:
+            return False
+        
+        attrib = {"ID": plugin_info["name"], "task_name": task_name, "success": issuccess}
+      
+        tag = "Condition"
+        return tag, attrib
+    
+    
     # <UpdateParameter service_name="update_param" topic="/arm_param_server" data_type="double"/>
-    def parameter_module(self, topic, data_type, service_name):
+    def update_parameter_module(self, topic, data_type, service_name):
         data_loaded = self.plugin_data_loaded
         (result, plugin_name) = self.find_plugin(["Update", "Parameter"])
         if result:
@@ -53,7 +74,7 @@ class Create_BT_Module():
         return tag, attrib
 
     # <UpdateGoalForArm service_name="update_arm_goal" step="T2S1arm" goal_frame_id="world" based_target="{container}" goal="{arm_goal}"/>
-    def goal_module_arm(self, step, goal_frame_id, based_target, goal):
+    def update_goal_arm_module(self, step, goal_frame_id, based_on_pose, goal, service_name = None):
         data_loaded = self.plugin_data_loaded
         result, plugin_name = self.find_plugin(["Goal", "Arm"])
         if result:
@@ -62,22 +83,64 @@ class Create_BT_Module():
             return False
 
         if service_name == None:
-            attrib = {"step": step, "goal_frame_id": goal_frame_id, "based_target": based_target, "goal": goal}
+            attrib = {"step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
         else:
-            attrib = {'service_name': service_name , "step": step, "goal_frame_id": goal_frame_id, "based_target": based_target, "goal": goal}
-            tag = plugin_info["name"]
-        print(tag, attrib)
+            attrib = {'service_name': service_name , "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
+        
+        tag = plugin_info["name"]
+        #print(tag, attrib)
         return tag, attrib
 
-    def arm_module(self, action):
-        if action == "move":
-            #  create compute path module
-            # <ComputePath goal_name="home" target_type="Name" replan_times="3" plan="{plan}"/>
-            # <ComputePath goal="{arm_goal}" target_type="Pose" replan_times="3" plan="{plan}"/>
-            (result, plugin_name) = self.find_plugin(["Compute", "Arm"])
-            if result:
-                print(plugin_name)
+    # for arm 
+    # <Action ID="ExecuteTrajectoryArm" plan="" result=""/>
+    # <Action ID="ExecuteTrajectoryArm" plan=""/>
+    def execute_trajectory_arm_module(self, plan, issuccessed = None):
+        data_loaded = self.plugin_data_loaded
+        result, plugin_name = self.find_plugin(["Execute", "Arm"])
+        if result:
+            plugin_info = data_loaded[plugin_name]
+        else:
+            return False
 
+        if issuccessed == None:
+            attrib = {"plan": plan}
+        else:
+            attrib = {"result": issuccessed}
+        
+        tag = plugin_info["name"]
+        #print(tag, attrib)
+        return tag, attrib
+    
+    # for gripper
+    # <Action ID="ExecuteGripperTrajectory" action_name="" result="" step=""/>
+    def execute_trajectory_gripper_module(self, action_name = None, step = None, issuccessed = None):
+        data_loaded = self.plugin_data_loaded
+        result, plugin_name = self.find_plugin(["Execute", "gripper"])
+        if result:
+            plugin_info = data_loaded[plugin_name]
+        else:
+            return False
+
+        if issuccessed == None:
+            if step == None:
+                attrib = {"action_name": action_name}
+            else:
+                attrib = {"step": step}
+        else:
+            if step == None:
+                attrib = {"action_name": action_name, "result": issuccessed}
+            else:
+                attrib = {"step": step, "result": issuccessed}
+        
+        tag = plugin_info["name"]
+        #print(tag, attrib)
+        return tag, attrib
+
+    # <Action ID="FindObjects" container="{container}" 
+    #container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" 
+    #container_B="0.35;0.55;0.78;0;0.707;0;0.707" 
+    #frame_id="world" marker="{marker}" marker_id="2"/>
+    def find_object(self):
 
     def create_execution_module(self, single_step):
         for step_tuple in single_step:
@@ -95,6 +158,7 @@ class Create_BT_Module():
                 attrib[key] = value
         tag = "SubTree"
         return tag, attrib
+
 
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
