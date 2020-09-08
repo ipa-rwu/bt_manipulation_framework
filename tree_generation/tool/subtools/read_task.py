@@ -41,11 +41,18 @@ class GetTaskInfo():
         return tasks
     
     def get_task_name(self, tasks):
-        task_names = []
+        # task_names = []
+        
+        # for task_tuple in tasks:
+        #     task_names.append((task_tuple[0],task_tuple[1]["name"]))
+        # #print(task_names)
+        # return task_names
+        
+        task_names = {}
         
         for task_tuple in tasks:
-            task_names.append((task_tuple[0],task_tuple[1]["name"]))
-        #print(task_names)
+            task_names[task_tuple[0]] = task_tuple[1]["name"]
+        print("!!!", task_names)
         return task_names
 
 
@@ -81,10 +88,11 @@ class GetTaskInfo():
         if flag_task == 1:
             for task_tuple in tasks:
                 task_names.append((task_tuple[0],task_tuple[1]["name"]))
-                for title in task_tuple[1]["steps"]:
+                for title in sorted(task_tuple[1]["steps"]):
+                    #print(title)
                     single_step.append((task_tuple[0], title, task_tuple[1]["steps"][title]))
                     #print(single_step)
-        #print(single_step)
+        print("????", single_step)
         return single_step
 
 
@@ -98,9 +106,10 @@ if __name__ == "__main__":
     read_task = GetTaskInfo()
 
     job_spec = read_task.load_task_specification(task_file)
-    read_task.get_single_step(job_spec)
-   # tasks = read_task.get_tasks(job_spec)
-   # task_names = read_task.get_task_name(tasks)
+    steps = read_task.get_single_step(job_spec)
+    print(steps)
+    tasks = read_task.get_tasks(job_spec)
+    task_names = read_task.get_task_name(tasks)
 
     task_spec = read_task.load_task_specification(
         "/home/rachel/kogrob/manbt_ws/src/manipulator_bt/tree_generation/examples/pick_and_place/application_specification/task.yaml")

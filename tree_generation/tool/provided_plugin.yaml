@@ -48,14 +48,14 @@ man_compute_path_action_client_node:
         plan:
 
 man_execute_trajectory_action_client_node:
-    name: ExecuteTrajectory
+    name: ExecuteTrajectoryArm
     input:
         plan:
     output:
         result:
 
 man_execute_gripper_trajectory_action_client_node:
-    name: ExecuteGripperTrajectory
+    name: ExecuteTrajectoryGripper
     input:
         step:
     output:

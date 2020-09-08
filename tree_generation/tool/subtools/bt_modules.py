@@ -42,7 +42,7 @@ class Create_BT_Module():
         return tag, attrib
 
         # <Condition ID="SetFlagTask" success="true" task_name=""/>
-    def set_flag_condition_module(self, task_name, issuccess):    
+    def set_flag_condition_module(self, task_name, is_succeeded):    
         data_loaded = self.plugin_data_loaded
         (result, plugin_name) = self.find_plugin(["Set", "Flag"])
         if result:
@@ -50,7 +50,7 @@ class Create_BT_Module():
         else:
             return False
         
-        attrib = {"ID": plugin_info["name"], "task_name": task_name, "success": issuccess}
+        attrib = {"ID": plugin_info["name"], "task_name": task_name, "success": is_succeeded}
       
         tag = "Condition"
         return tag, attrib
@@ -66,10 +66,10 @@ class Create_BT_Module():
             return False
         
         if service_name == None:
-            attrib = {"topic": topic, "data_type": data_type}
+            attrib = {"ID": plugin_info["name"], "topic": topic, "data_type": data_type}
         else:
-            attrib = {'service_name': service_name , "topic": topic, "data_type": data_type}
-        tag = plugin_info["name"]
+            attrib = {"ID": plugin_info["name"], 'service_name': service_name , "topic": topic, "data_type": data_type}
+        tag = "Action"
         print(tag, attrib)
         return tag, attrib
 
@@ -83,18 +83,32 @@ class Create_BT_Module():
             return False
 
         if service_name == None:
-            attrib = {"step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
+            attrib = {"ID": plugin_info["name"], "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
         else:
-            attrib = {'service_name': service_name , "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
+            attrib = {"ID": plugin_info["name"], 'service_name': service_name , "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
         
-        tag = plugin_info["name"]
+        tag = "Action"
         #print(tag, attrib)
+        return tag, attrib
+    
+    # <Action ID="ComputePath" goal="" plan="" replan_times="" target_type=""/>
+    def compute_path_module(self, goal, plan, replan_times, target_type):
+        data_loaded = self.plugin_data_loaded
+        result, plugin_name = self.find_plugin(["Compute", "Path"])
+        if result:
+            plugin_info = data_loaded[plugin_name]
+        else:
+            return False
+        
+        attrib = {"ID": plugin_info["name"], "goal": goal, "plan": plan, "replan_times":"1", "target_type": target_type}
+        tag = "Action"
+
         return tag, attrib
 
     # for arm 
     # <Action ID="ExecuteTrajectoryArm" plan="" result=""/>
     # <Action ID="ExecuteTrajectoryArm" plan=""/>
-    def execute_trajectory_arm_module(self, plan, issuccessed = None):
+    def execute_trajectory_arm_module(self, plan, is_succeeded = None):
         data_loaded = self.plugin_data_loaded
         result, plugin_name = self.find_plugin(["Execute", "Arm"])
         if result:
@@ -102,37 +116,38 @@ class Create_BT_Module():
         else:
             return False
 
-        if issuccessed == None:
-            attrib = {"plan": plan}
+        if is_succeeded == None:
+            attrib = {"ID": plugin_info["name"], "plan": plan}
         else:
-            attrib = {"result": issuccessed}
+            attrib = {"ID": plugin_info["name"], "plan": plan, "result": is_succeeded}
         
-        tag = plugin_info["name"]
+        tag = "Action"
+        print(tag, attrib)
         #print(tag, attrib)
         return tag, attrib
     
     # for gripper
     # <Action ID="ExecuteGripperTrajectory" action_name="" result="" step=""/>
-    def execute_trajectory_gripper_module(self, action_name = None, step = None, issuccessed = None):
+    def execute_trajectory_gripper_module(self, action_name = None, step = None, is_succeeded = None):
         data_loaded = self.plugin_data_loaded
-        result, plugin_name = self.find_plugin(["Execute", "gripper"])
+        result, plugin_name = self.find_plugin(["Execute", "Gripper"])
         if result:
             plugin_info = data_loaded[plugin_name]
         else:
             return False
 
-        if issuccessed == None:
+        if is_succeeded == None:
             if step == None:
-                attrib = {"action_name": action_name}
+                attrib = {"ID": plugin_info["name"], "action_name": action_name}
             else:
-                attrib = {"step": step}
+                attrib = {"ID": plugin_info["name"], "step": step}
         else:
             if step == None:
-                attrib = {"action_name": action_name, "result": issuccessed}
+                attrib = {"ID": plugin_info["name"], "action_name": action_name, "result": is_succeeded}
             else:
-                attrib = {"step": step, "result": issuccessed}
+                attrib = {"ID": plugin_info["name"], "step": step, "result": is_succeeded}
         
-        tag = plugin_info["name"]
+        tag = "Action"
         #print(tag, attrib)
         return tag, attrib
 
@@ -140,7 +155,21 @@ class Create_BT_Module():
     #container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" 
     #container_B="0.35;0.55;0.78;0;0.707;0;0.707" 
     #frame_id="world" marker="{marker}" marker_id="2"/>
-    def find_object(self):
+    def find_object_module(self, container, marker_id, frame_id, container_A, container_B, marker):
+        data_loaded = self.plugin_data_loaded
+        result, plugin_name = self.find_plugin(["Find", "Object"])
+        if result:
+            plugin_info = data_loaded[plugin_name]
+        
+        attrib = {"ID": plugin_info["name"],
+                    "container": container, 
+                    "marker_id": marker_id, 
+                    "frame_id": frame_id, 
+                    "container_A": container_A, 
+                    "container_B": container_B, 
+                    "marker" : marker}
+        tag = "Action"
+        return tag, attrib
 
     def create_execution_module(self, single_step):
         for step_tuple in single_step:
@@ -171,6 +200,6 @@ if __name__ == "__main__":
     single_step = read_task.get_single_step(task_spec)
     
     bt_module = Create_BT_Module()
-    parameter_module = bt_module.parameter_module(topic="arm_param_server", data_type="double", service_name=None)
+    parameter_module = bt_module.update_parameter_module(topic="arm_param_server", data_type="double", service_name=None)
     print(parameter_module)
     bt_module.create_execution_module(single_step)

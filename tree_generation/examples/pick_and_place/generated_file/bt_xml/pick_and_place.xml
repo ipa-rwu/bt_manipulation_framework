@@ -1,10 +1,9 @@
-<?xml version='1.0' encoding='us-ascii'?>
 <root main_tree_to_execute="MainTree">
   <BehaviorTree ID="Initialization">
     <Sequence>
-      <UpdateParameter data_type="double" topic="/arm_param_server" />
-      <UpdateParameter data_type="string" topic="/gripper_param_server" />
-      <UpdateParameter data_type="bool" topic="/flag_param_server" />
+      <Action ID="UpdateParameter" data_type="double" topic="/arm_param_server" />
+      <Action ID="UpdateParameter" data_type="string" topic="/gripper_param_server" />
+      <Action ID="UpdateParameter" data_type="bool" topic="/flag_param_server" />
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="MainTree">
@@ -15,23 +14,86 @@
         <SubTree ID="Initialization" __shared_blackboard="true" />
       </Fallback>
       <Fallback name="task1">
-        <SetBlackboard name="setTaskName" output_key="current_task_name" value="task1detect" />
+        <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task1Detect" />
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
-        <SubTree ID="task1detect" __shared_blackboard="true" />
+        <SubTree ID="Task1Detect" __shared_blackboard="true" />
         <SubTree ID="NeedHelp" __shared_blackboard="true" />
       </Fallback>
       <Fallback name="task2">
-        <SetBlackboard name="setTaskName" output_key="current_task_name" value="task2pick" />
+        <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task2Pick" />
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
-        <SubTree ID="task2pick" __shared_blackboard="true" />
+        <SubTree ID="Task2Pick" __shared_blackboard="true" />
         <SubTree ID="NeedHelp" __shared_blackboard="true" />
       </Fallback>
       <Fallback name="task3">
-        <SetBlackboard name="setTaskName" output_key="current_task_name" value="task3place" />
+        <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task3Place" />
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
-        <SubTree ID="task3place" __shared_blackboard="true" />
+        <SubTree ID="Task3Place" __shared_blackboard="true" />
         <SubTree ID="NeedHelp" __shared_blackboard="true" />
       </Fallback>
     </Sequence>
   </BehaviorTree>
-<BehaviorTree ID="NeedHelp"><Condition ID="SetFlagTask" success="false" task_name="{current_task_name}" /></BehaviorTree></root>
+  <BehaviorTree ID="Task1Detect">
+    <Sequence name="steps">
+      <Sequence name="task1step1">
+        <Action ID="FindObjects" container="{container}" container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" frame_id="world" marker="{marker}" marker_id="1" />
+      </Sequence>
+      <Sequence name="task1finish">
+        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="Task2Pick">
+    <Sequence name="steps">
+      <Sequence name="task2step1">
+        <Action ID="UpdateGoalForArm" based_on_pose="marker" goal="{arm_goal}" goal_frame_id="world" step="task2step1" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2step2">
+        <Action ID="UpdateGoalForArm" based_on_pose="marker" goal="{arm_goal}" goal_frame_id="world" step="task2step2" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2step3">
+        <Action ID="UpdateGoalForArm" based_on_pose="marker" goal="{arm_goal}" goal_frame_id="world" step="task2step3" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2finish">
+        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="Task3Place">
+    <Sequence name="steps">
+      <Sequence name="task3step1">
+        <Action ID="UpdateGoalForArm" based_on_pose="container" goal="{arm_goal}" goal_frame_id="world" step="task3step1" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3step2">
+        <Action ID="UpdateGoalForArm" based_on_pose="container" goal="{arm_goal}" goal_frame_id="world" step="task3step2" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3step3">
+        <Action ID="UpdateGoalForArm" based_on_pose="container" goal="{arm_goal}" goal_frame_id="world" step="task3step3" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="Execution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3finish">
+        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="NeedHelp">
+    <Condition ID="SetFlagTask" success="false" task_name="{current_task_name}" />
+  </BehaviorTree>
+  <BehaviorTree ID="Execution">
+    <Sequence name="arm_gripper_execute">
+      <Action ID="ExecuteTrajectoryArm" plan="{plan}" />
+      <Action ID="ExecuteTrajectoryGripper" step="{current_step}" />
+    </Sequence>
+  </BehaviorTree>
+</root>
