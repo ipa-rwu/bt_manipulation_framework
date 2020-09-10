@@ -43,6 +43,12 @@ void BT_Manipulator::initialize()
       ros::shutdown();
     }
 
+    if(!pnh_.getParam(robot_namespace_param_ + "/world_frame_id", world_frame_id_))
+    {
+      ROS_ERROR("Please provide world_frame_id");
+      ros::shutdown();
+    }
+
     initialize_robot();
 
     // wrap bt_engine
@@ -57,13 +63,14 @@ void BT_Manipulator::initialize()
     blackboard_->set<std::map<std::string, int8_t>>("param_int", param_int_);
     blackboard_->set<std::map<std::string, std::string>>("param_string", param_string_);
     blackboard_->set<std::map<std::string, bool>>("param_bool", param_bool_);
-
+    blackboard_->set<std::string>("world_frame_id", world_frame_id_); 
     blackboard_->set<std::string>("group_name_arm", group_name_arm_);
     blackboard_->set<std::string>("group_name_gripper", group_name_gripper_);
     blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
     blackboard_->set<std::string>("end_effector", end_effector_name_);
     blackboard_->set<bool>("first_time", first_time_);
 
+    blackboard_->set<std::string>("current_step", step_); 
     // shouldn't share state in heap
     // blackboard_->set<moveit::core::RobotStatePtr>("kinematic_state", kinematic_state_);
     

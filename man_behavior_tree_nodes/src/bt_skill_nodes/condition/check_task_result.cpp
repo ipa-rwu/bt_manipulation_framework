@@ -31,6 +31,7 @@ public:
 
   BT::NodeStatus tick() override
   {
+    initialized_ = false;
     if (!initialized_) {
       initialize();
     }
@@ -43,21 +44,47 @@ public:
 
   void initialize()
   {
+
+    std::cout << "initialized_: start"<< std::endl;
     getInput("task_name", task_name_);
+    std::cout << "check task name:    "<< task_name_ << std::endl;
     config().blackboard->get<bool>("first_time", first_time_);
+    std::cout << "first_time:    "<< first_time_<< std::endl;
+
     param_bool_.clear();
     config().blackboard->get<std::map<std::string, bool>>("param_bool", param_bool_);
     initialized_ = true;
+    std::cout << "initialized_: true"<< std::endl;
   }
 
   bool isTaskSuccess()
   {
-    if(first_time_)
+    std::cout << "isTaskSuccess Function"<< std::endl;
+    if(first_time_ == 1)
+    { 
+       return false;
+    }
+    
+    if(first_time_ == 0)
+    {
+     std::cout <<  "  value: " << param_bool_.at(task_name_) <<std::endl;
+
+
+    if (task_name_.compare("Help") == 0 && param_bool_.at(task_name_) == 1)
+    {
+      std::cout << "!!!!!!"<<std::endl;
       return false;
-    if (param_bool_.at(task_name_))
+    }
+
+    if (task_name_.compare("Help") == 0 && param_bool_.at(task_name_) == 0)
+    {
+      std::cout << "######" <<std::endl;
+      return true;
+    }
+
+    if (param_bool_.at(task_name_) == 1)
         return true;
-    else
-        return false; 
+    }
   }
     
 

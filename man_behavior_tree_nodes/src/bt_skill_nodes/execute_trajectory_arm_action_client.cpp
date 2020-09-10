@@ -1,4 +1,4 @@
-#include "man_behavior_tree_nodes/bt_skill_nodes/execute_trajectory_action_client.hpp"
+#include "man_behavior_tree_nodes/bt_skill_nodes/execute_trajectory_arm_action_client.hpp"
 
 namespace man_behavior_tree_nodes
 {
@@ -27,6 +27,7 @@ void ExecuteTrajectoryActionClient::on_tick()
 BT::NodeStatus ExecuteTrajectoryActionClient::on_success()
 {
     success_ = result_->success;
+    // for debug
     setOutput("result", success_);
 
     if(success_ == 1)
@@ -51,5 +52,5 @@ BT_REGISTER_NODES(factory)
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::ExecuteTrajectoryActionClient>(
-    "ExecuteTrajectory", builder);
+    "ExecuteTrajectoryArm", builder);
 }

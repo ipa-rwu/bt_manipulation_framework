@@ -15,8 +15,13 @@ void UpdateArmGoalServiceClient::on_tick()
 {
     config().blackboard->get<std::map<std::string, float>>("param_float", param_float_);
     getInput("step", step_);
-    getInput("goal_frame_id", service_.request.frame_id);
-    getInput("target", service_.request.target);
+    config().blackboard->set<std::string>("current_step", step_); 
+    getInput("based_on_pose", service_.request.target);
+
+    // frame id of the goal of the arm
+    config().blackboard->get<std::string>("world_frame_id", world_frame_id_); 
+    if(!getInput("goal_frame_id", service_.request.frame_id))
+      service_.request.frame_id = world_frame_id_;
     
     // ROS_INFO( "request: \"%s\", \"%s\"", request_->topic.c_str(), request_->data_type.c_str());
     
@@ -24,7 +29,7 @@ void UpdateArmGoalServiceClient::on_tick()
     service_.request.param = param_float_.find(step_)->second;
 
     ROS_INFO_STREAM_NAMED("update_goal_for_arm", "[req] step: "<< step_ << "  param: "<< service_.request.param);
-    ROS_INFO_STREAM_NAMED("update_goal_for_arm", "[req] target: "<< service_.request.target);
+    ROS_INFO_STREAM_NAMED("update_goal_for_arm", "[req] based_on_pose: "<< service_.request.target);
     ROS_INFO_STREAM_NAMED("update_goal_for_arm", "[req] goal_frame_id: "<< service_.request.frame_id);
     
 }  // namespace man_behavior_tree_nodes
@@ -46,7 +51,7 @@ BT_REGISTER_NODES(factory)
     [](const std::string & name, const BT::NodeConfiguration & config)
     {
       return std::make_unique<man_behavior_tree_nodes::UpdateArmGoalServiceClient>(
-        name, "update_goal", config);
+        name, "update_arm_goal", config);
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::UpdateArmGoalServiceClient>(

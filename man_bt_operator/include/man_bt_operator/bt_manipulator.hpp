@@ -46,7 +46,7 @@ protected:
     BT::Tree tree_;
     // The blackboard shared by all of the nodes in the tree
     BT::Blackboard::Ptr blackboard_;
-    std::map<std::string, float> param_float_;
+    std::map<std::string, float>    param_float_;
     std::map<std::string, std::string> param_string_;
     std::map<std::string, int8_t> param_int_;
     std::map<std::string, bool> param_bool_;
@@ -68,7 +68,8 @@ protected:
     std::string group_name_gripper_;
     std::string group_name_arm_;
     std::string end_effector_name_;
-
+    std::string world_frame_id_;
+    std::string step_;
     bool first_time_{true};
 };
 

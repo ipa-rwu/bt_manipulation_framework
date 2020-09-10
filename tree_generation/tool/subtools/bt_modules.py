@@ -74,25 +74,28 @@ class Create_BT_Module():
         return tag, attrib
 
     # <UpdateGoalForArm service_name="update_arm_goal" step="T2S1arm" goal_frame_id="world" based_target="{container}" goal="{arm_goal}"/>
-    def update_goal_arm_module(self, step, goal_frame_id, based_on_pose, goal, service_name = None):
+    def update_goal_arm_module(self, step, goal_frame_id, based_on_pose, goal, service_name):
         data_loaded = self.plugin_data_loaded
         result, plugin_name = self.find_plugin(["Goal", "Arm"])
         if result:
             plugin_info = data_loaded[plugin_name]
         else:
             return False
+        
+        attrib = {"ID": plugin_info["name"], "step": step, "based_on_pose": based_on_pose, "goal": goal}
 
-        if service_name == None:
-            attrib = {"ID": plugin_info["name"], "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
-        else:
-            attrib = {"ID": plugin_info["name"], 'service_name': service_name , "step": step, "goal_frame_id": goal_frame_id, "based_on_pose": based_on_pose, "goal": goal}
+        if service_name != None:
+            attrib['service_name'] = service_name
+        
+        if goal_frame_id != None:
+            attrib['goal_frame_id'] = goal_frame_id
         
         tag = "Action"
         #print(tag, attrib)
         return tag, attrib
     
     # <Action ID="ComputePath" goal="" plan="" replan_times="" target_type=""/>
-    def compute_path_module(self, goal, plan, replan_times, target_type):
+    def compute_path_module(self, goal, plan, replan_times, target_type, planner_id):
         data_loaded = self.plugin_data_loaded
         result, plugin_name = self.find_plugin(["Compute", "Path"])
         if result:
@@ -101,6 +104,8 @@ class Create_BT_Module():
             return False
         
         attrib = {"ID": plugin_info["name"], "goal": goal, "plan": plan, "replan_times":"1", "target_type": target_type}
+        if planner_id != None:
+            attrib["planner_id"] = planner_id
         tag = "Action"
 
         return tag, attrib

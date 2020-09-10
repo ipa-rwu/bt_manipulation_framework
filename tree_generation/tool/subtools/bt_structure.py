@@ -68,11 +68,14 @@ class CreateBTStructure():
                     element = root[counter_root][0].makeelement('Fallback', attrib)
                     root[counter_root][0].append(element)
                     
-                    # <SetBlackboard name="setTaskName" output_key="task_name" value="task2pick"/>
+                    attrib = {}
+                    root[counter_root][0][counter_maintree].makeelement("Inverter", attrib)
+                    ET.SubElement(root[counter_root][0][counter_maintree], "Inverter", attrib)
+                    # <SetBlackboard name="setTaskName" output_key="task_name" value="Task2Pick"/>
                     set_balkboard_module = self.bt_modules.set_balkboard_module( \
                         name = "setTaskName", output_key = "current_task_name", value = label.capitalize() + task_names[label].capitalize())
-                    root[counter_root][0][counter_maintree].makeelement(set_balkboard_module[0], set_balkboard_module[1])
-                    ET.SubElement(root[counter_root][0][counter_maintree], set_balkboard_module[0], set_balkboard_module[1])
+                    root[counter_root][0][counter_maintree][0].makeelement(set_balkboard_module[0], set_balkboard_module[1])
+                    ET.SubElement(root[counter_root][0][counter_maintree][0], set_balkboard_module[0], set_balkboard_module[1])
 
                     # <Action ID="CheckTaskResult" task_name="FHelp" />
                     check_result_module = self.bt_modules.check_result_module(task_name = "{current_task_name}")
@@ -87,8 +90,30 @@ class CreateBTStructure():
                     root[counter_root][0][counter_maintree].makeelement(subtree_module[0], subtree_module[1])
                     ET.SubElement(root[counter_root][0][counter_maintree], subtree_module[0], subtree_module[1])
                     counter_maintree += 1
+                
+                # add Finish
+                # <Sequence name="Finish">
+                #     <Action ID="ASetFlag" flagupdate="{Param}" name="ASetFlagTask1" param="{Param}" task="1" value="false"/>
+                #     <Action ID="ASetFlag" flagupdate="{Param}" name="ASetFlagTask2" param="{Param}" task="2" value="false"/>
+                #     <Action ID="ASetFlag" flagupdate="{Param}" name="ASetFlagTask3" param="{Param}" task="3" value="false"/>
+                # </Sequence>
+                attrib = {"name": "AllFinish"}
+                element = root[counter_root][0].makeelement('Sequence', attrib)
+                root[counter_root][0].append(element)
+
+                counter_lev3 = 0
+                for lev3 in root[counter_root][0]:
+                    if lev3.attrib["name"] == "AllFinish":
+                        for label in task_names.keys():
+                            set_flag_condition_module = self.bt_modules.set_flag_condition_module(task_name = label.capitalize() + task_names[label].capitalize(), 
+                                                                                        is_succeeded="false")
+                            root[counter_root][0][counter_lev3].makeelement(set_flag_condition_module[0], set_flag_condition_module[1])
+                            ET.SubElement(root[counter_root][0][counter_lev3], set_flag_condition_module[0], set_flag_condition_module[1])
+                    else:
+                        counter_lev3 += 1
             else:
                 counter_root += 1
+        
 
         tree.write(self.created_bt_xml, xml_declaration=True, encoding='utf-8')
 
@@ -257,16 +282,19 @@ class CreateBTStructure():
                     
                     if info["object"] == "arm":
                         update_goal_arm_module = self.bt_modules.update_goal_arm_module(step = step_name, 
-                                                            goal_frame_id = "world", 
-                                                            based_on_pose = info["base"], 
-                                                            goal="{arm_goal}")
+                                                            #goal_frame_id = "world", 
+                                                            goal_frame_id = None,
+                                                            based_on_pose = "{" + info["base"] + "}", 
+                                                            goal="{arm_goal}",
+                                                            service_name = None)
                         root[counter_root][0][counter_step].makeelement(update_goal_arm_module[0], update_goal_arm_module[1])
                         ET.SubElement(root[counter_root][0][counter_step], update_goal_arm_module[0], update_goal_arm_module[1])
                         
                         compute_path_module = self.bt_modules.compute_path_module(replan_times = "1", 
                                                             target_type = "Cartesian", 
                                                             plan = "{plan}", 
-                                                            goal="{arm_goal}")
+                                                            goal="{arm_goal}",
+                                                            planner_id = None)
                         root[counter_root][0][counter_step].makeelement(compute_path_module[0], compute_path_module[1])
                         ET.SubElement(root[counter_root][0][counter_step], compute_path_module[0], compute_path_module[1])
 
@@ -342,13 +370,13 @@ if __name__ == "__main__":
     read_task = GetTaskInfo()
 
     # first write Initialization
-    params = [  {"topic": "/arm_param_server", \
+    params = [  {"topic": "/arm_parameter_server", \
                 "data_type": "double", \
                 "service_name": None},
-                {"topic": "/gripper_param_server", \
+                {"topic": "/gripper_parameter_server", \
                 "data_type": "string", \
                 "service_name": None},
-                {"topic": "/flag_param_server", \
+                {"topic": "/task_flag_parameter_server", \
                 "data_type": "bool", \
                 "service_name": None}]
     for param_info in params:
@@ -357,9 +385,8 @@ if __name__ == "__main__":
     # start from "job" or "task"
     # add tasks in maintree
     task_spec = read_task.load_task_specification(task_file)
-    tasks = read_task.get_tasks(task_spec)
     # task_name: {'task1': 'detect', 'task2': 'pick', 'task3': 'place'}
-    task_names = read_task.get_task_name(tasks)
+    task_names = read_task.get_task_name(task_spec)
 
     create_bt.maintree(task_names = task_names, created_bt_xml_path = None)
 

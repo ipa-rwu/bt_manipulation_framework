@@ -90,5 +90,5 @@ BT_REGISTER_NODES(factory)
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::ComputePathActionClient>(
-    "ComputePath", builder);
+    "ComputePathArm", builder);
 }

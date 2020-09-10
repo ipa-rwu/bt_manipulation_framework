@@ -17,7 +17,7 @@ job:
           param: 0.3
         2: 
           object: gripper
-          action: open
+          param: open
       step2:
         1: 
           object: arm
@@ -26,7 +26,7 @@ job:
           param: -0.01
         2: 
           object: gripper
-          action: close
+          param: close
       step3:
         1: 
           object: arm
@@ -35,7 +35,7 @@ job:
           param: 0.4
         2: 
           object: gripper
-          action: close
+          param: close
   task3:
     name: place
     steps:
@@ -47,7 +47,7 @@ job:
           param: 0.3
         2: 
           object: gripper
-          action: close
+          param: close
       step2:
         1: 
           object: arm
@@ -56,7 +56,7 @@ job:
           param: 0.03
         2: 
           object: gripper
-          action: open
+          param: open
       step3:
         1: 
           object: arm
@@ -65,4 +65,4 @@ job:
           param: 0.4
         2: 
           object: gripper
-          action: open
+          param: open
