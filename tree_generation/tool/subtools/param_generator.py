@@ -9,8 +9,8 @@ class parameter_generator():
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         print(BASE_DIR)
         template_path = BASE_DIR + "/template/dynamic_parameter_template.ros_package"
-        if BASE_DIR.endswith('/manipulator_bt/tree_generation'):
-            rm_size = len("/manipulator_bt/tree_generation")
+        if BASE_DIR.endswith('/manipulator_bt/tree_generation/tool'):
+            rm_size = len("/manipulator_bt/tree_generation/tool")
             workspace_dir = BASE_DIR[:-rm_size]
         package_path = workspace_dir + "/arm_parameter_server.ros_package"
         self.modify_template(template_path, package_path, package_name, author_name, author_email, target)

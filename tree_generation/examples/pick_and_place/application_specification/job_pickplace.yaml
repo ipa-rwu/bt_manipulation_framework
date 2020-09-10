@@ -4,7 +4,7 @@ job:
     steps: 
       step1:
         1:
-          objetc: camera:
+          object: camera
           marker_id: 1
   task2:
     name: pick
@@ -13,7 +13,8 @@ job:
         1: 
           object: arm
           action: move
-          location: marker + 0.3
+          base: marker
+          param: 0.3
         2: 
           object: gripper
           action: open
@@ -21,15 +22,17 @@ job:
         1: 
           object: arm
           action: move
-          location: marker
+          base: marker
+          param: -0.01
         2: 
           object: gripper
           action: close
-      Step3:
+      step3:
         1: 
           object: arm
           action: move
-          location: marker + 0.4
+          base: marker
+          param: 0.4
         2: 
           object: gripper
           action: close
@@ -40,7 +43,8 @@ job:
         1: 
           object: arm
           action: move
-          location: container + 0.2
+          base: container
+          param: 0.3
         2: 
           object: gripper
           action: close
@@ -48,15 +52,17 @@ job:
         1: 
           object: arm
           action: move
-          location: container
+          base: container
+          param: 0.03
         2: 
           object: gripper
           action: open
-      Step3:
+      step3:
         1: 
           object: arm
           action: move
-          location: container + 0.4
+          base: container
+          param: 0.4
         2: 
           object: gripper
           action: open
