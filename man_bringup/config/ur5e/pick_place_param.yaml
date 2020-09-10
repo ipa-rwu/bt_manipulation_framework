@@ -1,4 +1,4 @@
-world_frame_id: world_frame
+world_frame_id: world
 ar_frame_id: ar_tag
 arm_group_name: manipulator
 tcp_link_name: tcp_frame

@@ -5,8 +5,13 @@
 </include>
 
 <!-- dynamic_parameter -->
-<include file="$(find dynamic_parameter)/launch/parameter_server.launch">
-</include>
+<node pkg="arm_parameter_server" type="arm_parameter_server" name="arm_parameter_server" output="screen" required="true">
+</node>
+<node pkg="gripper_parameter_server" type="gripper_parameter_server" name="gripper_parameter_server" output="screen" required="true">
+</node>
+<node pkg="task_flag_parameter_server" type="task_flag_parameter_server" name="task_flag_parameter_server" output="screen" required="true">
+</node>
+
 
 <!-- detect marker -->
 <node pkg="ar_marker_detector" type="get_marker_pose_fake.py" name="get_marker_pose_fake_node" output="screen" required="true">
@@ -31,7 +36,7 @@
 <node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
 </node>
 
-<node pkg="manipulator_skills" type="set_flag_for_task_server" name="set_flag_for_task_server_node" output="screen" required="true">
+<node pkg="manipulator_skills" type="help" name="help_server" output="screen" required="true">
 </node>
 
 </launch>

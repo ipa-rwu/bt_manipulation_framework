@@ -24,6 +24,11 @@ void ExecuteGripperTrajectoryActionClient::on_tick()
     {
         if(!getInput("step", step_))
              throw BT::RuntimeError("ExecuteGripperTrajectoryActionClient missing required input [step]");
+        else
+        {
+         config().blackboard->get<std::string>("current_step", step_); 
+        }
+        
         
         ROS_INFO_STREAM_NAMED("ExecuteGripperTrajectoryActionClient", "[ExecuteGripper] step: "<< step_);
      
@@ -62,5 +67,5 @@ BT_REGISTER_NODES(factory)
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::ExecuteGripperTrajectoryActionClient>(
-    "ExecuteGripperTrajectory", builder);
+    "ExecuteTrajectoryGripper", builder);
 }

@@ -42,9 +42,7 @@ public:
   }
 
   void initialize()
-  {
-    getInput("param_topic", param_topic_);
-  
+  {  
     getInput("task_name", task_name_);
 
     getInput("success", task_result_);
@@ -79,7 +77,6 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-            BT::InputPort<std::string>("param_topic", "parameter topic"),
             BT::InputPort<std::string>("task_name", "task name will be set"),
             BT::InputPort<bool>("success", "if task success"),
             };
@@ -92,7 +89,6 @@ protected:
 
 private:
   std::map<std::string, bool> param_bool_;
-  std::string param_topic_;
   std::string task_name_;
   bool task_result_;
   bool initialized_;

@@ -20,10 +20,10 @@ public:
     const std::string & service_name,
     const BT::NodeConfiguration & conf)
   : BT::SyncActionNode(xml_tag_name, conf), 
-  service_client_name_(service_name+"_client")
+  service_name_(service_name)
   {
     // ** share nodehandle in blackboard
-    nh_ = config().blackboard->get<ros::NodeHandle>("node_handle");
+    pnh_ = config().blackboard->get<ros::NodeHandle>("node_handle");
 
     // Get the required items from the blackboard
     // server_timeout_ =
@@ -49,6 +49,8 @@ public:
     {
       ROS_INFO( "service: \"%s\" available", service_name_.c_str());
     }
+
+    service_client_name_ = service_name_ + "_client";
 
     ROS_INFO("\"%s\"  initialized", service_client_name_.c_str());
 

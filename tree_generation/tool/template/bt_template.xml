@@ -1,10 +1,17 @@
 <?xml version="1.0"?>
-<root main_tree_to_execute="BehaviorTree">
+<root main_tree_to_execute="MainTree">
     <!-- ////////// -->
-    <BehaviorTree ID="BehaviorTree">
+    <BehaviorTree ID="Initialization">
+        <Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
         <Sequence name="Job">
             <Fallback name="Help">
-                <Action ID="CheckTaskResult" task_name="help"/>
+                <Action ID="CheckTaskResult" task_name="Help"/>
+                <Action ID="CallExternHelp" service_name="help_server"/>
+                <SubTree ID="Initialization" __shared_blackboard="true"/>
             </Fallback>
         </Sequence>
     </BehaviorTree>

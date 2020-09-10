@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="Execution">
+        <Sequence>
+            <Action ID="ExecuteTrajectory" plan="" result=""/>
+            <Action ID="ExecuteGripperTrajectory" action_name="" result="" step=""/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Initialization">
+        <Sequence>
+            <Action ID="UpdateParameter" data_type="double" topic="/arm_param_server"/>
+            <Action ID="UpdateParameter" data_type="string" topic="/gripper_param_server"/>
+            <Action ID="UpdateParameter" data_type="bool" topic="/flag_param_server"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Sequence name="Job">
+            <Fallback name="Help">
+                <Action ID="CheckTaskResult" task_name="FHelp"/>
+                <Action ID="CallExternHelp" service_name="help_server"/>
+                <SubTree ID="Initialization" __shared_blackboard="true"/>
+            </Fallback>
+            <Fallback name="Task1">
+                <SetBlackboard name="setTaskName" output_key="task_name" value="task2pick"/>
+                <Action ID="CheckTaskResult" task_name="{task_name}"/>
+                <SubTree ID="T1Detect" __shared_blackboard="true"/>
+                <SubTree ID="NeedHelp" __shared_blackboard="true"/>
+            </Fallback>
+            <Fallback name="Task2">
+                <Action ID="CheckTaskResult" task_name=""/>
+                <SubTree ID="T2Pick" __shared_blackboard="true"/>
+                <SubTree ID="NeedHelp" __shared_blackboard="false"/>
+            </Fallback>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="NeedHelp">
+        <Condition ID="SetFlagTask" success="true" task_name=""/>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="T1Detect">
+        <Sequence name="T1Steps">
+            <Sequence name="T1Step1">
+                <Action ID="FindObjects" container="{container}" container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" frame_id="world" marker="{marker}" marker_id="2"/>
+            </Sequence>
+            <Sequence name="T1Finish">
+                <Condition ID="SetFlagTask" success="true" task_name=""/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="T2Pick">
+        <Sequence name="T2Steps">       
+            <Sequence name="T2Step1">
+                <Action ID="UpdateGoalForArm" step="T2S1arm" goal_frame_id="world" target="{container}" goal="{arm_goal}"/>
+                <Action ID="ComputePath" goal_name="" plan="" replan_times="" target_type=""/>
+                <SubTree ID="Execution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="T2Step2">
+                <Action ID="UpdateGoalForArm" step="T2S1arm" goal_frame_id="world" target="{container}" goal="{arm_goal}"/>
+                <Action ID="ComputePath" goal_name="" plan="" replan_times="" target_type=""/>
+                <SubTree ID="Execution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="T2Finish">
+                <Condition ID="SetFlagTask" success="true" task_name=""/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CallExternHelp">
+            <inout_port name="service_name"/>
+        </Action>
+        <Action ID="CheckTaskResult">
+            <inout_port name="task_name"/>
+        </Action>
+        <Action ID="ComputePath">
+            <inout_port name="goal_name"/>
+            <inout_port name="plan"/>
+            <inout_port name="replan_times"/>
+            <inout_port name="target_type"/>
+        </Action>
+        <Action ID="ExecuteGripperTrajectory">
+            <inout_port name="action_name"/>
+            <inout_port name="result"/>
+            <inout_port name="step"/>
+        </Action>
+        <Action ID="ExecuteTrajectory">
+            <inout_port name="plan"/>
+            <inout_port name="result"/>
+        </Action>
+        <SubTree ID="Execution">
+            <input_port default="true" name="__shared_blackboard">If false (default), the Subtree has an isolated blackboard and needs port remapping</input_port>
+        </SubTree>
+        <Action ID="FindObjects">
+            <inout_port name="container"/>
+            <inout_port name="container_A"/>
+            <inout_port name="container_B"/>
+            <inout_port name="frame_id"/>
+            <inout_port name="marker"/>
+            <inout_port name="marker_id"/>
+        </Action>
+        <SubTree ID="Initialization">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <SubTree ID="NeedHelp">
+            <input_port default="false" name="__shared_blackboard">If false (default), the Subtree has an isolated blackboard and needs port remapping</input_port>
+        </SubTree>
+        <Condition ID="SetFlagTask">
+            <inout_port name="success"/>
+            <inout_port name="task_name"/>
+        </Condition>
+        <SubTree ID="T1Detect">
+            <input_port default="false" name="__shared_blackboard">If false (default), the Subtree has an isolated blackboard and needs port remapping</input_port>
+        </SubTree>
+        <SubTree ID="T2Pick">
+            <input_port default="true" name="__shared_blackboard">If false (default), the Subtree has an isolated blackboard and needs port remapping</input_port>
+        </SubTree>
+        <Action ID="UpdateParameter">
+            <inout_port name="data_type"/>
+            <inout_port name="topic"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
