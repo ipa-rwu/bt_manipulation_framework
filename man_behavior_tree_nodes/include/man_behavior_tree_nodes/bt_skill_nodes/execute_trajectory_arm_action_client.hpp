@@ -5,6 +5,8 @@
 #include "man_behavior_tree_nodes/bt_action_client.hpp"
 #include "man_msgs/ExecuteTrajectorySkillAction.h"
 
+// #include "man_behavior_tree_nodes/webots_elements.hpp"
+
 namespace man_behavior_tree_nodes
 {
 class ExecuteTrajectoryActionClient : public btActionClient<man_msgs::ExecuteTrajectorySkillAction, 
@@ -18,7 +20,11 @@ public:
         const BT::NodeConfiguration & conf,
         float time_for_wait);
     
+    void initialize();
+
     void on_tick() override;
+
+    void on_wait_for_result() override;
 
     BT::NodeStatus on_success() override;
 
@@ -38,9 +44,18 @@ public:
     }
 
 private:
+    // void TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg);
+
     bool first_time_{true};
     man_msgs::Plan plan_;
     int success_{0};
+
+    std::string webotsRobotName_;
+    bool result_touchsensor_{false};
+
+    ros::Subscriber touch_sensor_sub_;
+
+    std::string touch_sensor_topic_name_;
 
 };
 } // namespace

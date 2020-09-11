@@ -42,6 +42,14 @@ add_executable(bt_manipulator_node src/main.cpp)
 add_dependencies(bt_manipulator_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(bt_manipulator_node bt_manipulator)
 
+add_library(bt_manipulator_sub src/bt_run_success.cpp)
+add_dependencies(bt_manipulator_sub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bt_manipulator_sub   ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(bt_manipulator_sub_node src/sub_main.cpp)
+add_dependencies(bt_manipulator_sub_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bt_manipulator_sub_node bt_manipulator_sub)
+
  install(TARGETS bt_manipulator
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

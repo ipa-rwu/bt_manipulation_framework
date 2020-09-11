@@ -27,6 +27,7 @@ UpdateArmGoal.srv
 UpdateParam.srv
 Help.srv
 SetFlagTask.srv
+CheckCollisionService.srv
 )
 
 set(ACT_FILES

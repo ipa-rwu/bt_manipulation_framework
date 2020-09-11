@@ -17,7 +17,7 @@ public:
         const std::string & action_name,
         const BT::NodeConfiguration & conf,
         float time_for_wait);
-    
+
     void on_tick() override;
 
     BT::NodeStatus on_success() override;
@@ -37,6 +37,7 @@ private:
     int success_{0};
     std::string step_;
     std::map<std::string, std::string> param_string_;
+
 
 };
 } // namespace

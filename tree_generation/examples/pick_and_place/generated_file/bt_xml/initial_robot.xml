@@ -1,0 +1,9 @@
+  <root main_tree_to_execute = "IntialTree" >
+     <BehaviorTree ID="IntialTree">
+        <Sequence name="root_sequence">
+            <ComputePathArm goal_name="home" target_type="Name" replan_times="3" plan="{plan}"/>
+            <ExecuteTrajectoryGripper action_name="open" result="{gripper_exection_result}"/>
+            <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/>
+        </Sequence>
+     </BehaviorTree>
+ </root>

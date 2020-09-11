@@ -99,7 +99,10 @@
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="NeedHelp">
-    <Condition ID="SetFlagTask" success="false" task_name="{current_task_name}" />
+    <Sequence name="setHelpsteps">
+      <Condition ID="SetFlagTask" success="false" task_name="{current_task_name}" />
+      <Condition ID="SetFlagTask" success="true" task_name="Help" />
+    </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="Execution">
     <Sequence name="arm_gripper_execute">

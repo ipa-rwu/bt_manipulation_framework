@@ -76,7 +76,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
       pose_constraints_ = updateGoal(position_tolerances_, orientation_tolerances_, goal->goal, end_effector_);
 
       ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
-      ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] pose of goal is " << goal->goal);
+      // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] pose of goal is " << goal->goal);
 
       current_state_ = move_group_->getCurrentState();
       robot_state::robotStateToRobotStateMsg(*current_state_ ,robot_state_);
@@ -137,7 +137,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
       action_res_.plan.planning_time = plan.planning_time_;
 
       ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute path succeeded!");
-      ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] get path " << action_res_.plan.trajectory);
+      // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] get path " << action_res_.plan.trajectory);
 
 
       const std::string response = "SUCCESS";

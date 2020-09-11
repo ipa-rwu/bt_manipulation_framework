@@ -13,7 +13,29 @@ ExecuteTrajectoryActionClient::ExecuteTrajectoryActionClient(
                 man_msgs::ExecuteTrajectorySkillResultConstPtr>
                   (xml_tag_name, action_name, conf, time_for_wait)
 {
+  //  this->initialize();
 }
+
+// void ExecuteTrajectoryActionClient::initialize()
+// {
+//     WebotsSkills webots_obj;
+//     webotsRobotName_ = webots_obj.fixName();
+//     ROS_INFO_STREAM_NAMED("ExecuteTrajectoryActionClient", "webots robot name: " << webotsRobotName_ );
+
+//     touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
+//     touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
+//                           1,
+//                           &ExecuteTrajectoryActionClient::TouchsensorCallback,
+//                           this);
+// }
+
+// void ExecuteTrajectoryActionClient::TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg)
+// {
+//   // msg: {"data": "start"}
+//   result_touchsensor_ = touchsensor_msg->data;
+// //   std::cout << result_touchsensor <<std::endl;
+
+// }
 
 void ExecuteTrajectoryActionClient::on_tick()
 {
@@ -21,6 +43,17 @@ void ExecuteTrajectoryActionClient::on_tick()
     // moveit_msgs::MotionPlanRequest& request;
 
     getInput("plan", goal_.plan);
+
+}
+
+void ExecuteTrajectoryActionClient::on_wait_for_result()
+{
+
+  if (result_touchsensor_ == true)
+  {
+    collision_happened_  = true;
+    ROS_INFO_STREAM_NAMED("ExecuteTrajectoryActionClient", "ExecuteTrajectoryActionClient: touched table" );
+  }
 
 }
   

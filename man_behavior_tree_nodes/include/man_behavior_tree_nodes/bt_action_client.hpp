@@ -279,14 +279,24 @@ public:
                  on_new_goal_received();
             }
 
-
-            // check if, after invoking spin_some(), we finally received the result
-            if (client_status == actionlib::SimpleClientGoalState::ACTIVE ||
-               client_status == actionlib::SimpleClientGoalState::PENDING) 
+            // if collisoion happend
+            if (collision_happened_ && 
+            (client_status == actionlib::SimpleClientGoalState::ACTIVE ||
+               client_status == actionlib::SimpleClientGoalState::PENDING)
+               )
             {
-                // Yield this Action, returning RUNNING
-                return BT::NodeStatus::RUNNING;
+                 collision_happened_ = false;
+                 collision_happened();
             }
+
+
+            // // check if, after invoking spin_some(), we finally received the result
+            // if (client_status == actionlib::SimpleClientGoalState::ACTIVE ||
+            //    client_status == actionlib::SimpleClientGoalState::PENDING) 
+            // {
+            //     // Yield this Action, returning RUNNING
+            //     return BT::NodeStatus::RUNNING;
+            // }
         }
 
         auto client_status = action_client_->getState();
@@ -368,6 +378,13 @@ protected:
         done_ = true;
     }
 
+    BT::NodeStatus collision_happened()
+    {
+        action_client_->cancelGoal();
+        ROS_DEBUG_STREAM_NAMED("btActionNode", "collision_happened, will aborted ");
+        return on_aborted();
+    }
+
 //      bool cancelExecution() override
 //   {
 //     if (!controller_action_client_)
@@ -431,6 +448,8 @@ protected:
         bool done_;
 
         bool goal_updated_{false};
+
+        bool collision_happened_{false};
 
         ExecutionStatus last_exec_;
 };

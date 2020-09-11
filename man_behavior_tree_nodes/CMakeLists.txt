@@ -15,6 +15,8 @@ set(dependencies
   geometry_msgs
   #tf2_ros
   #tf2_geometry_msgs
+
+  webots_ros
 )
 
 find_package(catkin REQUIRED COMPONENTS ${dependencies})

@@ -140,6 +140,7 @@ class CreateBTStructure():
 
     #  <BehaviorTree ID="NeedHelp">
     #     <Condition ID="SetFlagTask" success="true" task_name=""/>
+    #     <Condition ID="SetFlagTask" success="true" task_name="Help"/>
     # </BehaviorTree>   
     def need_help_subtree(self, created_bt_xml_path = None):
         created_bt_xml = self.update_created_bt_xml(created_bt_xml_path)
@@ -151,15 +152,25 @@ class CreateBTStructure():
         element = root.makeelement('BehaviorTree', attrib)
         root.append(element)
 
+
+
         set_flag_condition_module = self.bt_modules.set_flag_condition_module(task_name = "{current_task_name}", is_succeeded="false")
         #print(set_flag_condition_module)
 
         counter_root = 0
         for lev_1 in root:
             #print(lev_1.attrib)    
-            if lev_1.attrib["ID"] == "NeedHelp":               
-                root[counter_root].makeelement(set_flag_condition_module[0], set_flag_condition_module[1])
-                ET.SubElement(root[counter_root], set_flag_condition_module[0], set_flag_condition_module[1])
+            if lev_1.attrib["ID"] == "NeedHelp":  
+                attrib = {"name": "setHelpsteps"}
+                element = root[counter_root].makeelement('Sequence', attrib)
+                root[counter_root].append(element)     
+
+                root[counter_root][0].makeelement(set_flag_condition_module[0], set_flag_condition_module[1])
+                ET.SubElement(root[counter_root][0], set_flag_condition_module[0], set_flag_condition_module[1])
+
+                set_flag_condition_module = self.bt_modules.set_flag_condition_module(task_name = "Help", is_succeeded="true")
+                root[counter_root][0].makeelement(set_flag_condition_module[0], set_flag_condition_module[1])
+                ET.SubElement(root[counter_root][0], set_flag_condition_module[0], set_flag_condition_module[1])
                 break
             else:
                 counter_root += 1
@@ -197,7 +208,7 @@ class CreateBTStructure():
                 # add action
                 execute_trajectory_arm_module = self.bt_modules.execute_trajectory_arm_module(
                                                 plan = plan)
-                #sprint(execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
+                # print(execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
                 root[counter_root][0].makeelement(execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
                 ET.SubElement(root[counter_root][0], execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
                 execute_trajectory_gripper_module = self.bt_modules.execute_trajectory_gripper_module(

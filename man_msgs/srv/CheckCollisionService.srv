@@ -1,0 +1,6 @@
+#request for help
+bool check
+---
+#response
+bool result
+string collision

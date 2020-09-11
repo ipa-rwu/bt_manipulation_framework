@@ -27,7 +27,7 @@ public:
   // ,std::function<void()> onLoop,
   // std::function<bool()> cancelRequested
   // ,std::chrono::milliseconds loopTimeout
- 
+   BtStatus run_until_success(BT::Tree * tree);
 
   // In order to re-run a Behavior Tree, we must be able to reset all nodes to the initial state
   void haltAllActions(BT::TreeNode * root_node)

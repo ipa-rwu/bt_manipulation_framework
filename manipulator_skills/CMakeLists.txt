@@ -19,6 +19,7 @@ set(dependencies
   tf2_geometry_msgs
   tf2_ros
   ar_marker_detector
+  webots_ros
 )
 
 find_package(catkin REQUIRED COMPONENTS ${dependencies}
@@ -89,7 +90,8 @@ add_executable(update_arm_state_skill_server
   src/skills/service_server/update_arm_state_skill/main.cpp)
 target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
-
+add_dependencies(update_arm_state_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(update_arm_state_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(update_arm_goal_skill SHARED
   src/skills/service_server/update_arm_goal_skill/update_arm_goal.cpp)
@@ -107,7 +109,16 @@ add_executable(update_param_skill_server
 target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_param_skill_server update_param_skill)
 add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})#
+add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_library(check_collision_skill SHARED
+  src/skills/service_server/check_collision_skill/check_collision.cpp)
+add_executable(check_collision_skill_server 
+  src/skills/service_server/check_collision_skill/main.cpp)
+target_link_libraries(check_collision_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(check_collision_skill_server check_collision_skill)
+add_dependencies(check_collision_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(check_collision_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(set_flag_for_task SHARED
   src/skills/service_server/set_flag_for_task/set_flag_for_task.cpp)
@@ -124,6 +135,9 @@ add_library(execute_trajectory_skill SHARED
 add_executable(execute_trajectory_skill_server 
   src/skills/action_servers/execute_trajectory_skill/main.cpp)
 target_link_libraries(execute_trajectory_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+target_link_libraries(execute_trajectory_skill webots_elements)
+
 target_link_libraries(execute_trajectory_skill_server execute_trajectory_skill)
 add_dependencies(execute_trajectory_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(execute_trajectory_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -138,7 +152,10 @@ add_dependencies(execute_gripper_trajectory_skill ${${PROJECT_NAME}_EXPORTED_TAR
 add_dependencies(execute_gripper_trajectory_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
-
+add_library(webots_elements SHARED
+  src/webots_elements.cpp)
+target_link_libraries(webots_elements ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_dependencies(webots_elements ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(test_compute_path_skill_node 
   src/skills/test_compute_path.cpp)

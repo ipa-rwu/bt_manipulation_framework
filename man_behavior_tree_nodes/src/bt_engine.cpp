@@ -23,8 +23,7 @@ BT::Tree BT_Engine::buildTreeFromText(const std::string & xml_string,
 
 
 
-BtStatus BT_Engine::run(
-  BT::Tree * tree
+BtStatus BT_Engine::run(BT::Tree * tree
   // ,std::function<void()> onLoop,
   // std::function<bool()> cancelRequested
   // ,std::chrono::milliseconds loopTimeout
@@ -35,6 +34,32 @@ BtStatus BT_Engine::run(
   // Loop until something happens with ROS or the node completes
    while (ros::ok()) 
 //  while (ros::ok()&& result == BT::NodeStatus::RUNNING) 
+  {
+    // if (cancelRequested()) {
+    //   tree->rootNode()->halt();
+    //   return BtStatus::CANCELED;
+    // }
+
+    result = tree->rootNode()->executeTick();
+    r.sleep();
+    // onLoop();
+
+    // loopRate.sleep();
+  }
+
+  // return (result == BT::NodeStatus::SUCCESS) ? BtStatus::SUCCEEDED : BtStatus::FAILED;
+}
+
+BtStatus BT_Engine::run_until_success(BT::Tree * tree
+  // ,std::function<void()> onLoop,
+  // std::function<bool()> cancelRequested
+  // ,std::chrono::milliseconds loopTimeout
+  )
+{
+  BT::NodeStatus result = BT::NodeStatus::RUNNING;
+  ros::Rate r(1);
+  // Loop until something happens with ROS or the node completes
+  while (ros::ok()&& result == BT::NodeStatus::RUNNING) 
   {
     // if (cancelRequested()) {
     //   tree->rootNode()->halt();
