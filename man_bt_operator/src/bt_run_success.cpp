@@ -82,9 +82,9 @@ void BT_Manipulator::initialize()
 
     }
 
-    #ifdef ZMQ_FOUND
-      BT::PublisherZMQ publisher_zmq(tree_);
-    #endif
+    // #ifdef ZMQ_FOUND
+    //   BT::PublisherZMQ publisher_zmq(tree_);
+    // #endif
 
     // This logger prints state changes on console
     BT::StdCoutLogger logger_cout(tree_);

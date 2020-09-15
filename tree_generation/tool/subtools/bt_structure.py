@@ -64,7 +64,7 @@ class CreateBTStructure():
             if lev_1.attrib["ID"] == "MainTree":
                 for label in task_names.keys():
                     # add task <Fallback name="Task1">
-                    attrib = {"name": label}
+                    attrib = {"name": label.capitalize()}
                     element = root[counter_root][0].makeelement('Fallback', attrib)
                     root[counter_root][0].append(element)
                     
@@ -85,10 +85,14 @@ class CreateBTStructure():
                     subtree_module = self.bt_modules.subtree_module(subtree_name =  label.capitalize() + task_names[label].capitalize())
                     root[counter_root][0][counter_maintree].makeelement(subtree_module[0], subtree_module[1])
                     ET.SubElement(root[counter_root][0][counter_maintree], subtree_module[0], subtree_module[1])
+
+                    attrib = {}
+                    root[counter_root][0][counter_maintree].makeelement("Inverter", attrib)
+                    ET.SubElement(root[counter_root][0][counter_maintree], "Inverter", attrib)
                     # <SubTree ID="NeedHelp" __shared_blackboard="true"/>
                     subtree_module = self.bt_modules.subtree_module(subtree_name = "NeedHelp")
-                    root[counter_root][0][counter_maintree].makeelement(subtree_module[0], subtree_module[1])
-                    ET.SubElement(root[counter_root][0][counter_maintree], subtree_module[0], subtree_module[1])
+                    root[counter_root][0][counter_maintree][3].makeelement(subtree_module[0], subtree_module[1])
+                    ET.SubElement(root[counter_root][0][counter_maintree][3], subtree_module[0], subtree_module[1])
                     counter_maintree += 1
                 
                 # add Finish

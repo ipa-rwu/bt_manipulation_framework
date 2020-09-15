@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("");
     std::string group_name = "manipulator";
 
-    ros::AsyncSpinner spinner(2); 
+    ros::AsyncSpinner spinner(1); 
     spinner.start();
 
     manipulator_skills::ArmUpdateGoal ArmUpdateStateSkill(group_name, nh);

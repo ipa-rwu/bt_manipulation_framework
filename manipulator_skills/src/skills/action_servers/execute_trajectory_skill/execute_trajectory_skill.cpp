@@ -24,11 +24,11 @@ void ArmExecuteTrajectorySkill::initialize()
     webotsRobotName_ = webots_obj.fixName();
     ROS_INFO_STREAM_NAMED(getName(), "webots robot name: " << webotsRobotName_ );
 
-    touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
-    touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
-                          1,
-                          &ArmExecuteTrajectorySkill::TouchsensorCallback,
-                          this);
+    // touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
+    // touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
+    //                       1,
+    //                       &ArmExecuteTrajectorySkill::TouchsensorCallback,
+    //                       this);
 
     // move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
     move_group_.reset(new moveit::planning_interface::MoveGroupInterface(group_name_));
@@ -36,19 +36,22 @@ void ArmExecuteTrajectorySkill::initialize()
     as_.reset(new ExecuteTrajectorySkillServer(root_node_handle_, EXECUTE_TRAJECTORY_NAME, 
     boost::bind(&ArmExecuteTrajectorySkill::executeCB, this, _1), false));
 
+   
     // robot_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
     
     as_->start();
     ROS_INFO_STREAM_NAMED(getName(), "start action" );
+
+    // 
 }
 
-void ArmExecuteTrajectorySkill::TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg)
-{
-  // msg: {"data": "start"}
-  result_touchsensor_ = touchsensor_msg->data;
-//   std::cout << result_touchsensor <<std::endl;
+// void ArmExecuteTrajectorySkill::TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg)
+// {
+//   // msg: {"data": "start"}
+//   result_touchsensor_ = touchsensor_msg->data;
+// //   std::cout << result_touchsensor <<std::endl;
 
-}
+// }
 
 void ArmExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteTrajectorySkillGoalConstPtr& goal)
 {
@@ -63,29 +66,81 @@ void ArmExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteTrajectorySkill
 
     std::cout << "before execute" << result_touchsensor_ <<std::endl;
 
-    if (move_group_->execute(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS)
+    if (as_->isPreemptRequested())
     {
-        std::cout << "finish execute" << result_touchsensor_ <<std::endl;
-        if(result_touchsensor_ == false)
-        {
-            action_res_.success = 1;
-            const std::string response = "SUCCESS";
-            as_->setSucceeded(action_res_, response);
-        }
-        else
-        {
-            action_res_.success = 0;
-            const std::string response = "FAILURE";
-            as_->setAborted(action_res_, response);
-        }
-
+        ROS_INFO("%s: Preempted", action_name_.c_str());
+        // set the action state to preempted
+        // as_->setPreempted();
     }
-    else
+    
+    std::cout << "Execute" <<std::endl;
+    auto error_code = move_group_->execute(plan);
+
+     ROS_INFO("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
+
+    if (as_->isPreemptRequested())
+    {
+        ROS_INFO("%s: Preempted", action_name_.c_str());
+        // set the action state to preempted
+        // as_->setPreempted();
+        error_code = moveit::planning_interface::MoveItErrorCode::PREEMPTED;
+    }
+
+    
+    // if (!move_group_->getMoveGroupClient().getState().isDone())
+    // {
+    //     ROS_DEBUG("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
+    // }
+
+    // ROS_DEBUG("move_action_client: %s %s",
+    //       move_group_->getMoveGroupClient().getState().toString().c_str(),
+    //       move_group_->getMoveGroupClient().getState().getText().c_str());
+
+    // auto error_code = move_group_->getMoveGroupClient().getResult()->error_code.val;
+
+    if (error_code == moveit::planning_interface::MoveItErrorCode::SUCCESS) 
+    {
+        ROS_INFO("Moving to home pose SUCCESSFUL");
+        action_res_.success = 1;
+        const std::string response = "SUCCESS";
+        as_->setSucceeded(action_res_, response);
+    } 
+    if (error_code == moveit::planning_interface::MoveItErrorCode::FAILURE)
     {
         action_res_.success = 0;
         const std::string response = "FAILURE";
         as_->setAborted(action_res_, response);
     }
+
+    if (error_code == moveit::planning_interface::MoveItErrorCode::PREEMPTED)
+    {
+        action_res_.success = 0;
+        const std::string response = "PREEMPTED";
+        as_->setPreempted(action_res_, response);
+    }
+    // if (move_group_->asyncExecute(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS)
+    // {
+    //     std::cout << "finish execute" << result_touchsensor_ <<std::endl;
+    //     if(result_touchsensor_ == false)
+    //     {
+    //         action_res_.success = 1;
+    //         const std::string response = "SUCCESS";
+    //         as_->setSucceeded(action_res_, response);
+    //     }
+    //     else
+    //     {
+    //         action_res_.success = 0;
+    //         const std::string response = "FAILURE";
+    //         as_->setAborted(action_res_, response);
+    //     }
+
+    // }
+    // else
+    // {
+    //     action_res_.success = 0;
+    //     const std::string response = "FAILURE";
+    //     as_->setAborted(action_res_, response);
+    // }
 
 }
 

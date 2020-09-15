@@ -7,13 +7,14 @@ ExecuteTrajectoryActionClient::ExecuteTrajectoryActionClient(
   const std::string & xml_tag_name,
   const std::string & action_name,
   const BT::NodeConfiguration & conf,
-  float time_for_wait)
+  float time_for_wait,
+  const std::string & subscribe_topic_name_)
 : btActionClient<man_msgs::ExecuteTrajectorySkillAction, 
                 man_msgs::ExecuteTrajectorySkillGoal,
-                man_msgs::ExecuteTrajectorySkillResultConstPtr>
-                  (xml_tag_name, action_name, conf, time_for_wait)
+                man_msgs::ExecuteTrajectorySkillResultConstPtr,
+                webots_ros::BoolStamped::ConstPtr>
+                  (xml_tag_name, action_name, conf, time_for_wait, subscribe_topic_name_)
 {
-  //  this->initialize();
 }
 
 // void ExecuteTrajectoryActionClient::initialize()
@@ -48,17 +49,18 @@ void ExecuteTrajectoryActionClient::on_tick()
 
 void ExecuteTrajectoryActionClient::on_wait_for_result()
 {
-
-  if (result_touchsensor_ == true)
+  std::cout << "ExecuteTrajectoryActionClient on_wait_for_result" << std::endl;
+  if (touch_data_ == true)
   {
     collision_happened_  = true;
-    ROS_INFO_STREAM_NAMED("ExecuteTrajectoryActionClient", "ExecuteTrajectoryActionClient: touched table" );
   }
 
 }
   
 BT::NodeStatus ExecuteTrajectoryActionClient::on_success()
 {
+    std::cout << "ExecuteTrajectoryActionClient on_success" << std::endl;
+
     success_ = result_->success;
     // for debug
     setOutput("result", success_);
@@ -77,11 +79,12 @@ BT::NodeStatus ExecuteTrajectoryActionClient::on_success()
 BT_REGISTER_NODES(factory)
 {
   float time_for_wait = 20.0;
+  std::string subscribe_topic_name = "/container_A/touch_sensor";
   BT::NodeBuilder builder =
-    [&time_for_wait](const std::string & name, const BT::NodeConfiguration & config)
+    [&time_for_wait, &subscribe_topic_name](const std::string & name, const BT::NodeConfiguration & config)
     {
       return std::make_unique<man_behavior_tree_nodes::ExecuteTrajectoryActionClient>(
-        name, "execute_trajectory_arm", config, time_for_wait);
+        name, "execute_trajectory_arm", config, time_for_wait, "/container_A/touch_sensor");
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::ExecuteTrajectoryActionClient>(

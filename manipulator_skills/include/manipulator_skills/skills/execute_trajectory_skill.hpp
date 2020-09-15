@@ -37,6 +37,9 @@ private:
   std::unique_ptr<ExecuteTrajectorySkillServer> as_;
   std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
 
+  // std::unique_ptr<actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> > move_action_client_;
+
+
   std::string group_name_;
   std::string action_name_;
 

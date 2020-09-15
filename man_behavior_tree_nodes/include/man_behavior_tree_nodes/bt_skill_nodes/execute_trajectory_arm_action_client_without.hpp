@@ -2,9 +2,8 @@
 #define MAN_BEHAVIOR_TREE_NODES_ARM_EXECUTE_TRAJECTORY_CLIENT_
 
 
-#include "man_behavior_tree_nodes/bt_action_client_subscriber.hpp"
+#include "man_behavior_tree_nodes/bt_action_client.hpp"
 #include "man_msgs/ExecuteTrajectorySkillAction.h"
-#include <webots_ros/BoolStamped.h>
 
 // #include "man_behavior_tree_nodes/webots_elements.hpp"
 
@@ -12,19 +11,16 @@ namespace man_behavior_tree_nodes
 {
 class ExecuteTrajectoryActionClient : public btActionClient<man_msgs::ExecuteTrajectorySkillAction, 
                                                         man_msgs::ExecuteTrajectorySkillGoal,
-                                                        man_msgs::ExecuteTrajectorySkillResultConstPtr,
-                                                        webots_ros::BoolStamped::ConstPtr>
+                                                        man_msgs::ExecuteTrajectorySkillResultConstPtr>
 {
 public:
     ExecuteTrajectoryActionClient(
         const std::string & xml_tag_name,
         const std::string & action_name,
         const BT::NodeConfiguration & conf,
-        float time_for_wait,
-        const std::string & subscribe_topic_name_);
+        float time_for_wait);
     
     void initialize();
-
 
     void on_tick() override;
 

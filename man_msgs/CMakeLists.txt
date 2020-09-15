@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation ${MSG_DEPS})
 
 set(MSG_FILES
 ParameterMsg.msg
+Plan.msg
 )
 
 set(SRV_FILES
@@ -33,6 +34,8 @@ CheckCollisionService.srv
 set(ACT_FILES
 ComputePathSkill.action
 FindObjects.action
+ExecuteGripperTrajectory.action
+ExecuteTrajectorySkill.action
 )
 
 add_action_files(DIRECTORY action FILES ${ACT_FILES})

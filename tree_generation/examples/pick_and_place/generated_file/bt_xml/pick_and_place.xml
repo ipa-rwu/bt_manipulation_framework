@@ -13,29 +13,35 @@
         <Action ID="CallExternHelp" service_name="help_server" />
         <SubTree ID="Initialization" __shared_blackboard="true" />
       </Fallback>
-      <Fallback name="task1">
+      <Fallback name="Task1">
         <Inverter>
           <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task1Detect" />
         </Inverter>
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
         <SubTree ID="Task1Detect" __shared_blackboard="true" />
-        <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
       </Fallback>
-      <Fallback name="task2">
+      <Fallback name="Task2">
         <Inverter>
           <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task2Pick" />
         </Inverter>
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
         <SubTree ID="Task2Pick" __shared_blackboard="true" />
-        <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
       </Fallback>
-      <Fallback name="task3">
+      <Fallback name="Task3">
         <Inverter>
           <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task3Place" />
         </Inverter>
         <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
         <SubTree ID="Task3Place" __shared_blackboard="true" />
-        <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
       </Fallback>
       <Sequence name="AllFinish">
         <Condition ID="SetFlagTask" success="false" task_name="Task1Detect" />
