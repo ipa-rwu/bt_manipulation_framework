@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="Initialization">
+        <Sequence>
+            <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server"/>
+            <Action ID="UpdateParameter" data_type="string" topic="/gripper_parameter_server"/>
+            <Action ID="UpdateParameter" data_type="bool" topic="/task_flag_parameter_server"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Sequence name="Job">
+            <Fallback name="Help">
+                <Action ID="CheckTaskResult" task_name="Help"/>
+                <Sequence>
+                    <Action ID="CallExternHelp" service_name="help_server"/>
+                    <Condition ID="SetFlagTask" success="false" task_name="Help"/>
+                </Sequence>
+                <SubTree ID="Initialization" __shared_blackboard="true"/>
+            </Fallback>
+            <Fallback name="Task1">
+                <Inverter>
+                    <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task1Detect"/>
+                </Inverter>
+                <Action ID="CheckTaskResult" task_name="{current_task_name}"/>
+                <SubTree ID="Task1Detect" __shared_blackboard="true"/>
+                <Inverter>
+                    <SubTree ID="NeedHelp" __shared_blackboard="true"/>
+                </Inverter>
+            </Fallback>
+            <Fallback name="Task2">
+                <Inverter>
+                    <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task2Pick"/>
+                </Inverter>
+                <Action ID="CheckTaskResult" task_name="{current_task_name}"/>
+                <SubTree ID="Task2Pick" __shared_blackboard="true"/>
+                <Inverter>
+                    <SubTree ID="NeedHelp" __shared_blackboard="true"/>
+                </Inverter>
+            </Fallback>
+            <Fallback name="Task3">
+                <Inverter>
+                    <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task3Place"/>
+                </Inverter>
+                <Action ID="CheckTaskResult" task_name="{current_task_name}"/>
+                <SubTree ID="Task3Place" __shared_blackboard="true"/>
+                <Inverter>
+                    <SubTree ID="NeedHelp" __shared_blackboard="true"/>
+                </Inverter>
+            </Fallback>
+            <Sequence name="AllFinish">
+                <Condition ID="SetFlagTask" success="false" task_name="Task1Detect"/>
+                <Condition ID="SetFlagTask" success="false" task_name="Task2Pick"/>
+                <Condition ID="SetFlagTask" success="false" task_name="Task3Place"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="NeedHelp">
+        <Sequence name="setHelpsteps">
+            <Condition ID="SetFlagTask" success="false" task_name="{current_task_name}"/>
+            <Condition ID="SetFlagTask" success="true" task_name="Help"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Task1Detect">
+        <Sequence name="steps">
+            <Sequence name="task1step1">
+                <Action ID="FindObjects" container="{container}" container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" frame_id="world" marker="{marker}" marker_id="1"/>
+            </Sequence>
+            <Sequence name="task1finish">
+                <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Task2Pick">
+        <Sequence name="steps">
+            <Sequence name="task2step1">
+                <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step1"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task2step2">
+                <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step2"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task2step3">
+                <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step3"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task2finish">
+                <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Task3Place">
+        <Sequence name="steps">
+            <Sequence name="task3step1">
+                <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step1"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task3step2">
+                <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step2"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task3step3">
+                <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step3"/>
+                <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian"/>
+                <SubTree ID="subExecution" __shared_blackboard="true"/>
+            </Sequence>
+            <Sequence name="task3finish">
+                <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="change">
+        <SequenceStar>
+            <Sequence name="Sequce">
+                <SubTree ID="Initialization" __shared_blackboard=""/>
+                <Action ID="FindObjects" container="" container_A="" container_B="" frame_id="" marker="" marker_id=""/>
+            </Sequence>
+            <RetryUntilSuccesful num_attempts="3">
+                <Sequence>
+                    <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="" step="task2step1"/>
+                    <Action ID="ComputePathArm" goal="" plan="" replan_times="" target_type=""/>
+                    <Action ID="ExecuteTrajectoryArm" plan="" topic_name=""/>
+                </Sequence>
+            </RetryUntilSuccesful>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="subExecution">
+        <Sequence>
+            <Action ID="ExecuteTrajectoryArm" plan="{plan}" topic_name="/container_A_23942_rachel_Inspiron_7560/touch_sensor/value"/>
+            <Action ID="ExecuteTrajectoryGripper" step="{current_step}"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CallExternHelp">
+            <inout_port name="service_name"/>
+        </Action>
+        <Action ID="CheckTaskResult">
+            <inout_port name="task_name"/>
+        </Action>
+        <Action ID="ComputePathArm">
+            <inout_port name="goal"/>
+            <inout_port name="plan"/>
+            <inout_port name="replan_times"/>
+            <inout_port name="target_type"/>
+        </Action>
+        <Action ID="ExecuteTrajectoryArm">
+            <inout_port name="plan"/>
+            <inout_port name="topic_name"/>
+        </Action>
+        <Action ID="ExecuteTrajectoryGripper">
+            <inout_port name="step"/>
+        </Action>
+        <Action ID="FindObjects">
+            <inout_port name="container"/>
+            <inout_port name="container_A"/>
+            <inout_port name="container_B"/>
+            <inout_port name="frame_id"/>
+            <inout_port name="marker"/>
+            <inout_port name="marker_id"/>
+        </Action>
+        <SubTree ID="Initialization">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <SubTree ID="NeedHelp">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <Condition ID="SetFlagTask">
+            <inout_port name="success"/>
+            <inout_port name="task_name"/>
+        </Condition>
+        <SubTree ID="Task1Detect">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <SubTree ID="Task2Pick">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <SubTree ID="Task3Place">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+        <Action ID="UpdateGoalForArm">
+            <inout_port name="based_on_pose"/>
+            <inout_port name="goal"/>
+            <inout_port name="step"/>
+        </Action>
+        <Action ID="UpdateParameter">
+            <inout_port name="data_type"/>
+            <inout_port name="topic"/>
+        </Action>
+        <SubTree ID="change">
+            <input_port default="false" name="__shared_blackboard">If false (default), the Subtree has an isolated blackboard and needs port remapping</input_port>
+        </SubTree>
+        <Action ID="getCurrentStep"/>
+        <SubTree ID="subExecution">
+            <inout_port name="__shared_blackboard"/>
+        </SubTree>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

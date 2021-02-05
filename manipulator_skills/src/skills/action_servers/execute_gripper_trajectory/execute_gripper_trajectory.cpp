@@ -25,7 +25,7 @@ void GripperExecuteTrajectorySkill::initialize()
     // robot_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
     
     as_->start();
-    ROS_INFO_STREAM_NAMED(getName(), "start action" );
+    // ROS_INFO_STREAM_NAMED(getName(), "start action" );
 }
 
 void GripperExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteGripperTrajectoryGoalConstPtr& goal)

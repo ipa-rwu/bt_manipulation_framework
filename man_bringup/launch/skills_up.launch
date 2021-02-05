@@ -39,4 +39,7 @@
 <node pkg="manipulator_skills" type="help" name="help_server" output="screen" required="true">
 </node>
 
+<node pkg="manipulator_skills" type="set_parameter_server" name="set_parameter_server" output="screen" required="true">
+</node>
+
 </launch>

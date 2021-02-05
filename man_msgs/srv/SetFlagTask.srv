@@ -2,6 +2,7 @@
 string param_topic
 string task_name
 bool success
+float32 param_float
 ---
 #response
 bool result

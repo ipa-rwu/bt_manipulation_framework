@@ -17,7 +17,7 @@ CallExternHelpServiceClient::CallExternHelpServiceClient(
 void CallExternHelpServiceClient::on_tick()
 {
     config().blackboard->get<bool>("first_time", first_time_);
-    std::cout << "CallExternHelpService first_time:    "<< first_time_ << std::endl;;
+    // std::cout << "CallExternHelpService first_time:    "<< first_time_ << std::endl;;
 
     if(first_time_ == false)
         service_.request.needhelp = true;

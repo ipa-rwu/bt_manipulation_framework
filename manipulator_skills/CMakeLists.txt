@@ -129,6 +129,14 @@ target_link_libraries(set_flag_for_task_server set_flag_for_task)
 add_dependencies(set_flag_for_task ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(set_flag_for_task_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_library(set_parameter SHARED
+  src/skills/service_server/set_parameter/set_parameter.cpp)
+add_executable(set_parameter_server 
+  src/skills/service_server/set_parameter/main.cpp)
+target_link_libraries(set_parameter ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(set_parameter_server set_parameter)
+add_dependencies(set_parameter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(set_parameter_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(execute_trajectory_skill SHARED
   src/skills/action_servers/execute_trajectory_skill/execute_trajectory_skill.cpp)

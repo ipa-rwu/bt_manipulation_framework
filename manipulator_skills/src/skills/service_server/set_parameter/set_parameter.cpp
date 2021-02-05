@@ -1,55 +1,55 @@
-#include "manipulator_skills/skills/set_flag_for_task.hpp"
+#include "manipulator_skills/skills/set_parameter.hpp"
 #include "manipulator_skills/skill_names.hpp"
 #include <iostream>
 
 namespace manipulator_skills
 {
 
-SetFlagForTask::SetFlagForTask(
+SetParameter::SetParameter(
     const ros::NodeHandle &private_node_handle) :
-    ManipulatorSkill(SET_FLAG_FOR_TASK),
+    ManipulatorSkill(SET_PARAMETER),
     pnh_(private_node_handle),
-    service_name_(SET_FLAG_FOR_TASK)
+    service_name_(SET_PARAMETER)
   {
     this->initialize();
   }
 
-SetFlagForTask::~SetFlagForTask()
+SetParameter::~SetParameter()
 {
 
 }
 
-void SetFlagForTask::initialize()
+void SetParameter::initialize()
 {
 
-    service_ = pnh_.advertiseService(SET_FLAG_FOR_TASK, &SetFlagForTask::executeCB, this);
+    service_ = pnh_.advertiseService(SET_PARAMETER, &SetParameter::executeCB, this);
     ROS_INFO_NAMED(getName(), "start service: [%s] ", getName().c_str());
 }
 
-bool SetFlagForTask::executeCB(man_msgs::SetFlagTask::Request  &req,
+bool SetParameter::executeCB(man_msgs::SetFlagTask::Request  &req,
                         man_msgs::SetFlagTask::Response &res)
 {
-    ROS_INFO_NAMED(getName(), "[%s] get request", getName().c_str());
+    // ROS_INFO_NAMED(getName(), "[%s] get request", getName().c_str());
 
     if(!req.param_topic.empty())
         param_topic_ = req.param_topic;
 
-    std::vector<int8_t> value_int;
+    std::vector<float> value_float;
     std::vector<std::string> all_params;
     std::vector<std::string> labels;
     
-    getParam(all_params, param_topic_, labels, value_int);
+    getParam(all_params, param_topic_, labels, value_float);
 
-    setParam(param_topic_, req.task_name, req.success);
+    setParam(param_topic_, req.task_name, req.param_float);
 
     res.result = true;
     return true;
 }
 
-void SetFlagForTask::getParam(std::vector<std::string> all_params,
+void SetParameter::getParam(std::vector<std::string> all_params,
                             std::string param_topic, 
                             std::vector<std::string> labels,
-                            std::vector<int8_t> value_int)
+                            std::vector<float> value_float)
 {
     pnh_.getParamNames(all_params);
     // std::cout << "getParam function: "  <<std::endl;
@@ -60,12 +60,12 @@ void SetFlagForTask::getParam(std::vector<std::string> all_params,
         std::size_t found = all_params.at(i).find(param_topic);
         if (found!=std::string::npos)
         {
-            bool val;
+            float val;
             std::string label;
 
             // task value
             pnh_.getParam(all_params.at(i), val);
-            value_int.push_back(val);
+            value_float.push_back(val);
 
             //  lables = all task names
             label = all_params.at(i).substr(found + param_topic.size() + 1);
@@ -77,17 +77,13 @@ void SetFlagForTask::getParam(std::vector<std::string> all_params,
 
 }
     
-void SetFlagForTask::setParam(std::string param_topic,
+void SetParameter::setParam(std::string param_topic,
                 std::string task_name,
-                bool task_value)
+                float param_value)
 {
-    std::string value;
-    if(task_value)
-        value = "1";
-    else
-        value = "0";
+
     std::string command = "rosrun dynamic_reconfigure dynparam set_from_parameters";
-    command = command + " " + param_topic + " _" + task_name + ":=" + value;
+    command = command + " " + param_topic + " _" + task_name + ":=" + std::to_string(param_value);
     std::cout << command << std::endl;
     system(command.c_str());
 }

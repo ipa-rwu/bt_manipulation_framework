@@ -53,19 +53,19 @@ public:
   {
     param_bool_.clear();
     config().blackboard->get<std::map<std::string, bool>>("param_bool", param_bool_);
-    for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
-    {
-        std::cout <<"old task param"<< it->first << " " << it->second << "\n";
-    }    
+    // for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
+    // {
+    //     std::cout <<"old task param"<< it->first << " " << it->second << "\n";
+    // }    
     if(!param_bool_.find(task_name_)->first.empty())
         {
             param_bool_.at(task_name_) = task_result_;
             config().blackboard->set<std::map<std::string, bool>>("param_bool", param_bool_);
 
-            for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
-            {
-                std::cout <<"new task param"<< it->first << " " << it->second<< "\n";
-            }    
+            // for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
+            // {
+            //     std::cout <<"new task param"<< it->first << " " << it->second<< "\n";
+            // }    
 
             return true;
         }

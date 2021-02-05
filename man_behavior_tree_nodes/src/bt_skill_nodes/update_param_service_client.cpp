@@ -25,8 +25,6 @@ void UpdateParamServiceClient::on_tick()
 
 BT::NodeStatus UpdateParamServiceClient::on_success()
 {
-    ROS_INFO("get result");
-
     param_float_.clear();
     param_string_.clear();
     param_int_.clear();
@@ -59,10 +57,10 @@ BT::NodeStatus UpdateParamServiceClient::on_success()
 
     if(param_string_.size() != 0)
     {
-      for(auto it = param_string_.cbegin(); it != param_string_.cend(); ++it)
-      {
-          std::cout << it->first << " " << it->second << " "  << "\n";
-      }
+      // for(auto it = param_string_.cbegin(); it != param_string_.cend(); ++it)
+      // {
+      //     std::cout << it->first << " " << it->second << " "  << "\n";
+      // }
       config().blackboard->set<std::map<std::string, std::string>>("param_string", param_string_);
       return BT::NodeStatus::SUCCESS;
     }
@@ -80,20 +78,20 @@ BT::NodeStatus UpdateParamServiceClient::on_success()
 
     if(param_bool_.size() != 0)
     {
-      for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
-      {
-          std::cout << it->first << " " << it->second << " "  << "\n";
-      }
+      // for(auto it = param_bool_.cbegin(); it != param_bool_.cend(); ++it)
+      // {
+      //     std::cout << it->first << " " << it->second << " "  << "\n";
+      // }
       config().blackboard->set<std::map<std::string, bool>>("param_bool", param_bool_);
       return BT::NodeStatus::SUCCESS;      
     }
 
     if(param_int_.size() != 0)
     {
-      for(auto it = param_int_.cbegin(); it != param_int_.cend(); ++it)
-      {
-          std::cout << it->first << " " << it->second << " "  << "\n";
-      }
+      // for(auto it = param_int_.cbegin(); it != param_int_.cend(); ++it)
+      // {
+      //     std::cout << it->first << " " << it->second << " "  << "\n";
+      // }
       config().blackboard->set<std::map<std::string, int8_t>>("param_int", param_int_);
       return BT::NodeStatus::SUCCESS;
     }

@@ -30,11 +30,11 @@ void ExecuteGripperTrajectoryActionClient::on_tick()
         }
         
         
-        ROS_INFO_STREAM_NAMED("ExecuteGripperTrajectoryActionClient", "[ExecuteGripper] step: "<< step_);
+        // ROS_INFO_STREAM_NAMED("ExecuteGripperTrajectoryActionClient", "[ExecuteGripper] step: "<< step_);
      
         config().blackboard->get<std::map<std::string, std::string>>("param_string", param_string_);
         goal_.action_name = param_string_.find(step_)->second;
-        ROS_INFO_STREAM_NAMED("ExecuteGripperTrajectoryActionClient", "[ExecuteGripper] target: "<< goal_.action_name);
+        // ROS_INFO_STREAM_NAMED("ExecuteGripperTrajectoryActionClient", "[ExecuteGripper] target: "<< goal_.action_name);
     }
 
 

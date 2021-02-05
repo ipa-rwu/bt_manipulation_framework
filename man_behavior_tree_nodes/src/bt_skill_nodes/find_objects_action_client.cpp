@@ -37,8 +37,8 @@ BT::NodeStatus FindObjectsActionClient::on_success()
   man_msgs::FindObjectsResultConstPtr result;
   setOutput("marker", result_->marker_pose);
   setOutput("container", result_->container_pose);
-  ROS_INFO_STREAM_NAMED("find_objects", "[result] marker: "<< result_->marker_pose);
-  ROS_INFO_STREAM_NAMED("find_objects", "[result] container: "<< result_->container_pose);
+  // ROS_INFO_STREAM_NAMED("find_objects", "[result] marker: "<< result_->marker_pose);
+  // ROS_INFO_STREAM_NAMED("find_objects", "[result] container: "<< result_->container_pose);
 
   return BT::NodeStatus::SUCCESS;
 }

@@ -22,7 +22,7 @@ void ArmExecuteTrajectorySkill::initialize()
 {
     WebotsSkills webots_obj;
     webotsRobotName_ = webots_obj.fixName();
-    ROS_INFO_STREAM_NAMED(getName(), "webots robot name: " << webotsRobotName_ );
+    // ROS_INFO_STREAM_NAMED(getName(), "webots robot name: " << webotsRobotName_ );
 
     // touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
     // touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
@@ -40,7 +40,7 @@ void ArmExecuteTrajectorySkill::initialize()
     // robot_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
     
     as_->start();
-    ROS_INFO_STREAM_NAMED(getName(), "start action" );
+    // ROS_INFO_STREAM_NAMED(getName(), "start action" );
 
     // 
 }
@@ -64,23 +64,20 @@ void ArmExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteTrajectorySkill
 
     move_group_->setStartStateToCurrentState();
 
-    std::cout << "before execute" << result_touchsensor_ <<std::endl;
-
     if (as_->isPreemptRequested())
     {
-        ROS_INFO("%s: Preempted", action_name_.c_str());
+        // ROS_INFO("Before execution %s: Preempted", action_name_.c_str());
         // set the action state to preempted
         // as_->setPreempted();
     }
     
-    std::cout << "Execute" <<std::endl;
     auto error_code = move_group_->execute(plan);
 
-     ROS_INFO("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
+    //  ROS_INFO("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
 
     if (as_->isPreemptRequested())
     {
-        ROS_INFO("%s: Preempted", action_name_.c_str());
+        // ROS_INFO("After execution %s: Preempted", action_name_.c_str());
         // set the action state to preempted
         // as_->setPreempted();
         error_code = moveit::planning_interface::MoveItErrorCode::PREEMPTED;
@@ -100,7 +97,7 @@ void ArmExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteTrajectorySkill
 
     if (error_code == moveit::planning_interface::MoveItErrorCode::SUCCESS) 
     {
-        ROS_INFO("Moving to home pose SUCCESSFUL");
+        // ROS_INFO("Moving to home pose SUCCESSFUL");
         action_res_.success = 1;
         const std::string response = "SUCCESS";
         as_->setSucceeded(action_res_, response);

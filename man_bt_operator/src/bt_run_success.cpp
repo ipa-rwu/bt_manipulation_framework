@@ -69,6 +69,7 @@ void BT_Manipulator::initialize()
     blackboard_->set<ros::NodeHandle>("node_handle", pnh_);  // NOLINT
     blackboard_->set<std::string>("end_effector", end_effector_name_);
     blackboard_->set<bool>("first_time", first_time_);
+    blackboard_->set<double>("recovery_arm_parameter", recovery_arm_parameter_);
 
     blackboard_->set<std::string>("current_step", step_); 
     // shouldn't share state in heap
@@ -82,9 +83,9 @@ void BT_Manipulator::initialize()
 
     }
 
-    // #ifdef ZMQ_FOUND
-    //   BT::PublisherZMQ publisher_zmq(tree_);
-    // #endif
+    #ifdef ZMQ_FOUND
+      BT::PublisherZMQ publisher_zmq(tree_,25, 1669,1670);
+    #endif
 
     // This logger prints state changes on console
     BT::StdCoutLogger logger_cout(tree_);

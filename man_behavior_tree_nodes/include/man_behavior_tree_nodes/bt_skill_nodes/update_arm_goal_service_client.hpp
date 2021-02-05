@@ -25,8 +25,9 @@ class UpdateArmGoalServiceClient : public btServiceClient<man_msgs::UpdateArmGoa
             BT::InputPort<std::string>("step", "step for goal"),
             BT::InputPort<std::string>("goal_frame_id", "frame id of goal"),
             BT::InputPort<geometry_msgs::PoseStamped>("based_on_pose", "target for task to reach"),
-            
-            BT::OutputPort<geometry_msgs::PoseStamped>("goal", "goal for arm"),
+            BT::InputPort<geometry_msgs::PoseStamped>("based_on_pose", "target for task to reach"),
+            BT::InputPort<double>("param", "param"),
+            BT::OutputPort<geometry_msgs::PoseStamped>("goal", "goal"),
 
         });
     }
@@ -37,7 +38,8 @@ private:
     std::string step_;
     std::string goal_frame_id_;
     geometry_msgs::PoseStamped target_;
-    float param_;
+    double param_;
+    double old_param_;
 
     std::map<std::string, float> param_float_;
     std::string world_frame_id_;

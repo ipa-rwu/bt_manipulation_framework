@@ -30,14 +30,13 @@ void ArmUpdateGoal::initialize()
     tf_.reset(new tf2_ros::Buffer());
     tfListener_.reset(new tf2_ros::TransformListener(*tf_));
 
-    ROS_INFO_STREAM_NAMED(getName(), "start service" );
+    // ROS_INFO_STREAM_NAMED(getName(), "start service" );
     // std::cout << move_group_->getCurrentPose().pose;
 }
 
 bool ArmUpdateGoal::executeCB(man_msgs::UpdateArmGoal::Request  &req,
                     man_msgs::UpdateArmGoal::Response &res)
 {
-    ROS_INFO("get request");
     // current_state_ = move_group_->getCurrentState();
     // std::cout<< *current_state << std::endl;
     // moveit_msgs::RobotState robot_state;
@@ -99,10 +98,12 @@ bool ArmUpdateGoal::executeCB(man_msgs::UpdateArmGoal::Request  &req,
         res.goal.pose.position.z += req.param;
     }
 
-    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] frame_id: "<< req.frame_id<< "param: "<< req.param);
-    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] target: "<< req.target);
+    // ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] frame_id: "<< req.frame_id);
 
-    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[res] goal: "<< res.goal);
+    // ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] param: " << req.param);
+    // ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[req] target: "<< req.target);
+
+    ROS_INFO_STREAM_NAMED("update_arm_goal_server", "[Goal for Arm]: "<< res.goal.pose);
 
 
     return true;

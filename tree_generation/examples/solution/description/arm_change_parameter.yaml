@@ -1,0 +1,10 @@
+task:
+    name: change_parameter_arm
+    try_times: 3
+    steps:
+      step1:
+        1: 
+          object: arm
+          action: move
+          base: marker
+          param: 0.05 

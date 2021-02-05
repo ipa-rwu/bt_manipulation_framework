@@ -27,7 +27,7 @@ void SetFlagTaskServiceClient::on_tick()
 
 BT::NodeStatus SetFlagTaskServiceClient::on_success()
 {
-    ROS_INFO("get result");
+    // ROS_INFO("get result");
     param_bool_.clear();
 
 

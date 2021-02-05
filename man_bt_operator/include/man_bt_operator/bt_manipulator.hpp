@@ -71,6 +71,7 @@ protected:
     std::string world_frame_id_;
     std::string step_;
     bool first_time_{true};
+    double recovery_arm_parameter_{0.0};
 };
 
 

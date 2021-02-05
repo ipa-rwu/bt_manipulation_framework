@@ -60,7 +60,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
 
     // add construct
     end_effector_ = goal->end_effector;
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] end_effector is " << end_effector_);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] end_effector is " << end_effector_);
     group_name_ = goal->group_name;
     planner_id_ = goal->planner_id;
     replan_times_ = goal->num_planning_attempts;
@@ -75,7 +75,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
   {    
       pose_constraints_ = updateGoal(position_tolerances_, orientation_tolerances_, goal->goal, end_effector_);
 
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
       // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] pose of goal is " << goal->goal);
 
       current_state_ = move_group_->getCurrentState();
@@ -95,8 +95,8 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
     if(goal->target_type.compare("Name") == 0)
     {
 
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] pose name of goal: \"%s\" ", goal->named_goal.c_str());
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] pose name of goal: \"%s\" ", goal->named_goal.c_str());
 
       std::string named_goal = goal->named_goal;
       error_code = createPlanInterface(named_goal, 
@@ -115,8 +115,8 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
       current_state_ = move_group_->getCurrentState();
       robot_state::robotStateToRobotStateMsg(*current_state_ ,robot_state_);
 
-        ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
-        ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] pose of goal is " << goal->goal);
+        // ROS_INFO_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor is %f", goal->max_velocity_scaling_factor);
+        // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] pose of goal is " << goal->goal);
 
       error_code = createPlanInterface(goal->goal, 
                             goal->eef_step, 
@@ -136,7 +136,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
       action_res_.plan.trajectory = plan.trajectory_;
       action_res_.plan.planning_time = plan.planning_time_;
 
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute path succeeded!");
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute path succeeded!");
       // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] get path " << action_res_.plan.trajectory);
 
 
@@ -145,7 +145,7 @@ void ArmComputePathSkill::executeCB(const man_msgs::ComputePathSkillGoalConstPtr
     }
     else
     {
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute path Failed!");
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute path Failed!");
 
       const std::string response = "FAILURE";
       as_->setAborted(action_res_, response);
@@ -183,7 +183,7 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::createPlanWithPipeline(moveit
                                                   const moveit_msgs::RobotState& start_robot_state,
                                                   moveit::planning_interface::MoveGroupInterface::Plan& plan)
 {
-    ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm request received");
+    // ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm request received");
 
     moveit_msgs::MoveItErrorCodes error_code;
     error_code.val = moveit::planning_interface::MoveItErrorCode::FAILURE;
@@ -216,25 +216,25 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::createPlanWithPipeline(moveit
     // // Now, call the pipeline and check whether planning was successful.
     // planning_pipeline_->generatePlan(planning_scene_, req, res);
 
-    ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm request: ");
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] start_state: " << req.start_state);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] group_name: " << req.group_name);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] planner_id: " << req.planner_id);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] allowed_planning_time: " << req.allowed_planning_time);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] num_planning_attempts: " << req.num_planning_attempts);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor: " << req.max_velocity_scaling_factor);
-    ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] goal_constraints: " << req.goal_constraints.at(0));
+    // ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm request: ");
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] start_state: " << req.start_state);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] group_name: " << req.group_name);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] planner_id: " << req.planner_id);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] allowed_planning_time: " << req.allowed_planning_time);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] num_planning_attempts: " << req.num_planning_attempts);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] max_velocity_scaling_factor: " << req.max_velocity_scaling_factor);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] goal_constraints: " << req.goal_constraints.at(0));
 
-    ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan");
+    // ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan");
 
     if(motion_plan_client_.call(motion_plan))
     { 
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan Succeeded");
-      ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] call motionplan result: " << res.error_code.val);
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan Succeeded");
+      // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] call motionplan result: " << res.error_code.val);
     }
     else
     {
-      ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan Failed");
+      // ROS_INFO_NAMED(getName(), "[ComputePathSkill] call motionplan Failed");
     }
       
       if(res.error_code.val == res.error_code.SUCCESS)
@@ -246,12 +246,12 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::createPlanWithPipeline(moveit
         plan.trajectory_ = res.trajectory;
         plan.planning_time_ = res.planning_time;
         error_code.val = moveit::planning_interface::MoveItErrorCode::SUCCESS;
-        ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm Succeeded");
+        // ROS_INFO_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline for Arm Succeeded");
 
       }
       else
         error_code.val = moveit::planning_interface::MoveItErrorCode::FAILURE;
-        ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline : " << res.error_code.val);
+        // ROS_INFO_STREAM_NAMED(getName(), "[ComputePathSkill] createPlanWithPipeline : " << res.error_code.val);
 
     return error_code;
 }
@@ -264,7 +264,7 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::createPlanInterface(const geo
                                                                         const moveit_msgs::RobotState &start_robot_state,
                                                                         moveit::planning_interface::MoveGroupInterface::Plan& plan)
 {
-    ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute Path for Cartesian Paths");
+    // ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute Path for Cartesian Paths");
 
     moveit_msgs::MoveItErrorCodes error_code;
     error_code.val = moveit::planning_interface::MoveItErrorCode::FAILURE;
@@ -313,7 +313,7 @@ moveit_msgs::MoveItErrorCodes ArmComputePathSkill::createPlanInterface(std::stri
                                                                         const moveit_msgs::RobotState &start_robot_state,
                                                                         moveit::planning_interface::MoveGroupInterface::Plan& plan)
 {
-    ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute Path for pose name: \"%s\" ", pose_name.c_str());
+    // ROS_INFO_NAMED(getName(), "[ComputePathSkill] Compute Path for pose name: \"%s\" ", pose_name.c_str());
 
     moveit_msgs::MoveItErrorCodes error_code;
 

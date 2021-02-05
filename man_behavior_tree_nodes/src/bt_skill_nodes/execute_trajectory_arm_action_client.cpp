@@ -49,17 +49,16 @@ void ExecuteTrajectoryActionClient::on_tick()
 
 void ExecuteTrajectoryActionClient::on_wait_for_result()
 {
-  std::cout << "ExecuteTrajectoryActionClient on_wait_for_result" << std::endl;
-  if (touch_data_ == true)
+  if (collision_happened_ == true)
   {
-    collision_happened_  = true;
+    // ROS_INFO("[ExecuteTrajectoryActionClient] on_wait_for_result: touched");
   }
 
 }
   
 BT::NodeStatus ExecuteTrajectoryActionClient::on_success()
 {
-    std::cout << "ExecuteTrajectoryActionClient on_success" << std::endl;
+    // std::cout << "ExecuteTrajectoryActionClient on_success" << std::endl;
 
     success_ = result_->success;
     // for debug

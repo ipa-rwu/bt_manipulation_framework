@@ -10,11 +10,7 @@
     <Sequence name="Job">
       <Fallback name="Help">
         <Action ID="CheckTaskResult" task_name="Help" />
-        <Sequence>
-            <Action ID="CallExternHelp" service_name="help_server"/>
-            <Condition ID="SetFlagTask" success="false" task_name="Help"/>
-            <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
-        </Sequence>
+        <Action ID="CallExternHelp" service_name="help_server" />
         <SubTree ID="Initialization" __shared_blackboard="true" />
       </Fallback>
       <Fallback name="Task1">
@@ -116,7 +112,7 @@
   </BehaviorTree>
   <BehaviorTree ID="subExecution">
     <Sequence name="Sequence">
-      <Action ID="ExecuteTrajectoryArm" plan="{plan}" topic_name="/container_A_17867_rachel_Inspiron_7560/touch_sensor/value"/>
+      <Action ID="ExecuteTrajectoryArm" plan="{plan}" />
       <Action ID="ExecuteTrajectoryGripper" step="{current_step}" />
     </Sequence>
   </BehaviorTree>

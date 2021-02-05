@@ -28,7 +28,6 @@ void UpdateParam::initialize()
 bool UpdateParam::executeCB(man_msgs::UpdateParam::Request  &req,
                         man_msgs::UpdateParam::Response &res)
 {
-    ROS_INFO("get request");
     std::string topic_name = req.topic;
     std::string data_type = req.data_type;
 

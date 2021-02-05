@@ -121,6 +121,87 @@ class CreateBTStructure():
 
         tree.write(self.created_bt_xml, xml_declaration=True, encoding='utf-8')
 
+    def solution_maintree(self, task_names, step_name, retry_times, param, sub_steps, created_bt_xml_path = None):
+        created_bt_xml = self.update_created_bt_xml(created_bt_xml_path)
+        tree = created_bt_xml[0]
+        root = created_bt_xml[1]
+        
+        # add tasks or task
+        counter_root = 0
+        counter_maintree = 1
+        for lev_1 in root:
+            if lev_1.attrib["ID"] == "MainTree":
+                for label in task_names.keys():
+                    for lev2 in root[counter_root]:
+                        lev2.set('name', task_names[label])
+                    for lev3 in root[counter_root][0]:
+                        if lev3.tag == "RetryUntilSuccesful":
+                            lev3.set('num_attempts', str(retry_times))
+                            for steps_level2 in sub_steps.keys():
+                                info = sub_steps[steps_level2]
+                                if info["object"] == "arm":
+                                    update_goal_arm_module = self.bt_modules.update_goal_arm_module(step = step_name, 
+                                                                    #goal_frame_id = "world", 
+                                                                    goal_frame_id = None,
+                                                                    based_on_pose = "{" + info["base"] + "}", 
+                                                                    goal="{arm_goal}",
+                                                                    param = str(param),
+                                                                    service_name = None)
+                                    break
+                            root[counter_root][0][1][0].makeelement(update_goal_arm_module[0], update_goal_arm_module[1])
+                            ET.SubElement(root[counter_root][0][1][0], update_goal_arm_module[0], update_goal_arm_module[1])
+
+                            compute_path_module = self.bt_modules.compute_path_module(replan_times = "1", 
+                                                    target_type = "Cartesian", 
+                                                    plan = "{plan}", 
+                                                    goal="{arm_goal}",
+                                                    planner_id = None)
+                            root[counter_root][0][1][0].makeelement(compute_path_module[0], compute_path_module[1])
+                            ET.SubElement(root[counter_root][0][1][0], compute_path_module[0], compute_path_module[1])
+
+                            execute_trajectory_arm_module = self.bt_modules.execute_trajectory_arm_module(
+                                plan = "{plan}")
+                            # print(execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
+                            root[counter_root][0][1][0].makeelement(execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
+                            ET.SubElement(root[counter_root][0][1][0], execute_trajectory_arm_module[0], execute_trajectory_arm_module[1])
+
+                    # <RetryUntilSuccesful num_attempts="3">
+                    #     <Sequence>
+                    #         <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="" step="task2step1"/>
+                    #         <Action ID="ComputePathArm" goal="" plan="" replan_times="" target_type=""/>
+                    #         <Action ID="ExecuteTrajectoryArm" plan="" topic_name=""/>
+                    #     </Sequence>
+                    # </RetryUntilSuccesful>
+                    # add task <Fallback name="Task1">
+
+
+            else:
+                counter_root += 1
+        
+        self.indent(root)
+        tree.write(self.created_bt_xml, xml_declaration=True, encoding='utf-8')
+
+    def update_solution_initialization(self,created_bt_xml_path = None):
+        created_bt_xml = self.update_created_bt_xml(created_bt_xml_path)
+        tree = created_bt_xml[0]
+        root = created_bt_xml[1] 
+        counter = 0
+        for lev_1 in root:
+            if lev_1.attrib["ID"] == "Initialization":
+                find_object_module = self.bt_modules.find_object_module(marker_id = "1", \
+                                    frame_id="world", \
+                                    marker="{marker}", \
+                                    container_A="-0.35;0.55;0.78;0;0.707;0;0.707;",\
+                                    container_B="0.35;0.55;0.78;0;0.707;0;0.707",\
+                                    container="{container}")
+                root[counter][0].makeelement(find_object_module[0], find_object_module[1])
+                ET.SubElement(root[counter][0], find_object_module[0], find_object_module[1])
+                break
+            else:
+                counter += 1
+        self.indent(root)
+        tree.write(self.created_bt_xml, xml_declaration=True)
+
     # param = (topic, data_type, service_name)
     # <UpdateParameter service_name="update_param" topic="/arm_param_server" data_type="double"/>
     def initial_subtree(self, param_info={}, created_bt_xml_path = None):
@@ -193,19 +274,19 @@ class CreateBTStructure():
         root = created_bt_xml[1]
 
         # append NeedHep subtree
-        attrib = {"ID": "Execution"}
+        attrib = {"ID": "subExecution"}
         element = root.makeelement('BehaviorTree', attrib)
         root.append(element)
 
         if sequence_name == None:
-            attrib = {"name": "arm_gripper_execute"}  
+            attrib = {"name": "Sequence"}  
         else:
             attrib = {"ID": sequence_name}  
 
         counter_root = 0
         for lev_1 in root:
             print(lev_1.attrib)    
-            if lev_1.attrib["ID"] == "Execution":       
+            if lev_1.attrib["ID"] == "subExecution":       
                 root[counter_root].makeelement("Sequence", attrib)
                 ET.SubElement(root[counter_root], "Sequence", attrib)
 
@@ -301,7 +382,8 @@ class CreateBTStructure():
                                                             goal_frame_id = None,
                                                             based_on_pose = "{" + info["base"] + "}", 
                                                             goal="{arm_goal}",
-                                                            service_name = None)
+                                                            service_name = None,
+                                                            param = None)
                         root[counter_root][0][counter_step].makeelement(update_goal_arm_module[0], update_goal_arm_module[1])
                         ET.SubElement(root[counter_root][0][counter_step], update_goal_arm_module[0], update_goal_arm_module[1])
                         
@@ -313,7 +395,7 @@ class CreateBTStructure():
                         root[counter_root][0][counter_step].makeelement(compute_path_module[0], compute_path_module[1])
                         ET.SubElement(root[counter_root][0][counter_step], compute_path_module[0], compute_path_module[1])
 
-                        execution_subtree = self.bt_modules.subtree_module(subtree_name="Execution", share="true")
+                        execution_subtree = self.bt_modules.subtree_module(subtree_name="subExecution", share="true")
                         root[counter_root][0][counter_step].makeelement(execution_subtree[0], execution_subtree[1])
                         ET.SubElement(root[counter_root][0][counter_step], execution_subtree[0], execution_subtree[1])
 
@@ -369,6 +451,7 @@ class CreateBTStructure():
                 counter_root += 1
 
             tree.write(self.created_bt_xml, xml_declaration=True)
+
 
 
 

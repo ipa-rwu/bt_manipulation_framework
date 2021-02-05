@@ -118,7 +118,7 @@ public:
         last_exec_ = ExecutionStatus::SUCCEEDED;
 
         // Give the derive class a chance to do any initialization
-        ROS_INFO_STREAM_NAMED("btActionClient", xml_tag_name.c_str()<< " btActionClient initialized");
+        // ROS_INFO_STREAM_NAMED("btActionClient", xml_tag_name.c_str()<< " btActionClient initialized");
     }
 
     btActionClient() = delete;
@@ -207,10 +207,12 @@ public:
     void subCallback(TopicMsgTypeT msg)
     {
         touch_data_ = msg->data;
-        if (touch_data_)
+        if (touch_data_ && finished_ == false)
         {
+            // ROS_INFO("[touch sensor call back]: touched");
             collision_happened_ = true;
         }
+        touch_data_ = false;
     }
     // Any subclass of BtActionNode that accepts parameters must provide a providedPorts method
     // and call providedBasicPorts in it.
@@ -249,6 +251,8 @@ public:
     // method to put a value on the blackboard, for example.
     virtual BT::NodeStatus on_success()
     {
+        collision_happened_ = false;
+
         return BT::NodeStatus::SUCCESS;
     }
 
@@ -256,6 +260,8 @@ public:
     // The user may override it to return another value, instead.
     virtual BT::NodeStatus on_aborted()
     {
+        collision_happened_ = false;
+
         return BT::NodeStatus::FAILURE;
     }
 
@@ -263,6 +269,8 @@ public:
     // The user may override it to return another value, instead.
     virtual BT::NodeStatus on_cancelled()
     {
+        collision_happened_ = false;
+
         return BT::NodeStatus::FAILURE;
     }
 
@@ -294,22 +302,41 @@ public:
             {
                 if (goal_updated_ )
                 {
-                    ROS_INFO("[ExecuteTrajectoryActionClient] goal Update again, action_client state: %s", action_client_->getState().toString().c_str());
+                    // ROS_INFO("[ExecuteTrajectoryActionClient] goal Update again, action_client state: %s", action_client_->getState().toString().c_str());
                     goal_updated_ = false;
                     on_new_goal_received();
                 }
 
+
                 if(collision_happened_)
                 {
-                    ROS_INFO("[ExecuteTrajectoryActionClient] in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
+                    // ROS_INFO("[ExecuteTrajectoryActionClient] Already sent goal, in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
                     action_client_->cancelGoal();
-                    // goal_result_available_ = true;
-
+                    finished_ = true;
                     collision_happened_ = false;
+                    return on_aborted();
+
                 }
+                // else
+                // {
+                //     ROS_INFO("[ExecuteTrajectoryActionClient] NOT in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
+
+                // }
+                
 
             }
-            // on_wait_for_result();
+
+            if(collision_happened_ && action_client_->getState() == actionlib::SimpleClientGoalState::LOST)
+            {
+                // ROS_INFO("[ExecuteTrajectoryActionClient] before send goal in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
+                // goal_result_available_ = true;
+                finished_ = true;
+                collision_happened_ = false;
+                return on_aborted();
+            }
+
+            on_wait_for_result();
+
             ros::spinOnce();
 
             if (!goal_result_available_)
@@ -325,21 +352,39 @@ public:
 
         if (client_status == actionlib::SimpleClientGoalState::SUCCEEDED)
         {
-            return on_success();
+            finished_ = true;
+            if(collision_happened_)
+            {
+                // ROS_INFO("[ExecuteTrajectoryActionClient] Succeed, but in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
+                collision_happened_ = false;
+                return on_aborted();
+            }
+            else
+            {
+                            
+                collision_happened_ = false;
+                return on_success();
+            }
         }
 
         if (client_status == actionlib::SimpleClientGoalState::ABORTED)
         {
+            finished_ = true;
+            collision_happened_ = false;
             return on_aborted();
         }
 
         if (client_status == actionlib::SimpleClientGoalState::PREEMPTED)
         {
+            finished_ = true;
+            collision_happened_ = false;
             return on_cancelled();
         }
 
         if (client_status == actionlib::SimpleClientGoalState::RECALLED)
         {
+            finished_ = true;
+            collision_happened_ = false;
             return on_aborted();
         }
 
@@ -353,7 +398,7 @@ public:
     {
         if (should_cancel_goal()) 
         {
-            ROS_INFO_STREAM_NAMED("btActionNode", "Cancelling execution for " << action_name_.c_str());
+            // ROS_INFO_STREAM_NAMED("btActionNode", "Cancelling execution for " << action_name_.c_str());
             action_client_->cancelGoal();
             last_exec_ = ExecutionStatus::PREEMPTED;
             done_ = true;
@@ -432,16 +477,29 @@ protected:
     void on_new_goal_received()
     {
         goal_result_available_ = false;
-        action_client_->sendGoal(goal_,
+        finished_ = false;
+        if(collision_happened_ == false)
+        {
+            action_client_->sendGoal(goal_,
                                 boost::bind(&btActionClient::doneCB, this, _1, _2),
                                 boost::bind(&btActionClient::activeCB, this),
                                 boost::bind(&btActionClient::feedbackCB, this));
+            // ROS_INFO("[ExecuteTrajectoryActionClient] on_new_goal_received, Not in collision, action_client: %s", action_client_->getState().toString().c_str());
+
+        }
+        else
+        {
+            finished_ = true;
+            // ROS_INFO("[ExecuteTrajectoryActionClient] on_new_goal_received, in collision: %d, action_client: %s",collision_happened_, action_client_->getState().toString().c_str());
+
+            // ROS_INFO("[ExecuteTrajectoryActionClient] before send goal in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
+        }
+
 
         // goal_result_available_ = true;
 
 
         auto client_status = action_client_->getState();
-        ROS_INFO("[ExecuteTrajectoryActionClient] on_new_goal_received, action_client: %s", action_client_->getState().toString().c_str());
         if (client_status == actionlib::SimpleClientGoalState::REJECTED)
         {
             throw std::runtime_error("Goal was rejected by the action server");
@@ -461,19 +519,20 @@ protected:
     void activeCB()
     {
         goal_result_available_ = false;
-       ROS_INFO("[ExecuteTrajectoryActionClient]  activeCB: Goal just went active, action_client: %s", action_client_->getState().toString().c_str()); 
+    //    ROS_INFO("[ExecuteTrajectoryActionClient]  activeCB: Goal just went active, action_client: %s", action_client_->getState().toString().c_str()); 
     }
 
     void feedbackCB()
     {
-        ROS_INFO("feedback, action_client: %s", action_client_->getState().toString().c_str()); 
+        // ROS_INFO("feedback, action_client: %s", action_client_->getState().toString().c_str()); 
     }
 
     void doneCB(const actionlib::SimpleClientGoalState& state,
             const ActionResultT result)
     {
+        finished_ = true;
         goal_result_available_ = true;
-        ROS_INFO("Finished in state [%s]", state.toString().c_str());
+        // ROS_INFO("Finished in state [%s]", state.toString().c_str());
         result_ = result;
         // ROS_INFO("Answer: %i", result->sequence.back());
     }
@@ -502,6 +561,8 @@ protected:
 
         bool done_;
 
+        bool finished_{false};
+
         bool goal_updated_{false};
 
         bool collision_happened_{false};
@@ -512,7 +573,7 @@ protected:
 
         std::string subscribe_topic_name_;
 
-        bool touch_data_;
+        bool touch_data_{false};
 };
 
 }  // namespace nav2_behavior_tree

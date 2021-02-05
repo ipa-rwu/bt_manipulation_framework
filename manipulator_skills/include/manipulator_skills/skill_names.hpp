@@ -15,7 +15,7 @@ static const std::string EXECUTE_TRAJECTORY_NAME = "execute_trajectory_arm";  //
 static const std::string EXECUTE_GRIPPER_TRAJECTORY_NAME = "execute_gripper_trajectory";  // name of 'find_objects' action
 static const std::string SET_FLAG_FOR_TASK = "set_flag_for_task";
 static const std::string CHECK_COLLISION = "check_collision";
-
+static const std::string SET_PARAMETER = "set_parameter_server";
 
 
 

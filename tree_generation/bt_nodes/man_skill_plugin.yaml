@@ -48,6 +48,7 @@ man_execute_trajectory_action_client_node:
     name: ExecuteTrajectory
     input:
         plan:
+        topic_name:
     output:
         result:
 
@@ -58,6 +59,29 @@ man_execute_gripper_trajectory_action_client_node:
     output:
         result:           
 
+man_set_flag_task_condition_node:
+    name: SetFlagTask
+    input: 
+        task_name:
+        success:
+    output:
 
-    
-    
+man_check_task_result_condition_node:
+    name: CheckTaskResult
+    input:
+        task_name:
+    output:
+
+man_call_extern_help_service_client_node
+    name: CallExternHelp
+    service_name: help_server
+    input:
+    output:  
+
+man_set_parameter_node:
+    name: SetParameter
+    input: 
+        param_topic:
+        step:
+        value: (float)
+    output:

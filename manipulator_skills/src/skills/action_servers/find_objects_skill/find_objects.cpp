@@ -29,7 +29,7 @@ void FindObjectsSkill::initialize()
     armarker_client_ = pnh_.serviceClient<ar_marker_detector::getMarkerPose>(armarker_srv_name_);
 
     as_->start();
-    ROS_INFO_STREAM_NAMED(getName(), "start action" );
+    // ROS_INFO_STREAM_NAMED(getName(), "start action" );
 }
 
 void FindObjectsSkill::initialpose(geometry_msgs::Pose ps)
@@ -45,18 +45,18 @@ void FindObjectsSkill::initialpose(geometry_msgs::Pose ps)
 
 void FindObjectsSkill::executeCB(const man_msgs::FindObjectsGoalConstPtr& goal)
 {
-    ROS_INFO_NAMED(getName(), "[Find Objects] request received");
+    // ROS_INFO_NAMED(getName(), "[Find Objects] request received");
 
     initialpose(marker_posestamped_.pose);
 
     //  get marker pose
     if(getPose(goal, marker_posestamped_))
     {
-      ROS_INFO_STREAM_NAMED(getName(), "[goal] marker_id: "<< goal->marker_id);
-      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_a.pose: "<< goal->container_a);
-      ROS_INFO_STREAM_NAMED(getName(), "[goal] container_b.pose: "<< goal->container_b);
+      // ROS_INFO_STREAM_NAMED(getName(), "[goal] marker_id: "<< goal->marker_id);
+      // ROS_INFO_STREAM_NAMED(getName(), "[goal] container_a.pose: "<< goal->container_a);
+      // ROS_INFO_STREAM_NAMED(getName(), "[goal] container_b.pose: "<< goal->container_b);
 
-      ROS_INFO_STREAM_NAMED(getName(), "[response] marker_pose: "<< marker_posestamped_.pose);
+      // ROS_INFO_STREAM_NAMED(getName(), "[response] marker_pose: "<< marker_posestamped_.pose);
       // get container pose
       // assume frame_id = /camera
       // true: am >bm
@@ -68,7 +68,7 @@ void FindObjectsSkill::executeCB(const man_msgs::FindObjectsGoalConstPtr& goal)
       {
         action_res_.container_pose.pose = goal->container_b;
       }
-      ROS_INFO_STREAM_NAMED(getName(), "[response] container_pose: "<< action_res_.container_pose);
+      // ROS_INFO_STREAM_NAMED(getName(), "[response] container_pose: "<< action_res_.container_pose);
       action_res_.marker_pose = marker_posestamped_;
       action_res_.marker_pose.header.frame_id = goal->frame_id;
 
@@ -104,12 +104,12 @@ bool FindObjectsSkill::ComparePose(geometry_msgs::Pose A, geometry_msgs::Pose B,
     ( A.position.x-B.position.x ) * ( A.position.x-B.position.x ) +
     ( A.position.y-B.position.y ) * ( A.position.y-B.position.y ) +
     ( A.position.z-B.position.z ) * ( A.position.z-B.position.z );
-    ROS_INFO_STREAM_NAMED(getName(), "[ComparePose] AB: "<< AB);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComparePose] AB: "<< AB);
     double AC =
     ( A.position.x-C.position.x ) * ( A.position.x-C.position.x ) +
     ( A.position.y-C.position.y ) * ( A.position.y-C.position.y ) +
     ( A.position.z-C.position.z ) * ( A.position.z-C.position.z );
-    ROS_INFO_STREAM_NAMED(getName(), "[ComparePose] AC: "<< AC);
+    // ROS_INFO_STREAM_NAMED(getName(), "[ComparePose] AC: "<< AC);
 
 
     if (AB > AC)
