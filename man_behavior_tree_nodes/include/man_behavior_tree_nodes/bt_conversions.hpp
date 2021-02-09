@@ -59,6 +59,7 @@ inline geometry_msgs::PoseStamped convertFromString(const StringView key)
     geometry_msgs::PoseStamped poseStamped;
     poseStamped.header.seq = convertFromString<int>(parts[0]);
     poseStamped.header.stamp = ros::Time(convertFromString<int64_t>(parts[1]));
+    poseStamped.header.stamp = ros::Time::now();
     poseStamped.header.frame_id = convertFromString<std::string>(parts[2]);
     poseStamped.pose.position.x = convertFromString<double>(parts[3]);
     poseStamped.pose.position.y = convertFromString<double>(parts[4]);

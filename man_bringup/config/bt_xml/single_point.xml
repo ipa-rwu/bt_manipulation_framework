@@ -1,0 +1,10 @@
+<root main_tree_to_execute = "SignlePoint" >
+    <BehaviorTree ID="SignlePoint">
+    <Sequence name="root_sequence">
+        <Action ID="UpdateGoalForArm" based_on_pose="1;1;world;0.38;0.76;1.02;-0.54;0.46;0.54;0.46" goal="{arm_goal}"/>
+        <ComputePathArm goal="{arm_goal}" target_type="Pose" replan_times="3" plan="{plan}"/>
+        <!-- <ExecuteTrajectoryGripper action_name="open" result="{gripper_exection_result}"/> -->
+        <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/>
+    </Sequence>
+    </BehaviorTree>
+</root>

@@ -7,8 +7,8 @@
 <!-- dynamic_parameter -->
 <node pkg="arm_parameter_server" type="arm_parameter_server" name="arm_parameter_server" output="screen" required="true">
 </node>
-<node pkg="gripper_parameter_server" type="gripper_parameter_server" name="gripper_parameter_server" output="screen" required="true">
-</node>
+<!-- <node pkg="gripper_parameter_server" type="gripper_parameter_server" name="gripper_parameter_server" output="screen" required="true">
+</node> -->
 <node pkg="task_flag_parameter_server" type="task_flag_parameter_server" name="task_flag_parameter_server" output="screen" required="true">
 </node>
 
@@ -33,8 +33,8 @@
 <node pkg="manipulator_skills" type="execute_trajectory_skill_server" name="execute_trajectory_skill_server_node" output="screen" required="true">
 </node>
 
-<node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
-</node>
+<!-- <node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
+</node> -->
 
 <node pkg="manipulator_skills" type="help" name="help_server" output="screen" required="true">
 </node>

@@ -25,7 +25,6 @@ class UpdateArmGoalServiceClient : public btServiceClient<man_msgs::UpdateArmGoa
             BT::InputPort<std::string>("step", "step for goal"),
             BT::InputPort<std::string>("goal_frame_id", "frame id of goal"),
             BT::InputPort<geometry_msgs::PoseStamped>("based_on_pose", "target for task to reach"),
-            BT::InputPort<geometry_msgs::PoseStamped>("based_on_pose", "target for task to reach"),
             BT::InputPort<double>("param", "param"),
             BT::OutputPort<geometry_msgs::PoseStamped>("goal", "goal"),
 

@@ -1,6 +1,7 @@
 plugin_lib_names: [man_compute_path_action_client_node,
                     man_execute_trajectory_arm_action_client_node,
+                    man_update_goal_for_arm_service_client_node,
                     man_execute_gripper_trajectory_action_client_node]
-bt_xml_file_name: /home/rachel/kogrob/man_ws/src/manipulator_bt/man_bringup/config/bt_xml/initial_robot.xml
+bt_xml_file_name: /home/rachel/kogrob/man_ws/src/manipulator_bt/man_bringup/config/bt_xml/single_point.xml
     # /home/rachel/kogrob/manbt_ws/src/manipulator_bt/tree_generation/try/1.xml
     #/home/rachel/kogrob/manbt_ws/src/manipulator_bt/man_bringup/config/bt_xml/try.xml

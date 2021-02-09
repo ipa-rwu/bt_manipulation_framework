@@ -68,7 +68,9 @@ void FindObjectsSkill::executeCB(const man_msgs::FindObjectsGoalConstPtr& goal)
       {
         action_res_.container_pose.pose = goal->container_b;
       }
-      // ROS_INFO_STREAM_NAMED(getName(), "[response] container_pose: "<< action_res_.container_pose);
+      ROS_INFO_STREAM_NAMED(getName(), getName() << ": container_pose: "<< action_res_.container_pose);
+      ROS_INFO_STREAM_NAMED(getName(), getName() << ": marker: "<< action_res_.marker_pose);
+
       action_res_.marker_pose = marker_posestamped_;
       action_res_.marker_pose.header.frame_id = goal->frame_id;
 
