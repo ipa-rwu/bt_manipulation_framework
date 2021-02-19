@@ -7,16 +7,20 @@
 
 namespace man_behavior_tree_nodes
 {
+class EmptyClass{};
 class ExecuteGripperTrajectoryActionClient : public btActionClient<man_msgs::ExecuteGripperTrajectoryAction, 
                                                         man_msgs::ExecuteGripperTrajectoryGoal,
-                                                        man_msgs::ExecuteGripperTrajectoryResultConstPtr>
+                                                        man_msgs::ExecuteGripperTrajectoryResultConstPtr,
+                                                        man_msgs::ExecuteGripperTrajectoryFeedbackConstPtr,
+                                                        EmptyClass>
 {
 public:
     ExecuteGripperTrajectoryActionClient(
         const std::string & xml_tag_name,
         const std::string & action_name,
         const BT::NodeConfiguration & conf,
-        float time_for_wait);
+        float time_for_wait,
+        const std::string & subscribe_topic_name);
 
     void on_tick() override;
 

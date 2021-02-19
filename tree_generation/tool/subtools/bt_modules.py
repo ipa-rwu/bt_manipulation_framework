@@ -74,7 +74,7 @@ class Create_BT_Module():
         return tag, attrib
 
     # <UpdateGoalForArm service_name="update_arm_goal" step="T2S1arm" goal_frame_id="world" based_target="{container}" goal="{arm_goal}"/>
-    def update_goal_arm_module(self, step, goal_frame_id, based_on_pose, goal, service_name, param):
+    def update_goal_arm_module(self, step, goal_frame_id, initial_pose, goal, service_name, param):
         data_loaded = self.plugin_data_loaded
         result, plugin_name = self.find_plugin(["Goal", "Arm"])
         if result:
@@ -82,7 +82,7 @@ class Create_BT_Module():
         else:
             return False
         
-        attrib = {"ID": plugin_info["name"], "step": step, "based_on_pose": based_on_pose, "goal": goal}
+        attrib = {"ID": plugin_info["name"], "step": step, "initial_pose": initial_pose, "goal": goal}
 
         if service_name != None:
             attrib['service_name'] = service_name

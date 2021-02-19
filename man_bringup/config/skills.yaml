@@ -1,0 +1,5 @@
+skill_update_arm_goal_skill:
+    group_name: manipulator
+    service_name: skill_update_arm_goal
+# update_param_skill_server_node:
+#     service_name: update_param

@@ -1,14 +1,11 @@
-#include "manipulator_skills/skills/execute_trajectory_skill.hpp"
-#include <manipulator_skills/skill_names.hpp>
-
-#include "manipulator_skills/webots_elements.hpp"
-
+#include "manipulator_skills/skills/action_servers/execute_trajectory_skill.hpp"
 
 namespace manipulator_skills
 {
-ArmExecuteTrajectorySkill::ArmExecuteTrajectorySkill(std::string group_name) :
-    ManipulatorSkill(EXECUTE_TRAJECTORY_NAME),
-    action_name_(EXECUTE_TRAJECTORY_NAME),
+ArmExecuteTrajectorySkill::ArmExecuteTrajectorySkill(std::string group_name,
+    std::string server_name) :
+    ManipulatorSkill(server_name),
+    action_name_(server_name),
     group_name_(group_name)
 {
   this->initialize();
@@ -20,127 +17,107 @@ ArmExecuteTrajectorySkill::~ArmExecuteTrajectorySkill()
 
 void ArmExecuteTrajectorySkill::initialize()
 {
-    WebotsSkills webots_obj;
-    webotsRobotName_ = webots_obj.fixName();
-    // ROS_INFO_STREAM_NAMED(getName(), "webots robot name: " << webotsRobotName_ );
-
-    // touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
-    // touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
-    //                       1,
-    //                       &ArmExecuteTrajectorySkill::TouchsensorCallback,
-    //                       this);
-
-    // move_group_ = new moveit::planning_interface::MoveGroupInterface(group_name_);
+    // WebotsSkills webots_obj;
+    // webotsRobotName_ = webots_obj.fixName();
     move_group_.reset(new moveit::planning_interface::MoveGroupInterface(group_name_));
     // start the move action server
-    as_.reset(new ExecuteTrajectorySkillServer(root_node_handle_, EXECUTE_TRAJECTORY_NAME, 
-    boost::bind(&ArmExecuteTrajectorySkill::executeCB, this, _1), false));
-
-   
-    // robot_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
-    
+    as_.reset(new ExecuteTrajectorySkillServer(root_node_handle_, action_name_, 
+        boost::bind(&ArmExecuteTrajectorySkill::executeCB, this, _1), false)); 
+    plan_.reset(new moveit::planning_interface::MoveGroupInterface::Plan);  
     as_->start();
-    // ROS_INFO_STREAM_NAMED(getName(), "start action" );
-
-    // 
+    ROS_INFO_STREAM_NAMED(getName(),getName() << ": waitng for client" );
 }
 
-// void ArmExecuteTrajectorySkill::TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg)
-// {
-//   // msg: {"data": "start"}
-//   result_touchsensor_ = touchsensor_msg->data;
-// //   std::cout << result_touchsensor <<std::endl;
+void ArmExecuteTrajectorySkill::executePlan(){
+    try 
+    { 
+        ROS_WARN_STREAM_NAMED(action_name_, action_name_ + ": Start execution");
+        error_code_ = move_group_->execute(*plan_);   
+        ROS_WARN_STREAM_NAMED(action_name_, action_name_ + ": After error_code: " <<error_convert(error_code_));
 
-// }
+    } 
+    catch (boost::thread_interrupted&) 
+    { 
+       move_group_->stop();
+    } 
+}
+
+void ArmExecuteTrajectorySkill::check(){
+    try 
+    { 
+        while (!error_code_ == moveit::planning_interface::MoveItErrorCode::SUCCESS || 
+            !error_code_ == moveit::planning_interface::MoveItErrorCode::FAILURE ||
+            !error_code_ == moveit::planning_interface::MoveItErrorCode::PREEMPTED ||
+             !error_code_ == moveit::planning_interface::MoveItErrorCode::CONTROL_FAILED)
+        {
+            // check that preempt has not been requested by the client
+            if (as_->isPreemptRequested() || !ros::ok())
+            {
+                // set the action state to preempted
+                as_->setPreempted();
+                wait_execute_thread_->interrupt();
+            }
+
+            if(error_code_ == moveit::planning_interface::MoveItErrorCode::CONTROL_FAILED){
+                break;
+            }
+
+            ROS_WARN_STREAM_NAMED(action_name_, action_name_ + ": in while loop error_code: " <<error_convert(error_code_));
+        }
+        ROS_WARN_STREAM_NAMED(action_name_, action_name_ + ":out while loop error_code: " <<error_convert(error_code_));
+
+    } 
+    catch (boost::thread_interrupted&) 
+    { 
+       move_group_->stop();
+    } 
+}
 
 void ArmExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteTrajectorySkillGoalConstPtr& goal)
 {
     moveit::planning_interface::MoveGroupInterface::Plan plan;
 
-    plan.start_state_ = goal->plan.start_state;
-    plan.trajectory_ = goal->plan.trajectory;
-    plan.planning_time_ = goal->plan.planning_time;
-
+    plan_->start_state_ = goal->plan.start_state;
+    plan_->trajectory_ = goal->plan.trajectory;
+    plan_->planning_time_ = goal->plan.planning_time;
 
     move_group_->setStartStateToCurrentState();
 
-    if (as_->isPreemptRequested())
-    {
-        // ROS_INFO("Before execution %s: Preempted", action_name_.c_str());
-        // set the action state to preempted
-        // as_->setPreempted();
-    }
+    wait_execute_thread_.reset(new boost::thread(boost::bind(&ArmExecuteTrajectorySkill::executePlan, this)));
+    wait_execute_thread_->join();
+
+    check_thread_.reset(new boost::thread(boost::bind(&ArmExecuteTrajectorySkill::check, this)));
+    check_thread_->join();
+
+    ROS_WARN_STREAM_NAMED(action_name_, action_name_ + ": error_code: " <<error_convert(error_code_));
     
-    auto error_code = move_group_->execute(plan);
-
-    //  ROS_INFO("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
-
-    if (as_->isPreemptRequested())
-    {
-        // ROS_INFO("After execution %s: Preempted", action_name_.c_str());
-        // set the action state to preempted
-        // as_->setPreempted();
-        error_code = moveit::planning_interface::MoveItErrorCode::PREEMPTED;
-    }
-
-    
-    // if (!move_group_->getMoveGroupClient().getState().isDone())
-    // {
-    //     ROS_DEBUG("move_action_client: %s", move_group_->getMoveGroupClient().getState().toString().c_str());
-    // }
-
-    // ROS_DEBUG("move_action_client: %s %s",
-    //       move_group_->getMoveGroupClient().getState().toString().c_str(),
-    //       move_group_->getMoveGroupClient().getState().getText().c_str());
-
-    // auto error_code = move_group_->getMoveGroupClient().getResult()->error_code.val;
-
-    if (error_code == moveit::planning_interface::MoveItErrorCode::SUCCESS) 
+    if (error_code_ == moveit::planning_interface::MoveItErrorCode::SUCCESS) 
     {
         // ROS_INFO("Moving to home pose SUCCESSFUL");
         action_res_.success = 1;
         const std::string response = "SUCCESS";
         as_->setSucceeded(action_res_, response);
     } 
-    if (error_code == moveit::planning_interface::MoveItErrorCode::FAILURE)
+    if (error_code_ == moveit::planning_interface::MoveItErrorCode::FAILURE)
     {
         action_res_.success = 0;
         const std::string response = "FAILURE";
         as_->setAborted(action_res_, response);
     }
 
-    if (error_code == moveit::planning_interface::MoveItErrorCode::PREEMPTED)
+    if (error_code_ == moveit::planning_interface::MoveItErrorCode::PREEMPTED)
     {
         action_res_.success = 0;
         const std::string response = "PREEMPTED";
         as_->setPreempted(action_res_, response);
     }
-    // if (move_group_->asyncExecute(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS)
-    // {
-    //     std::cout << "finish execute" << result_touchsensor_ <<std::endl;
-    //     if(result_touchsensor_ == false)
-    //     {
-    //         action_res_.success = 1;
-    //         const std::string response = "SUCCESS";
-    //         as_->setSucceeded(action_res_, response);
-    //     }
-    //     else
-    //     {
-    //         action_res_.success = 0;
-    //         const std::string response = "FAILURE";
-    //         as_->setAborted(action_res_, response);
-    //     }
 
-    // }
-    // else
-    // {
-    //     action_res_.success = 0;
-    //     const std::string response = "FAILURE";
-    //     as_->setAborted(action_res_, response);
-    // }
-
+    if (error_code_ == moveit::planning_interface::MoveItErrorCode::CONTROL_FAILED)
+    {
+        action_res_.success = 0;
+        const std::string response = "CONTROL_FAILED";
+        as_->setPreempted(action_res_, response);
+    }
 }
-
-
 
 } // namespace

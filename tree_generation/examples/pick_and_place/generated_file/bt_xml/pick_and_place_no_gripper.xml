@@ -67,17 +67,17 @@
   <BehaviorTree ID="Task2Pick">
     <Sequence name="steps">
       <Sequence name="task2step1">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step1" />
+        <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="{arm_goal}" step="task2step1" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task2step2">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step2" />
+        <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="{arm_goal}" step="task2step2" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task2step3">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step3" />
+        <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="{arm_goal}" step="task2step3" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
@@ -89,17 +89,17 @@
   <BehaviorTree ID="Task3Place">
     <Sequence name="steps">
       <Sequence name="task3step1">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step1" />
+        <Action ID="UpdateGoalForArm" initial_pose="{container}" goal="{arm_goal}" step="task3step1" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task3step2">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step2" />
+        <Action ID="UpdateGoalForArm" initial_pose="{container}" goal="{arm_goal}" step="task3step2" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task3step3">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step3" />
+        <Action ID="UpdateGoalForArm" initial_pose="{container}" goal="{arm_goal}" step="task3step3" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>

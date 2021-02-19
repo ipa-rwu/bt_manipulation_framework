@@ -1,0 +1,123 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="Initialization">
+    <Sequence>
+      <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
+      <Action ID="UpdateParameter" data_type="string" topic="/gripper_parameter_server" />
+      <Action ID="UpdateParameter" data_type="bool" topic="/task_flag_parameter_server" />
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="MainTree">
+    <Sequence name="Job">
+      <Fallback name="Help">
+        <Action ID="CheckTaskResult" task_name="Help" />
+        <Sequence>
+            <Action ID="CallExternHelp" service_name="help_server"/>
+            <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Help" data_type="bool" value="false" />
+            <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
+        </Sequence>
+        <SubTree ID="Initialization" __shared_blackboard="true" />
+      </Fallback>
+      <Fallback name="Task1">
+        <Inverter>
+          <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task1Detect" />
+        </Inverter>
+        <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
+        <SubTree ID="Task1Detect" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
+      </Fallback>
+      <Fallback name="Task2">
+        <Inverter>
+          <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task2Pick" />
+        </Inverter>
+        <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
+        <SubTree ID="Task2Pick" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
+      </Fallback>
+      <Fallback name="Task3">
+        <Inverter>
+          <SetBlackboard name="setTaskName" output_key="current_task_name" value="Task3Place" />
+        </Inverter>
+        <Condition ID="CheckTaskResult" task_name="{current_task_name}" />
+        <SubTree ID="Task3Place" __shared_blackboard="true" />
+        <Inverter>
+          <SubTree ID="NeedHelp" __shared_blackboard="true" />
+        </Inverter>
+      </Fallback>
+      <Sequence name="AllFinish">
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Task1Detect" data_type="bool" value="false" />
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Task2Pick" data_type="bool" value="false" />
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Task3Place" data_type="bool" value="false" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="Task1Detect">
+    <Sequence name="steps">
+      <Sequence name="task1step1">
+        <Action ID="FindObjects" container="{container}" container_A="0.38;0.76;1.02;-0.54;0.46;0.54;0.46" container_B="0.58;0.76;1.02;-0.54;0.46;0.54;0.46" frame_id="world" marker="{marker}" marker_id="1" />
+      </Sequence>
+      <Sequence name="task1finish">
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="{current_task_name}" data_type="bool" value="true" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="Task2Pick">
+    <Sequence name="steps">
+      <Sequence name="task2step1">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step1" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2step2">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step2" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2step3">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step3" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task2finish">
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="{current_task_name}" data_type="bool" value="true" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="Task3Place">
+    <Sequence name="steps">
+      <Sequence name="task3step1">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step1" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3step2">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step2" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3step3">
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step3" />
+        <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+        <SubTree ID="subExecution" __shared_blackboard="true" />
+      </Sequence>
+      <Sequence name="task3finish">
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="{current_task_name}" data_type="bool" value="true" />
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="NeedHelp">
+    <Sequence name="setHelpsteps">
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="{current_task_name}" data_type="bool" value="false" />
+        <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Help" data_type="bool" value="true" />
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="subExecution">
+    <Sequence name="Sequence">
+      <Action ID="ExecuteTrajectoryArm" plan="{plan}" topic_name="/container_A_17867_rachel_Inspiron_7560/touch_sensor/value"/>
+      <Action ID="ExecuteGripperIO" step="{current_step}" />
+    </Sequence>
+  </BehaviorTree>
+</root>

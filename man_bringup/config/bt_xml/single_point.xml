@@ -1,10 +1,26 @@
 <root main_tree_to_execute = "SignlePoint" >
     <BehaviorTree ID="SignlePoint">
-    <Sequence name="root_sequence">
-        <Action ID="UpdateGoalForArm" based_on_pose="1;1;world;0.38;0.76;1.02;-0.54;0.46;0.54;0.46" goal="{arm_goal}"/>
-        <ComputePathArm goal="{arm_goal}" target_type="Pose" replan_times="3" plan="{plan}"/>
+    <SequenceStar name="root_sequence">
+        <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
+        <Action ID="UpdateParameter" data_type="bool" topic="/task_flag_parameter_server" />
+
+        <!-- <Action ID="SetParameter" param_topic="/arm_parameter_server" label="task2step1" data_type="double" /> -->
+        <!-- <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Task1Detect" data_type="bool" value="true" /> -->
+        <!-- <ComputePathArm goal_name="home" target_type="Name" replan_times="3" plan="{plan}"/>
+        <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/> -->
+
+        <!-- <Action ID="FindObjects" container="{container}" container_A="0.38;0.76;1.02;-0.54;0.46;0.54;0.46" container_B="0.58;0.76;1.02;-0.54;0.46;0.54;0.46" frame_id="world" marker="{marker}" marker_id="1" /> -->
+        <!-- <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step1" /> -->
+
+        <!-- <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="1;1;world;0.38;0.76;1.02;-0.54;0.46;0.54;0.46" goal="{arm_goal}"/>
+        <ComputePathArm goal="{arm_goal}" target_type="Pose" replan_times="3" plan="{new_plan}"/>
+        <ExecuteTrajectoryArm plan="{new_plan}" result="{result}"/> -->
+        <Action ID="ExecuteGripperIO" fun="1" action="close" />
+        <Action ID="ExecuteGripperIO" fun="1" action="open" />
+        <!-- <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task2step1" />
+        <ComputePathArm goal="{arm_goal}" target_type="Cartesian" replan_times="3" plan="{plan}"/>
+        <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/> -->
         <!-- <ExecuteTrajectoryGripper action_name="open" result="{gripper_exection_result}"/> -->
-        <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/>
-    </Sequence>
+    </SequenceStar>
     </BehaviorTree>
 </root>

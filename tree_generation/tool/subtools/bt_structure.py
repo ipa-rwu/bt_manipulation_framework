@@ -143,7 +143,7 @@ class CreateBTStructure():
                                     update_goal_arm_module = self.bt_modules.update_goal_arm_module(step = step_name, 
                                                                     #goal_frame_id = "world", 
                                                                     goal_frame_id = None,
-                                                                    based_on_pose = "{" + info["base"] + "}", 
+                                                                    initial_pose = "{" + info["base"] + "}", 
                                                                     goal="{arm_goal}",
                                                                     param = str(param),
                                                                     service_name = None)
@@ -167,7 +167,7 @@ class CreateBTStructure():
 
                     # <RetryUntilSuccesful num_attempts="3">
                     #     <Sequence>
-                    #         <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="" step="task2step1"/>
+                    #         <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="" step="task2step1"/>
                     #         <Action ID="ComputePathArm" goal="" plan="" replan_times="" target_type=""/>
                     #         <Action ID="ExecuteTrajectoryArm" plan="" topic_name=""/>
                     #     </Sequence>
@@ -380,7 +380,7 @@ class CreateBTStructure():
                         update_goal_arm_module = self.bt_modules.update_goal_arm_module(step = step_name, 
                                                             #goal_frame_id = "world", 
                                                             goal_frame_id = None,
-                                                            based_on_pose = "{" + info["base"] + "}", 
+                                                            initial_pose = "{" + info["base"] + "}", 
                                                             goal="{arm_goal}",
                                                             service_name = None,
                                                             param = None)

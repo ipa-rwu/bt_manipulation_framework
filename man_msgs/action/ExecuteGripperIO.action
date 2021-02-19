@@ -1,0 +1,9 @@
+#goal
+int32 fun
+int32 pin # 1 open 0 close
+string action
+---
+#result
+bool success
+---
+#feedback

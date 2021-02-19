@@ -23,12 +23,11 @@ public:
     {
         return skill_name_;
     }
-protected:
     
+protected:
     std::string skill_name_;
     ros::NodeHandle root_node_handle_;
 };
 } //namespace
-
 
 #endif //MANIPULATOR_SKILLS_SKILL_

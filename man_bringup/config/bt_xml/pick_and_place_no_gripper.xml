@@ -12,7 +12,7 @@
         <Action ID="CheckTaskResult" task_name="Help" />
         <Sequence>
             <Action ID="CallExternHelp" service_name="help_server"/>
-            <Condition ID="SetFlagTask" success="false" task_name="Help"/>
+            <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Help" data_type="bool" value="false" />
             <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
         </Sequence>
         <SubTree ID="Initialization" __shared_blackboard="true" />
@@ -48,70 +48,70 @@
         </Inverter>
       </Fallback>
       <Sequence name="AllFinish">
-        <Condition ID="SetFlagTask" success="false" task_name="Task1Detect" />
-        <Condition ID="SetFlagTask" success="false" task_name="Task2Pick" />
-        <Condition ID="SetFlagTask" success="false" task_name="Task3Place" />
+        <Action ID="SetParameter" param_topic="" label="Task1Detect" data_type="bool" value="false" />
+        <Action ID="SetParameter" param_topic="" label="Task2Pick" data_type="bool" value="false" />
+        <Action ID="SetParameter" param_topic="" label="Task3Place" data_type="bool" value="false" />
       </Sequence>
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="Task1Detect">
     <Sequence name="steps">
       <Sequence name="task1step1">
-        <Action ID="FindObjects" container="{container}" container_A="0.38;0.76;1.02;-0.54;0.46;0.54;0.46" container_B="0.58;0.76;1.02;-0.54;0.46;0.54;0.46" frame_id="world" marker="{marker}" marker_id="1" />
+        <Action ID="FindObjects" container="{container}" container_A="0.38;0.76;0.9;-0.54;0.46;0.54;0.46" container_B="0.58;0.76;0.9;-0.54;0.46;0.54;0.46" frame_id="world" marker="{marker}" marker_id="1" />
       </Sequence>
       <Sequence name="task1finish">
-        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+        <Action ID="SetParameter" label="{current_task_name}" data_type="bool" value="true" />
       </Sequence>
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="Task2Pick">
     <Sequence name="steps">
       <Sequence name="task2step1">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step1" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step1" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task2step2">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step2" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step2" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task2step3">
-        <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" step="task2step3" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{marker}" goal="{arm_goal}" step="task2step3" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task2finish">
-        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+        <Action ID="SetParameter" label="{current_task_name}" data_type="bool" value="true" />
       </Sequence>
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="Task3Place">
     <Sequence name="steps">
       <Sequence name="task3step1">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step1" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step1" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task3step2">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step2" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step2" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task3step3">
-        <Action ID="UpdateGoalForArm" based_on_pose="{container}" goal="{arm_goal}" step="task3step3" />
+        <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task3step3" />
         <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
         <SubTree ID="subExecution" __shared_blackboard="true" />
       </Sequence>
       <Sequence name="task3finish">
-        <Condition ID="SetFlagTask" success="true" task_name="{current_task_name}" />
+        <Action ID="SetParameter" label="{current_task_name}" data_type="bool" value="true" />
       </Sequence>
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="NeedHelp">
     <Sequence name="setHelpsteps">
-      <Condition ID="SetFlagTask" success="false" task_name="{current_task_name}" />
-      <Condition ID="SetFlagTask" success="true" task_name="Help" />
+        <Action ID="SetParameter" label="{current_task_name}" data_type="bool" value="false" />
+        <Action ID="SetParameter" label="Help" data_type="bool" value="true" />
     </Sequence>
   </BehaviorTree>
   <BehaviorTree ID="subExecution">

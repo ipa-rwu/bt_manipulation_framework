@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <launch>
+
+ <rosparam command="load" file="$(find man_bringup)/config/skills.yaml" />
+
 <!-- tf_static base_link to camera -->
 <include file="$(find man_bringup)/launch/tf_camera_to_world.launch">
 </include>
@@ -21,10 +24,10 @@
 <node pkg="manipulator_skills" type="find_objects_skill_server" name="find_objects_skill_server_node" output="screen" required="true">
 </node>
 
-<node pkg="manipulator_skills" type="update_param_skill_server" name="update_param_skill_server_node" output="screen" required="true">
+<node pkg="manipulator_skills" type="update_param_skill_server" name="skill_update_param" output="screen" required="true">
 </node>
 
-<node pkg="manipulator_skills" type="update_arm_goal_skill_server" name="update_arm_goal_skill_server_node" output="screen" required="true">
+<node pkg="manipulator_skills" type="update_arm_goal_skill_server" name="skill_update_arm_goal_skill" output="screen" required="true">
 </node>
 
 <node pkg="manipulator_skills" type="compute_path_skill_server" name="compute_path_skill_server_node" output="screen" required="true">
@@ -35,6 +38,9 @@
 
 <!-- <node pkg="manipulator_skills" type="execute_gripper_trajectory_skill_server" name="execute_gripper_trajectory_skill_server_node" output="screen" required="true">
 </node> -->
+
+<node pkg="manipulator_skills" type="execute_gripper_io_skill_server" name="skill_execute_gripper_io_server_node" output="screen" required="true">
+</node>
 
 <node pkg="manipulator_skills" type="help" name="help_server" output="screen" required="true">
 </node>

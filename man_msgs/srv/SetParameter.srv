@@ -1,0 +1,10 @@
+#request
+string param_topic
+string label
+string data_type
+bool success
+bool param_bool
+float32 param_float
+---
+#response
+bool result

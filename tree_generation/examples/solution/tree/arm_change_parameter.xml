@@ -6,7 +6,7 @@
         </Sequence>
         <RetryUntilSuccesful num_attempts="3">
             <Sequence>
-                <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="" step="task2step1"/>
+                <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="" step="task2step1"/>
                 <Action ID="ComputePathArm" goal="" plan="" replan_times="" target_type=""/>
                 <Action ID="ExecuteTrajectoryArm" plan="" topic_name=""/>
             </Sequence>

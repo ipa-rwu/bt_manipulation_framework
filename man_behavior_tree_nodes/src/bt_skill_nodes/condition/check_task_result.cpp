@@ -3,11 +3,8 @@
 
 #include <string>
 #include <memory>
-
 #include "ros/ros.h"
 #include "behaviortree_cpp_v3/condition_node.h"
-
-
 
 namespace man_behavior_tree_nodes
 {
@@ -18,72 +15,61 @@ public:
   CheckTaskResult(
     const std::string & condition_name,
     const BT::NodeConfiguration & conf)
-  : BT::ConditionNode(condition_name, conf), initialized_(false)
-  {
+  : BT::ConditionNode(condition_name, conf),
+  condition_name_(condition_name){
   }
 
   CheckTaskResult() = delete;
 
-  ~CheckTaskResult()
-  {
+  ~CheckTaskResult(){
     cleanup();
   }
 
   BT::NodeStatus tick() override
   {
-    initialized_ = false;
-    if (!initialized_) {
-      initialize();
-    }
+    initialize();
 
-    if (isTaskSuccess()) {
+    if (isTaskSuccess()){
       return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::FAILURE;
   }
 
-  void initialize()
-  {
-
-    // std::cout << "initialized_: start"<< std::endl;
-    getInput("task_name", task_name_);
-    // std::cout << "check task name:    "<< task_name_ << std::endl;
+  void initialize(){
     config().blackboard->get<bool>("first_time", first_time_);
-    // std::cout << "first_time:    "<< first_time_<< std::endl;
+
+    if(!getInput("task_name", task_name_)){
+      ROS_ERROR_STREAM_NAMED(condition_name_, condition_name_ << ": Please provide the name of task");
+    }
 
     param_bool_.clear();
     config().blackboard->get<std::map<std::string, bool>>("param_bool", param_bool_);
-    initialized_ = true;
-    // std::cout << "initialized_: true"<< std::endl;
   }
 
-  bool isTaskSuccess()
-  {
-    // std::cout << "isTaskSuccess Function"<< std::endl;
-    if(first_time_ == 1)
-    { 
+  bool isTaskSuccess(){
+    if(first_time_ == true){ 
        return false;
     }
     
-    if(first_time_ == 0)
+    if(first_time_ == false)
     {
-    //  std::cout <<  "  value: " << param_bool_.at(task_name_) <<std::endl;
+      if (task_name_.compare("Help") == 0 && param_bool_.at("Help") == 1)
+      {      
+        return false;
+      }
 
-
-    if (task_name_.compare("Help") == 0 && param_bool_.at(task_name_) == 1)
-    {
-      // std::cout << "!!!!!!"<<std::endl;
-      return false;
-    }
-
-    if (task_name_.compare("Help") == 0 && param_bool_.at(task_name_) == 0)
-    {
-      // std::cout << "######" <<std::endl;
-      return true;
-    }
-
-    if (param_bool_.at(task_name_) == 1)
+      if (task_name_.compare("Help") == 0 && param_bool_.at("Help") == 0)
+      {
         return true;
+      }
+
+      if (param_bool_.at(task_name_) == 1){
+        return true;
+      }
+      else
+      {
+        return false;
+      }
     }
   }
     
@@ -103,8 +89,8 @@ protected:
 private:
   std::map<std::string, bool> param_bool_;
   std::string task_name_;
-  bool initialized_;
   bool first_time_;
+  std::string condition_name_;
 };
 
 }   //namespace

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="Initialization">
+    <Sequence>
+      <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
+      <Action ID="UpdateParameter" data_type="string" topic="/gripper_parameter_server" />
+      <Action ID="UpdateParameter" data_type="bool" topic="/task_flag_parameter_server" />
+      <Action ID="FindObjects" container="{container}" container_A="-0.35;0.55;0.78;0;0.707;0;0.707;" container_B="0.35;0.55;0.78;0;0.707;0;0.707" frame_id="world" marker="{marker}" marker_id="1" />
+    </Sequence>
+  </BehaviorTree>
+  <BehaviorTree ID="MainTree">
+    <SequenceStar name="change_parameter_arm">
+      <Sequence name="Initial">
+        <SubTree ID="Initialization" __shared_blackboard="true" />
+      </Sequence>
+      <RetryUntilSuccesful num_attempts="3">
+        <Sequence>
+          <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="{arm_goal}" param="0.1" step="task2step1" />
+          <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
+          <Action ID="ExecuteTrajectoryArm" plan="{plan}" />
+        </Sequence>
+      </RetryUntilSuccesful>
+        <Sequence name="update">
+        <Action ID="SetParam" />
+      </Sequence>
+    </SequenceStar>
+  </BehaviorTree>
+</root>

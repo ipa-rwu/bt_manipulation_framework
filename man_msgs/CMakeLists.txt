@@ -27,7 +27,7 @@ UpdateArmState.srv
 UpdateArmGoal.srv
 UpdateParam.srv
 Help.srv
-SetFlagTask.srv
+SetParameter.srv
 CheckCollisionService.srv
 )
 
@@ -36,6 +36,7 @@ ComputePathSkill.action
 FindObjects.action
 ExecuteGripperTrajectory.action
 ExecuteTrajectorySkill.action
+ExecuteGripperIO.action
 )
 
 add_action_files(DIRECTORY action FILES ${ACT_FILES})

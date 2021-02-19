@@ -1,11 +1,16 @@
 #ifndef MAN_BEHAVIOR_TREE_NODES_ARM_EXECUTE_TRAJECTORY_CLIENT_
 #define MAN_BEHAVIOR_TREE_NODES_ARM_EXECUTE_TRAJECTORY_CLIENT_
 
-
-#include "man_behavior_tree_nodes/bt_action_client_subscriber.hpp"
+#define ENABLE_SUBSCRIBE 1
+#include <mutex> 
+#include "man_behavior_tree_nodes/bt_action_client.hpp"
 #include "man_msgs/ExecuteTrajectorySkillAction.h"
 #include <webots_ros/BoolStamped.h>
 
+        // boost::mutex mutex; 
+        // mutex.lock(); 
+        // std::cout << "Thread " << boost::this_thread::get_id()<< std::endl; 
+        // mutex.unlock(); 
 // #include "man_behavior_tree_nodes/webots_elements.hpp"
 
 namespace man_behavior_tree_nodes
@@ -13,6 +18,7 @@ namespace man_behavior_tree_nodes
 class ExecuteTrajectoryActionClient : public btActionClient<man_msgs::ExecuteTrajectorySkillAction, 
                                                         man_msgs::ExecuteTrajectorySkillGoal,
                                                         man_msgs::ExecuteTrajectorySkillResultConstPtr,
+                                                        man_msgs::ExecuteTrajectorySkillFeedbackConstPtr,
                                                         webots_ros::BoolStamped::ConstPtr>
 {
 public:
@@ -21,7 +27,7 @@ public:
         const std::string & action_name,
         const BT::NodeConfiguration & conf,
         float time_for_wait,
-        const std::string & subscribe_topic_name_);
+        const std::string & subscribe_topic_name);
     
     void initialize();
 
@@ -29,6 +35,8 @@ public:
     void on_tick() override;
 
     void on_wait_for_result() override;
+
+    void subCallback(webots_ros::BoolStamped::ConstPtr msg) override;
 
     BT::NodeStatus on_success() override;
 
@@ -38,29 +46,16 @@ public:
         {
             BT::InputPort<man_msgs::Plan>("plan", ""),             
             BT::OutputPort<int>("result", ""), 
-            // BT::OutputPort<moveit_msgs::RobotState>("trajectory_start", ""),
-            // BT::OutputPort<moveit_msgs::RobotTrajectory>("trajectory", ""),
-            // BT::OutputPort<std::string>("group_name", ""),
-            // BT::OutputPort<float>("planning_time", ""),
-
-
         });
     }
 
 private:
-    // void TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg);
-
     bool first_time_{true};
     man_msgs::Plan plan_;
     int success_{0};
-
-    std::string webotsRobotName_;
-    bool result_touchsensor_{false};
-
-    ros::Subscriber touch_sensor_sub_;
-
-    std::string touch_sensor_topic_name_;
-
+    bool touch_data_{false};
+    std::mutex mtx_interrupt_;
+    std::mutex mtx_sub_;
 };
 } // namespace
 

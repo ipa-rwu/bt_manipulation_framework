@@ -15,7 +15,7 @@
       </Sequence>
       <RetryUntilSuccesful num_attempts="3">
         <Sequence>
-          <Action ID="UpdateGoalForArm" based_on_pose="{marker}" goal="{arm_goal}" param="0.1" step="task2step1" />
+          <Action ID="UpdateGoalForArm" initial_pose="{marker}" goal="{arm_goal}" param="0.1" step="task2step1" />
           <Action ID="ComputePathArm" goal="{arm_goal}" plan="{plan}" replan_times="1" target_type="Cartesian" />
           <Action ID="ExecuteTrajectoryArm" plan="{plan}" />
         </Sequence>

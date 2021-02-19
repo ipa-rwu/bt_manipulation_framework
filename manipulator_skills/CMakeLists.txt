@@ -27,10 +27,8 @@ find_package(catkin REQUIRED COMPONENTS ${dependencies}
 
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
-
 find_package(Eigen3 REQUIRED)
 add_definitions(${EIGEN3_DEFINITIONS})
-
 
 catkin_package(
    INCLUDE_DIRS include
@@ -40,8 +38,6 @@ catkin_package(
 )
 
 catkin_python_setup()
-
-
 
 include_directories(
   include
@@ -85,58 +81,58 @@ add_dependencies(find_objects_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} $
 
 
 add_library(update_arm_state_skill SHARED
-  src/skills/service_server/update_arm_state_skill/update_arm_state.cpp)
+  src/skills/service_servers/update_arm_state_skill/update_arm_state.cpp)
 add_executable(update_arm_state_skill_server 
-  src/skills/service_server/update_arm_state_skill/main.cpp)
+  src/skills/service_servers/update_arm_state_skill/main.cpp)
 target_link_libraries(update_arm_state_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_arm_state_skill_server update_arm_state_skill)
 add_dependencies(update_arm_state_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_arm_state_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(update_arm_goal_skill SHARED
-  src/skills/service_server/update_arm_goal_skill/update_arm_goal.cpp)
+  src/skills/service_servers/update_arm_goal_skill/update_arm_goal.cpp)
 add_executable(update_arm_goal_skill_server 
-  src/skills/service_server/update_arm_goal_skill/main.cpp)
+  src/skills/service_servers/update_arm_goal_skill/main.cpp)
 target_link_libraries(update_arm_goal_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_arm_goal_skill_server update_arm_goal_skill)
 add_dependencies(update_arm_goal_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_arm_goal_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(update_param_skill SHARED
-  src/skills/service_server/update_param_skill/update_param.cpp)
+  src/skills/service_servers/update_param_skill/update_param.cpp)
 add_executable(update_param_skill_server 
-  src/skills/service_server/update_param_skill/main.cpp)
+  src/skills/service_servers/update_param_skill/main.cpp)
 target_link_libraries(update_param_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(update_param_skill_server update_param_skill)
 add_dependencies(update_param_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_param_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(check_collision_skill SHARED
-  src/skills/service_server/check_collision_skill/check_collision.cpp)
+  src/skills/service_servers/check_collision_skill/check_collision.cpp)
 add_executable(check_collision_skill_server 
-  src/skills/service_server/check_collision_skill/main.cpp)
+  src/skills/service_servers/check_collision_skill/main.cpp)
 target_link_libraries(check_collision_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(check_collision_skill_server check_collision_skill)
 add_dependencies(check_collision_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(check_collision_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_library(set_flag_for_task SHARED
-  src/skills/service_server/set_flag_for_task/set_flag_for_task.cpp)
-add_executable(set_flag_for_task_server 
-  src/skills/service_server/set_flag_for_task/main.cpp)
-target_link_libraries(set_flag_for_task ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(set_flag_for_task_server set_flag_for_task)
-add_dependencies(set_flag_for_task ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(set_flag_for_task_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 add_library(set_parameter SHARED
-  src/skills/service_server/set_parameter/set_parameter.cpp)
+  src/skills/service_servers/set_parameter/set_parameter.cpp)
 add_executable(set_parameter_server 
-  src/skills/service_server/set_parameter/main.cpp)
+  src/skills/service_servers/set_parameter/main.cpp)
 target_link_libraries(set_parameter ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(set_parameter_server set_parameter)
 add_dependencies(set_parameter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(set_parameter_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_library(execute_gripper_io_skill SHARED
+  src/skills/action_servers/execute_gripper_io_skill/execute_gripper_io.cpp)
+add_executable(execute_gripper_io_skill_server 
+  src/skills/action_servers/execute_gripper_io_skill/main.cpp)
+target_link_libraries(execute_gripper_io_skill ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(execute_gripper_io_skill_server execute_gripper_io_skill)
+add_dependencies(execute_gripper_io_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(execute_gripper_io_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(execute_trajectory_skill SHARED
   src/skills/action_servers/execute_trajectory_skill/execute_trajectory_skill.cpp)
@@ -159,18 +155,10 @@ target_link_libraries(execute_gripper_trajectory_skill_server execute_gripper_tr
 add_dependencies(execute_gripper_trajectory_skill ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(execute_gripper_trajectory_skill_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
 add_library(webots_elements SHARED
   src/webots_elements.cpp)
 target_link_libraries(webots_elements ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(webots_elements ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-add_executable(test_compute_path_skill_node 
-  src/skills/test_compute_path.cpp)
-target_link_libraries(test_compute_path_skill_node compute_path_skill)
-add_dependencies(test_compute_path_skill_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-
 
 install(TARGETS compute_path_skill
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -185,41 +173,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
    PATTERN ".svn" EXCLUDE
  )
 
-
 #############
 ## Install ##
 #############
 
 catkin_install_python(PROGRAMS 
-                      scripts/service_server/help_extern_server/help
+                      scripts/service_servers/help_extern_server/help
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-
-## Mark executables for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark libraries for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_manipulator_skills.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

@@ -1,11 +1,11 @@
-#include "manipulator_skills/skills/execute_gripper_trajectory.hpp"
-#include <manipulator_skills/skill_names.hpp>
+#include "manipulator_skills/skills/action_servers/execute_gripper_trajectory.hpp"
 
 namespace manipulator_skills
 {
-GripperExecuteTrajectorySkill::GripperExecuteTrajectorySkill(std::string group_name) :
-    ManipulatorSkill(EXECUTE_GRIPPER_TRAJECTORY_NAME),
-    action_name_(EXECUTE_GRIPPER_TRAJECTORY_NAME),
+GripperExecuteTrajectorySkill::GripperExecuteTrajectorySkill(std::string group_name,
+    std::string server_name) :
+    ManipulatorSkill(server_name),
+    action_name_(server_name),
     group_name_(group_name)
 {
   this->initialize();
@@ -18,14 +18,10 @@ GripperExecuteTrajectorySkill::~GripperExecuteTrajectorySkill()
 void GripperExecuteTrajectorySkill::initialize()
 {
     move_group_.reset(new moveit::planning_interface::MoveGroupInterface(group_name_));
-    // start the move action server
-    as_.reset(new ExecuteGripperTrajectoryServer(root_node_handle_, EXECUTE_GRIPPER_TRAJECTORY_NAME, 
-    boost::bind(&GripperExecuteTrajectorySkill::executeCB, this, _1), false));
-
-    // robot_state_ = std::make_shared<moveit::core::RobotState>(kinematic_model_);
-    
+    as_.reset(new ExecuteGripperTrajectoryServer(root_node_handle_, action_name_, 
+    boost::bind(&GripperExecuteTrajectorySkill::executeCB, this, _1), false));    
     as_->start();
-    // ROS_INFO_STREAM_NAMED(getName(), "start action" );
+    ROS_INFO_STREAM_NAMED(getName(),getName() << ": waitng for client" );
 }
 
 void GripperExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteGripperTrajectoryGoalConstPtr& goal)
@@ -46,9 +42,5 @@ void GripperExecuteTrajectorySkill::executeCB(const man_msgs::ExecuteGripperTraj
         const std::string response = "FAILURE";
         as_->setAborted(action_res_, response);
     }
-
 }
-
-
-
 } // namespacev
