@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <mutex> 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>                       
 #include <iostream> 
@@ -193,6 +194,12 @@ public:
     // method to put a value on the blackboard, for example.
     virtual BT::NodeStatus on_success()
     {
+        mtx_interrupt_.lock();
+        interrupt_ = false;
+        mtx_interrupt_.unlock();
+        mtx_finished_.lock();
+        finished_ = false;
+        mtx_finished_.unlock();
         return BT::NodeStatus::SUCCESS;
     }
 
@@ -200,6 +207,12 @@ public:
     // The user may override it to return another value, instead.
     virtual BT::NodeStatus on_aborted()
     {
+        mtx_interrupt_.lock();
+        interrupt_ = false;
+        mtx_interrupt_.unlock();
+        mtx_finished_.lock();
+        finished_ = false;
+        mtx_finished_.unlock();
         return BT::NodeStatus::FAILURE;
     }
 
@@ -207,6 +220,12 @@ public:
     // The user may override it to return another value, instead.
     virtual BT::NodeStatus on_cancelled()
     {
+        mtx_interrupt_.lock();
+        interrupt_ = false;
+        mtx_interrupt_.unlock();
+        mtx_finished_.lock();
+        finished_ = false;
+        mtx_finished_.unlock();
         return BT::NodeStatus::SUCCESS;
     }
 
@@ -239,20 +258,18 @@ public:
     // The main override required by a BT action
     BT::NodeStatus tick() override
     {
-        // boost::mutex mutex; 
-        // mutex.lock(); 
-        // std::cout << "Thread " << boost::this_thread::get_id()<< std::endl; 
-        // mutex.unlock(); 
-
         // first step to be done only at the beginning of the Action
         if (status() == BT::NodeStatus::IDLE) 
         {
             // setting the status to RUNNING to notify the BT Loggers (if any)
             setStatus(BT::NodeStatus::RUNNING);
-            ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": Started, action state: " << state_convert(action_client_->getState()));
+            ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": Started, action state: " << state_convert(action_client_->getState()));
 
             // user defined goal, override
             on_tick();
+            mtx_finished_.lock();
+            finished_ = false;
+            mtx_finished_.unlock();
             
             // send goal
             // on_new_goal_received();
@@ -260,87 +277,91 @@ public:
             wait_result_thread_->join();
         }
         
-        ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": After sent, action state: " << state_convert(action_client_->getState()));
+        ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": After sent, action state: " << state_convert(action_client_->getState()));
 
         // The following code corresponds to the "RUNNING" loop
         // goal_result_available_ need to be defined in waitforresult
         if (pnh_.ok()){
-            if(!goal_result_available_){
-                if (action_client_->getState() == actionlib::SimpleClientGoalState::ACTIVE
-                    || action_client_->getState() == actionlib::SimpleClientGoalState::PENDING){
-                    // user defined callback. May modify the value of "goal_updated_"
-                    on_wait_for_result();
-                    
-                    // if a new goal coming
-                    if (goal_updated_)
-                    {
-                        action_client_->cancelGoal();
-                        goal_updated_ = false;
-                        wait_result_thread_->interrupt();
-                        wait_result_thread_.reset(new boost::thread(boost::bind(&btActionClient::on_new_goal_received, this)));
-                        wait_result_thread_->join();
-                    }
+            // sent goal, pending, maybe cancel before goal available
+            if(!finished_){
+                if(interrupt_)
+                {
+                    ROS_WARN_STREAM_NAMED(action_name_+"_client", action_name_+"_client: collisoion happended");
+                    wait_result_thread_->interrupt();
+                    finished_ = true;
+                    return on_aborted();
+                }
 
-                    // if collisoion happend
-                    if(collision_happened_)
-                    {
-                        ROS_WARN_STREAM_NAMED(action_name_+"_client", action_name_+"_client: collisoion happended");
-                        wait_result_thread_->interrupt();
-                        finished_ = true;
-                        collision_happened_ = false;
+                // active, waitng for goal
+                if(!goal_result_available_){
+                    if (action_client_->getState() == actionlib::SimpleClientGoalState::ACTIVE
+                        || action_client_->getState() == actionlib::SimpleClientGoalState::PENDING){
+                        // user defined callback. May modify the value of "goal_updated_"
+                        on_wait_for_result();
+                        
+                        // if a new goal coming
+                        if (goal_updated_)
+                        {
+                            action_client_->cancelGoal();
+                            goal_updated_ = false;
+                            wait_result_thread_->interrupt();
+                            wait_result_thread_.reset(new boost::thread(boost::bind(&btActionClient::on_new_goal_received, this)));
+                            wait_result_thread_->join();
+                        }
+
+                        if(interrupt_)
+                        {
+                            ROS_WARN_STREAM_NAMED(action_name_+"_client", action_name_+"_client: collisoion happended");
+                            wait_result_thread_->interrupt();
+                            finished_ = true;
+                            return on_aborted();
+                        }
+                    }
+                    
+                    if(action_client_->getState() == actionlib::SimpleClientGoalState::LOST){
                         return on_aborted();
                     }
+                    ros::spinOnce();
+                    return BT::NodeStatus::RUNNING;
                 }
-                
-                if(pnh_.ok() && collision_happened_ && action_client_->getState() == actionlib::SimpleClientGoalState::LOST){
-                    // ROS_INFO("[ExecuteTrajectoryActionClient] before send goal in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
-                    // goal_result_available_ = true;
-                    finished_ = true;
-                    collision_happened_ = false;
-                    return on_aborted();
-                }
-                ros::spinOnce();
-                return BT::NodeStatus::RUNNING;
-            }
-
-            // goal_result_available_
-            auto client_status = action_client_->getState();
-
-            if (client_status == actionlib::SimpleClientGoalState::SUCCEEDED)
-            {
-                finished_ = true;
-                if(collision_happened_)
-                {
-                    // ROS_INFO("[ExecuteTrajectoryActionClient] Succeed, but in COLLISION, action_client state: %s", action_client_->getState().toString().c_str());
-                    collision_happened_ = false;
-                    return on_aborted();
-                }
-                else
-                {                           
-                    collision_happened_ = false;
+                else{
                     return on_success();
                 }
             }
+            else{
+                // goal_result_available_
+                auto client_status = action_client_->getState();
+                if(interrupt_)
+                {
+                    ROS_WARN_STREAM_NAMED(action_name_+"_client", action_name_+"_client: collisoion happended");
+                    wait_result_thread_->interrupt();
+                    return on_aborted();
+                }
+                else{
+                    if (client_status == actionlib::SimpleClientGoalState::SUCCEEDED)
+                    {
+                        return on_success();
+                    }
 
-            if (client_status == actionlib::SimpleClientGoalState::ABORTED)
-            {
-                finished_ = true;
-                collision_happened_ = false;
-                return on_aborted();
-            }
+                    if (client_status == actionlib::SimpleClientGoalState::ABORTED)
+                    {
+                        return on_aborted();
+                    }
 
-            if (client_status == actionlib::SimpleClientGoalState::PREEMPTED)
-            {
-                finished_ = true;
-                collision_happened_ = false;
-                return on_cancelled();
-            }
+                    if (client_status == actionlib::SimpleClientGoalState::PREEMPTED)
+                    {
+                        return on_cancelled();
+                    }
 
-            if (client_status == actionlib::SimpleClientGoalState::RECALLED)
-            {
-                finished_ = true;
-                collision_happened_ = false;
-                return on_aborted();
+                    if (client_status == actionlib::SimpleClientGoalState::RECALLED)
+                    {
+                        return on_aborted();
+                    }
+                    if (client_status == actionlib::SimpleClientGoalState::LOST)
+                    {
+                        return on_aborted();
+                    }
+                }
             }
         }
         ROS_ERROR_STREAM_NAMED(action_name_+"_client", action_name_+"_client: BtActionNode::Tick: invalid status value, fix base class");
@@ -362,7 +383,7 @@ public:
     
     // The user may override it to return another value, instead.
     virtual void feedbackCB(const ActionFeedbackT& feedback){
-        ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client: feedbackCB");
+        ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client: feedbackCB");
     }
 
     virtual void doneCB(const actionlib::SimpleClientGoalState& state,
@@ -371,14 +392,17 @@ public:
         finished_ = true;
         goal_result_available_ = true;
         result_ = result;
-        ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client: doneCB");
+        ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client: doneCB");
     }
 
     virtual void activeCB()
     {
+        finished_ = false;
         goal_result_available_ = false;
-        ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client: activeCB");
+        ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client: activeCB");
     }
+
+    bool interrupt{false};
 
 protected:
     bool should_cancel_goal()                                                                               
@@ -432,7 +456,7 @@ protected:
         { 
             action_client_->cancelGoal();
         } 
-        ROS_INFO_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": send goal, action state: " << state_convert(action_client_->getState()));
+        ROS_DEBUG_STREAM_NAMED(action_name_+"_client", action_name_+"_client" <<": send goal, action state: " << state_convert(action_client_->getState()));
     }
 
     std::string action_name_;
@@ -461,6 +485,11 @@ protected:
     bool collision_happened_{false};
 
     bool finished_{false};
+    bool interrupt_{false};
+
+    std::mutex mtx_interrupt_;
+    std::mutex mtx_finished_;
+
 
     std::string subscribe_topic_name_{""};
 

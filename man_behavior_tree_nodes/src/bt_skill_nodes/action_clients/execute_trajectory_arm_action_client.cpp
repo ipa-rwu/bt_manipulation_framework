@@ -18,52 +18,41 @@ ExecuteTrajectoryActionClient::ExecuteTrajectoryActionClient(
 {
 }
 
-// void ExecuteTrajectoryActionClient::initialize()
-// {
-//     WebotsSkills webots_obj;
-//     webotsRobotName_ = webots_obj.fixName();
-//     ROS_INFO_STREAM_NAMED("ExecuteTrajectoryActionClient", "webots robot name: " << webotsRobotName_ );
-
-//     touch_sensor_topic_name_ = "/container_A" + webotsRobotName_ + "/touch_sensor/value";
-//     touch_sensor_sub_ = pnh_.subscribe(touch_sensor_topic_name_,
-//                           1,
-//                           &ExecuteTrajectoryActionClient::TouchsensorCallback,
-//                           this);
-// }
-
-// void ExecuteTrajectoryActionClient::TouchsensorCallback(const webots_ros::BoolStamped::ConstPtr& touchsensor_msg)
-// {
-//   // msg: {"data": "start"}
-//   result_touchsensor_ = touchsensor_msg->data;
-// //   std::cout << result_touchsensor <<std::endl;
-
-// }
-
 void ExecuteTrajectoryActionClient::on_tick()
 {
-    getInput("plan", goal_.plan);
+  getInput("plan", goal_.plan);
 
 }
 
 void ExecuteTrajectoryActionClient::on_wait_for_result()
 {
-  if (collision_happened_ == true)
-  {
-    // ROS_INFO("[ExecuteTrajectoryActionClient] on_wait_for_result: touched");
+  if(!finished_){
+    if(touch_data_){
+      mtx_interrupt_.lock();
+      interrupt_ = true;
+      mtx_interrupt_.unlock();
+    }
   }
-
 }
 
 void ExecuteTrajectoryActionClient::subCallback(webots_ros::BoolStamped::ConstPtr msg)
 {
-    touch_data_ = msg->data;
-    if (touch_data_ && finished_ == false)
-    {
-        // ROS_INFO("[touch sensor call back]: touched");
-        collision_happened_ = true;
-    }
-    touch_data_ = false;
+  mtx_sub_.lock();
+  touch_data_ = msg->data;
+  mtx_sub_.unlock();
+
 }
+
+// void ExecuteTrajectoryActionClient::subCallback(webots_ros::BoolStamped::ConstPtr msg)
+// {
+//     touch_data_ = msg->data;
+//     if (touch_data_ && finished_ == false)
+//     {
+//         // ROS_INFO("[touch sensor call back]: touched");
+//         collision_happened_ = true;
+//     }
+//     touch_data_ = false;
+// }
   
 BT::NodeStatus ExecuteTrajectoryActionClient::on_success()
 {

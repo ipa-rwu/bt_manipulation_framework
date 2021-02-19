@@ -54,7 +54,6 @@ private:
     man_msgs::Plan plan_;
     int success_{0};
     bool touch_data_{false};
-    std::mutex mtx_interrupt_;
     std::mutex mtx_sub_;
 };
 } // namespace
