@@ -37,6 +37,7 @@ private:
     std::string group_name_;
     std::string action_name_;
 
+    const int IO_SERVICE_FUN_LEVEL_ = 1; 
 
 }; //namespace manipulator_skills
 }
