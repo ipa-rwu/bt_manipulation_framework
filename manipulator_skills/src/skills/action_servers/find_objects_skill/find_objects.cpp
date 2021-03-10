@@ -22,7 +22,7 @@ void FindObjectsSkill::initialize()
     as_.reset(new FindObjectServer(root_node_handle_, service_name_, 
     boost::bind(&FindObjectsSkill::executeCB, this, _1), false));
 
-    armarker_client_ = pnh_.serviceClient<ar_marker_detector::getMarkerPose>(armarker_srv_name_);
+    armarker_client_ = pnh_.serviceClient<man_msgs::GetMarkerPose>(armarker_srv_name_);
 
     as_->start();
     // ROS_INFO_STREAM_NAMED(getName(), "start action" );
@@ -84,12 +84,12 @@ void FindObjectsSkill::executeCB(const man_msgs::FindObjectsGoalConstPtr& goal)
 bool FindObjectsSkill::getPose(const man_msgs::FindObjectsGoalConstPtr& goal,
                                          geometry_msgs::PoseStamped &posestamp)
 {
-    armarker_srv_.request.ar_marker_id = goal->marker_id;
+    // armarker_srv_.request.ar_marker_id = goal->marker_id;
     if (armarker_client_.call(armarker_srv_))
     {
       posestamp.header.stamp = ros::Time::now();
-      posestamp.pose = armarker_srv_.response.pose;   
-      posestamp = armarker_srv_.response.poseStamped;   
+      // posestamp.pose = armarker_srv_.response.pose;   
+      posestamp = armarker_srv_.response.object;   
       return true;
     }
     ROS_WARN_STREAM_NAMED(getName(), getName() <<": Didn't get marker pose");

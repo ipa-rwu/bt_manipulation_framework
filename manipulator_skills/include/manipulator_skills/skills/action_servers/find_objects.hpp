@@ -5,7 +5,7 @@
 #include "manipulator_skills/skill.hpp"
 #include <actionlib/server/simple_action_server.h>
 
-#include "ar_marker_detector/getMarkerPose.h"
+#include "man_msgs/GetMarkerPose.h"
 #include "man_msgs/FindObjectsAction.h"
 
 namespace manipulator_skills
@@ -36,7 +36,7 @@ private:
   std::string service_name_;
 
   std::string armarker_srv_name_ = "/getMarkerPose";
-  ar_marker_detector::getMarkerPose armarker_srv_;
+  man_msgs::GetMarkerPose armarker_srv_;
   ros::ServiceClient armarker_client_;
   
   geometry_msgs::PoseStamped marker_posestamped_;

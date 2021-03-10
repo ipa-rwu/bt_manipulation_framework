@@ -2,7 +2,7 @@
     <BehaviorTree ID="SignlePoint">
     <SequenceStar name="root_sequence">
         <Action ID="UpdateParameter" data_type="double" topic="/arm_parameter_server" />
-        <Action ID="UpdateParameter" data_type="bool" topic="/task_flag_parameter_server" />
+        <Action ID="UpdateParameter" data_type="string" topic="/gripper_parameter_server" />
 
         <!-- <Action ID="SetParameter" param_topic="/arm_parameter_server" label="task2step1" data_type="double" /> -->
         <!-- <Action ID="SetParameter" param_topic="/task_flag_parameter_server" label="Task1Detect" data_type="bool" value="true" /> -->
@@ -15,8 +15,10 @@
         <!-- <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="1;1;world;0.38;0.76;1.02;-0.54;0.46;0.54;0.46" goal="{arm_goal}"/>
         <ComputePathArm goal="{arm_goal}" target_type="Pose" replan_times="3" plan="{new_plan}"/>
         <ExecuteTrajectoryArm plan="{new_plan}" result="{result}"/> -->
-        <Action ID="ExecuteGripperIO" fun="1" action="close" />
-        <Action ID="ExecuteGripperIO" fun="1" action="open" />
+        <!-- <Action ID="ExecuteGripperIO" action="close" />
+        <Action ID="ExecuteGripperIO" action="open" /> -->
+        <Action ID="FindObjects" object_id = "0" container_a_id = "1" container_b_id = "2" container="{container}" object="{object}"/>
+
         <!-- <Action ID="UpdateGoalForArm" service_name="skill_update_arm_goal" initial_pose="{container}" goal="{arm_goal}" step="task2step1" />
         <ComputePathArm goal="{arm_goal}" target_type="Cartesian" replan_times="3" plan="{plan}"/>
         <ExecuteTrajectoryArm plan="{plan}" result="{exection_result}"/> -->

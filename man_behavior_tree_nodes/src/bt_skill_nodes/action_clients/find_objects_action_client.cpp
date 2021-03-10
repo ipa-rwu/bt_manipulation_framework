@@ -55,5 +55,5 @@ BT_REGISTER_NODES(factory)
     };
 
   factory.registerBuilder<man_behavior_tree_nodes::FindObjectsActionClient>(
-    "FindObjects", builder);
+    "FindObjectsFake", builder);
 }

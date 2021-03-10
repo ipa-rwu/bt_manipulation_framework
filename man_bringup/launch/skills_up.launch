@@ -10,8 +10,8 @@
 <!-- dynamic_parameter -->
 <node pkg="arm_parameter_server" type="arm_parameter_server" name="arm_parameter_server" output="screen" required="true">
 </node>
-<!-- <node pkg="gripper_parameter_server" type="gripper_parameter_server" name="gripper_parameter_server" output="screen" required="true">
-</node> -->
+<node pkg="gripper_parameter_server" type="gripper_parameter_server" name="gripper_parameter_server" output="screen" required="true">
+</node>
 <node pkg="task_flag_parameter_server" type="task_flag_parameter_server" name="task_flag_parameter_server" output="screen" required="true">
 </node>
 
@@ -47,5 +47,8 @@
 
 <node pkg="manipulator_skills" type="set_parameter_server" name="set_parameter_server" output="screen" required="true">
 </node>
+
+<include file="$(find ar_marker_detector)/launch/skill_find_objects.launch">
+</include>
 
 </launch>

@@ -29,6 +29,7 @@ UpdateParam.srv
 Help.srv
 SetParameter.srv
 CheckCollisionService.srv
+GetMarkerPose.srv
 )
 
 set(ACT_FILES

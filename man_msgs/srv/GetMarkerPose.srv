@@ -1,0 +1,7 @@
+int32 object_id
+int32 container_a_id
+int32 container_b_id
+---
+#response-marker pose
+geometry_msgs/PoseStamped object
+geometry_msgs/PoseStamped container
