@@ -1,7 +1,0 @@
-#request for help
-string param_topic
-string task_name
-bool success
----
-#response
-bool result

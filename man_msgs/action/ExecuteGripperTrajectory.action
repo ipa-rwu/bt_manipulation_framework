@@ -1,7 +1,0 @@
-#goal
-string action_name
----
-#result
-int32 success
----
-#feedback

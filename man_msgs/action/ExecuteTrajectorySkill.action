@@ -1,7 +1,0 @@
-#goal
-man_msgs/Plan plan
----
-#result
-int32 success
----
-#feedback
