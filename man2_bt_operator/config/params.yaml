@@ -1,0 +1,4 @@
+/bt_operator:
+  ros__parameters:
+    default_bt_xml_filename: "simple_tree.xml"
+    print_bt_status: true
