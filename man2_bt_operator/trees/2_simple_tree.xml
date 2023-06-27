@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="CheckStatus">
+    <!-- ////////// -->
+    <BehaviorTree ID="CheckStatus">
+        <Sequence>
+            <SetBlackboard output_key="eee" value="world"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CheckBattery"/>
+        <Action ID="CheckTemperature"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
