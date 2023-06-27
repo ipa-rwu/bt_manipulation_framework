@@ -1,0 +1,10 @@
+# goal
+string behavior_tree_filename
+---
+#result
+bool success
+---
+#feedback
+float64 percentage
+builtin_interfaces/Duration execution_time
+int16 number_of_recoveries
