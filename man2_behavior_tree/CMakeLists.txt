@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(behaviortree_cpp REQUIRED)
 find_package(nav2_behavior_tree REQUIRED)
 
 # uncomment the following section in order to fill in
@@ -26,7 +26,7 @@ set(dependencies
   rclcpp
   rclcpp_action
   rclcpp_lifecycle
-  behaviortree_cpp_v3
+  behaviortree_cpp
   nav2_behavior_tree
 )
 

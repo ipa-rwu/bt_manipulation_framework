@@ -1,6 +1,5 @@
 #ifndef MAN2_BT_OPERATOR__BT_OPERATOR_HPP_
 #define MAN2_BT_OPERATOR__BT_OPERATOR_HPP_
-#define STRINGIFY(x) #x
 
 #include <fstream>
 #include <map>
@@ -8,8 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "behaviortree_cpp_v3/loggers/bt_cout_logger.h"
-// #include "nav2_behavior_tree/behavior_tree_engine.hpp"
+#include "behaviortree_cpp/loggers/bt_cout_logger.h"
 #include "man2_behavior_tree/behavior_tree_engine.hpp"
 #include "nav2_util/lifecycle_node.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -18,7 +16,6 @@
 #include "nav2_util/simple_action_server.hpp"
 
 #ifdef ZMQ_FOUND
-#include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
 #endif
 
 namespace man2_bt_operator
@@ -130,7 +127,7 @@ protected:
   void startApplication();
 
   // The wrapper class for the BT functionality
-  std::unique_ptr<man2_behavior_tree::ManipulationBehaviorTreeEngine> bt_;
+  std::unique_ptr<ros2_behavior_tree::ROS2BehaviorTreeEngine> bt_;
 
   BT::Tree tree_;
 

@@ -22,14 +22,24 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
-#include "behaviortree_cpp_v3/utils/shared_library.h"
 
-namespace man2_behavior_tree
+namespace ros2_behavior_tree
 {
-nav2_behavior_tree::BtStatus
-ManipulationBehaviorTreeEngine::run_loop(BT::Tree* tree, std::function<void()> onLoop,
-                                         std::function<bool()> cancelRequested,
-                                         std::chrono::milliseconds loopTimeout)
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("ros2_behavior_tree_engine");
+
+ROS2BehaviorTreeEngine::ROS2BehaviorTreeEngine(const std::vector<std::string>& plugin_libraries)
+{
+  BT::SharedLibrary loader;
+  for (const auto& p : plugin_libraries)
+  {
+    factory_.registerFromPlugin(loader.getOSName(p));
+  }
+}
+
+ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(BT::Tree* tree,
+                                                              std::function<void()> onLoop,
+                                                              std::function<bool()> cancelRequested,
+                                                              std::chrono::milliseconds loopTimeout)
 {
   rclcpp::WallRate loopRate(loopTimeout);
   BT::NodeStatus result = BT::NodeStatus::RUNNING;
@@ -42,8 +52,8 @@ ManipulationBehaviorTreeEngine::run_loop(BT::Tree* tree, std::function<void()> o
     {
       if (cancelRequested())
       {
-        tree->rootNode()->halt();
-        return nav2_behavior_tree::BtStatus::CANCELED;
+        tree->haltTree();
+        return ros2_behavior_tree::BtStatus::CANCELED;
       }
 
       tree->rootNode()->executeTick();
@@ -55,13 +65,24 @@ ManipulationBehaviorTreeEngine::run_loop(BT::Tree* tree, std::function<void()> o
   }
   catch (const std::exception& ex)
   {
-    RCLCPP_ERROR(rclcpp::get_logger("BehaviorTreeEngine"),
-                 "Behavior tree threw exception: %s. Exiting with failure.", ex.what());
-    return nav2_behavior_tree::BtStatus::FAILED;
+    RCLCPP_ERROR(LOGGER, "Behavior tree threw exception: %s. Exiting with failure.", ex.what());
+    return ros2_behavior_tree::BtStatus::FAILED;
   }
 
-  return (result == BT::NodeStatus::SUCCESS) ? nav2_behavior_tree::BtStatus::SUCCEEDED :
-                                               nav2_behavior_tree::BtStatus::FAILED;
+  return (result == BT::NodeStatus::SUCCESS) ? ros2_behavior_tree::BtStatus::SUCCEEDED :
+                                               ros2_behavior_tree::BtStatus::FAILED;
 }
 
-}  // namespace man2_behavior_tree
+BT::Tree ROS2BehaviorTreeEngine::createTreeFromText(const std::string& xml_string,
+                                                    BT::Blackboard::Ptr blackboard)
+{
+  return factory_.createTreeFromText(xml_string, blackboard);
+}
+
+BT::Tree ROS2BehaviorTreeEngine::createTreeFromFile(const std::string& file_path,
+                                                    BT::Blackboard::Ptr blackboard)
+{
+  return factory_.createTreeFromFile(file_path, blackboard);
+}
+
+}  // namespace ros2_behavior_tree

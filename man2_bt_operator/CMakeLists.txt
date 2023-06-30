@@ -12,8 +12,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(nav2_behavior_tree REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(behaviortree_cpp REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(nav2_util REQUIRED)
 find_package(man2_behavior_tree)
@@ -40,9 +39,8 @@ set(dependencies
   rclcpp_action
   rclcpp_lifecycle
   std_msgs
-  nav2_behavior_tree
   man2_behavior_tree
-  behaviortree_cpp_v3
+  behaviortree_cpp
   std_srvs
   nav2_util
   man2_msgs

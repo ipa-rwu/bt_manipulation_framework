@@ -31,8 +31,7 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
                                      std::bind(&BTOperator::startApplication, this));
 
   // Create the class that registers our custom nodes and executes the BT
-  bt_ = std::make_unique<man2_behavior_tree::ManipulationBehaviorTreeEngine>(
-      parameters_->plugin_lib_names);
+  bt_ = std::make_unique<ros2_behavior_tree::ROS2BehaviorTreeEngine>(parameters_->plugin_lib_names);
 
   // add items to blackboard
   // Create the blackboard that will be shared by all of the nodes in the tree
@@ -79,7 +78,7 @@ nav2_util::CallbackReturn BTOperator::on_cleanup(const rclcpp_lifecycle::State& 
   parameters_.reset();
   blackboard_.reset();
   action_server_.reset();
-  bt_->haltAllActions(tree_.rootNode());
+  tree_.haltTree();
   bt_.reset();
 
   RCLCPP_INFO(LOGGER, "Completed Cleaning up");
@@ -183,24 +182,24 @@ void BTOperator::startApplication()
   // Execute the BT that was previously created in the configure step
 
   start_time_ = now();
-  nav2_behavior_tree::BtStatus rc = bt_->run_loop(&tree_, on_loop, is_canceling);
+  ros2_behavior_tree::BtStatus rc = bt_->run_loop(&tree_, on_loop, is_canceling);
   // Make sure that the Bt is not in a running state from a previous execution
   // note: if all the ControlNodes are implemented correctly, this is not needed.
-  bt_->haltAllActions(tree_.rootNode());
+  tree_.haltTree();
 
   switch (rc)
   {
-    case nav2_behavior_tree::BtStatus::SUCCEEDED:
+    case ros2_behavior_tree::BtStatus::SUCCEEDED:
       RCLCPP_INFO(LOGGER, "Application succeeded");
       action_server_->succeeded_current();
       break;
 
-    case nav2_behavior_tree::BtStatus::FAILED:
+    case ros2_behavior_tree::BtStatus::FAILED:
       RCLCPP_ERROR(LOGGER, "Application failed");
       action_server_->terminate_current();
       break;
 
-    case nav2_behavior_tree::BtStatus::CANCELED:
+    case ros2_behavior_tree::BtStatus::CANCELED:
       RCLCPP_INFO(LOGGER, "Application canceled");
       action_server_->terminate_all();
       break;

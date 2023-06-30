@@ -12,14 +12,12 @@
   <build_depend>rclcpp</build_depend>
   <build_depend>rclcpp_action</build_depend>
   <build_depend>rclcpp_lifecycle</build_depend>
-  <build_depend>behaviortree_cpp_v3</build_depend>
-  <build_depend>nav2_behavior_tree</build_depend>
+  <build_depend>behaviortree_cpp</build_depend>
 
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>rclcpp_action</exec_depend>
   <exec_depend>rclcpp_lifecycle</exec_depend>
-  <exec_depend>behaviortree_cpp_v3</exec_depend>
-  <build_depend>nav2_behavior_tree</build_depend>
+  <exec_depend>behaviortree_cpp</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
