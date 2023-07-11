@@ -27,12 +27,25 @@ namespace ros2_behavior_tree
 {
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("ros2_behavior_tree_engine");
 
-ROS2BehaviorTreeEngine::ROS2BehaviorTreeEngine(const std::vector<std::string>& plugin_libraries)
+ROS2BehaviorTreeEngine::ROS2BehaviorTreeEngine()
+{
+}
+
+void ROS2BehaviorTreeEngine::loadDefaultPlugins(const std::vector<std::string>& plugin_libraries)
 {
   BT::SharedLibrary loader;
   for (const auto& p : plugin_libraries)
   {
     factory_.registerFromPlugin(loader.getOSName(p));
+  }
+}
+
+void ROS2BehaviorTreeEngine::loadAbsolutePlugins(const std::vector<std::string>& plugin_libraries)
+{
+  BT::SharedLibrary loader;
+  for (const auto& p : plugin_libraries)
+  {
+    factory_.registerFromPlugin(p);
   }
 }
 
@@ -49,6 +62,42 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(BT::Tree* tree,
   {
     while (rclcpp::ok() && (tree->rootNode()->status() != BT::NodeStatus::SUCCESS ||
                             tree->rootNode()->status() != BT::NodeStatus::FAILURE))
+    {
+      if (cancelRequested())
+      {
+        tree->haltTree();
+        return ros2_behavior_tree::BtStatus::CANCELED;
+      }
+
+      tree->rootNode()->executeTick();
+
+      onLoop();
+
+      loopRate.sleep();
+    }
+  }
+  catch (const std::exception& ex)
+  {
+    RCLCPP_ERROR(LOGGER, "Behavior tree threw exception: %s. Exiting with failure.", ex.what());
+    return ros2_behavior_tree::BtStatus::FAILED;
+  }
+
+  return (result == BT::NodeStatus::SUCCESS) ? ros2_behavior_tree::BtStatus::SUCCEEDED :
+                                               ros2_behavior_tree::BtStatus::FAILED;
+}
+
+ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run(BT::Tree* tree,
+                                                         std::function<void()> onLoop,
+                                                         std::function<bool()> cancelRequested,
+                                                         std::chrono::milliseconds loopTimeout)
+{
+  rclcpp::WallRate loopRate(loopTimeout);
+  BT::NodeStatus result = BT::NodeStatus::RUNNING;
+
+  // Loop until something happens with ROS or the node completes
+  try
+  {
+    while (rclcpp::ok() && result == BT::NodeStatus::RUNNING)
     {
       if (cancelRequested())
       {

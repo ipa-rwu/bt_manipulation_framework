@@ -24,14 +24,50 @@ enum class BtStatus
 class ROS2BehaviorTreeEngine
 {
 public:
-  explicit ROS2BehaviorTreeEngine(const std::vector<std::string>& plugin_libraries);
+  explicit ROS2BehaviorTreeEngine();
   virtual ~ROS2BehaviorTreeEngine()
   {
   }
 
+  /**
+   * @brief Load BT plugin from current package
+   *
+   * @param plugin_libraries
+   */
+  void loadDefaultPlugins(const std::vector<std::string>& plugin_libraries);
+
+  /**
+   * @brief Load BT plugins from absolute path
+   *
+   * @param plugin_libraries
+   */
+  void loadAbsolutePlugins(const std::vector<std::string>& plugin_libraries);
+
+  /**
+   * @brief Run an entire BT in loops
+   *
+   * @param tree
+   * @param onLoop
+   * @param cancelRequested
+   * @param loopTimeout
+   * @return ros2_behavior_tree::BtStatus
+   */
   ros2_behavior_tree::BtStatus
   run_loop(BT::Tree* tree, std::function<void()> onLoop, std::function<bool()> cancelRequested,
            std::chrono::milliseconds loopTimeout = std::chrono::milliseconds(10));
+
+  /**
+   * @brief Run an entire BT one time
+   *
+   * @param tree
+   * @param onLoop
+   * @param cancelRequested
+   * @param loopTimeout
+   * @return ros2_behavior_tree::BtStatus
+   */
+  ros2_behavior_tree::BtStatus
+  run(BT::Tree* tree, std::function<void()> onLoop, std::function<bool()> cancelRequested,
+      std::chrono::milliseconds loopTimeout = std::chrono::milliseconds(10));
 
   /**
    * @brief Function to create a BT from a XML string
