@@ -9,12 +9,15 @@ int main(int argc, char** argv)
 
   auto node = std::make_shared<man2_bt_operator::BTOperator>();
 
-  rclcpp::executors::MultiThreadedExecutor exe;
+  rclcpp::executors::MultiThreadedExecutor executor;
 
-  exe.add_node(node->get_node_base_interface());
+  auto spin_thread = std::make_unique<std::thread>([&executor, &node]() {
+    executor.add_node(node->get_node_base_interface());
+    executor.spin();
+    executor.remove_node(node->get_node_base_interface());
+  });
 
-  exe.spin();
-
+  spin_thread->join();
   rclcpp::shutdown();
 
   return 0;
