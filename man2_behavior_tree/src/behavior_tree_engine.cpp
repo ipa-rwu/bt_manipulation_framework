@@ -1,7 +1,7 @@
-//  Copy and did modification from origin code
-
 // Copyright (c) 2018 Intel Corporation
 // Copyright (c) 2020 Florian Gramss
+// Copyright (c) 2023 Ruichao Wu
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
+#include <ament_index_cpp/get_package_prefix.hpp>
 
 namespace ros2_behavior_tree
 {
@@ -38,6 +39,23 @@ void ROS2BehaviorTreeEngine::loadDefaultPlugins(const std::vector<std::string>& 
   {
     factory_.registerFromPlugin(loader.getOSName(p));
   }
+}
+
+void ROS2BehaviorTreeEngine::loadAbsolutePlugins(
+    const std::map<std::string, std::vector<std::string>> package_plugin_map)
+{
+  BT::SharedLibrary loader;
+  std::vector<std::string> plugin_libraries;
+  for (const auto& [pkg, plugin_list] : package_plugin_map)
+  {
+    for (const auto& plugin : plugin_list)
+    {
+      auto plugin_path =
+          ament_index_cpp::get_package_prefix(pkg) + "/lib/" + loader.getOSName(plugin);
+      plugin_libraries.push_back(plugin_path);
+    }
+  }
+  loadAbsolutePlugins(plugin_libraries);
 }
 
 void ROS2BehaviorTreeEngine::loadAbsolutePlugins(const std::vector<std::string>& plugin_libraries)
@@ -57,6 +75,12 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(BT::Tree* tree,
   rclcpp::WallRate loopRate(loopTimeout);
   BT::NodeStatus result = BT::NodeStatus::RUNNING;
 
+  BT::Groot2Publisher groot_publisher_(*tree);
+  groot_publisher_.flush();
+
+  BT::StdCoutLogger logger_cout(*tree);
+  logger_cout.flush();
+
   // Loop until something happens with ROS or the node completes
   try
   {
@@ -68,7 +92,8 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(BT::Tree* tree,
         tree->haltTree();
         return ros2_behavior_tree::BtStatus::CANCELED;
       }
-
+      groot_publisher_.flush();
+      logger_cout.flush();
       tree->rootNode()->executeTick();
 
       onLoop();
@@ -94,6 +119,12 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run(BT::Tree* tree,
   rclcpp::WallRate loopRate(loopTimeout);
   BT::NodeStatus result = BT::NodeStatus::RUNNING;
 
+  BT::Groot2Publisher groot_publisher_(*tree);
+  groot_publisher_.flush();
+
+  BT::StdCoutLogger logger_cout(*tree);
+  logger_cout.flush();
+
   // Loop until something happens with ROS or the node completes
   try
   {
@@ -105,7 +136,10 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run(BT::Tree* tree,
         return ros2_behavior_tree::BtStatus::CANCELED;
       }
 
-      tree->rootNode()->executeTick();
+      groot_publisher_.flush();
+      logger_cout.flush();
+
+      tree->tickWhileRunning();
 
       onLoop();
 

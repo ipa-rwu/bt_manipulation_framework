@@ -10,6 +10,8 @@
 #include "behaviortree_cpp/behavior_tree.h"
 #include "behaviortree_cpp/bt_factory.h"
 #include "behaviortree_cpp/xml_parsing.h"
+#include "behaviortree_cpp/loggers/groot2_publisher.h"
+#include "behaviortree_cpp/loggers/bt_cout_logger.h"
 
 using namespace std::chrono_literals;
 
@@ -42,6 +44,8 @@ public:
    * @param plugin_libraries
    */
   void loadAbsolutePlugins(const std::vector<std::string>& plugin_libraries);
+
+  void loadAbsolutePlugins(const std::map<std::string, std::vector<std::string>> package_plugin_map);
 
   /**
    * @brief Run an entire BT in loops
@@ -84,6 +88,14 @@ public:
    * @return BT::Tree Created behavior tree
    */
   BT::Tree createTreeFromFile(const std::string& file_path, BT::Blackboard::Ptr blackboard);
+
+  /**
+   * @brief Save BT log into file (btlog)
+   *
+   * @param tree
+   * @param path for saving log
+   */
+  void saveLogIntoBtlog(const BT::Tree& tree, const std::string& path);
 
 protected:
   // The factory that will be used to dynamically construct the behavior tree
