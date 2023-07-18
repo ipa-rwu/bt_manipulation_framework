@@ -20,6 +20,8 @@
 
 namespace man2_bt_operator
 {
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("bt_operator");
+
 class BTOperator : public nav2_util::LifecycleNode
 {
   /**
@@ -28,10 +30,12 @@ class BTOperator : public nav2_util::LifecycleNode
    */
   struct RosParameters
   {
-    std::vector<std::string> plugin_lib_names;
+    std::vector<std::string> default_plugin_lib_names;
+    std::map<std::string, std::vector<std::string>> customized_plugin_lib_names;
     std::string default_bt_xml_filename;
     std::string current_bt_xml_filename;
     bool print_bt_status;
+    bool connect_to_groot2;
 
     std::string ns = "";
 
@@ -39,25 +43,60 @@ class BTOperator : public nav2_util::LifecycleNode
     {
       node->declare_parameter(ns + "current_bt_xml_filename", rclcpp::PARAMETER_STRING);
       node->declare_parameter(ns + "default_bt_xml_filename", rclcpp::PARAMETER_STRING);
-      node->declare_parameter(ns + "plugin_lib_names", rclcpp::PARAMETER_STRING_ARRAY);
+      node->declare_parameter(ns + "default_plugin_lib_names", rclcpp::PARAMETER_STRING_ARRAY);
       node->declare_parameter(ns + "print_bt_status", rclcpp::PARAMETER_BOOL);
+      node->declare_parameter(ns + "connect_to_groot2", rclcpp::PARAMETER_BOOL);
+      std::string prefix_plugin = "customized_plugin_lib_names.";
+      auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
+      for (const auto& param : all_params)
+      {
+        std::size_t i = param.first.find(prefix_plugin);
+        if (i != std::string::npos)
+        {
+          std::string tmp = param.first;
+          tmp.erase(i, prefix_plugin.length());
+          node->declare_parameter(param.first.c_str(), param.second);
+          customized_plugin_lib_names[tmp] = std::vector<std::string>{};
+        }
+      }
     }
 
     void loadRosParameters(const nav2_util::LifecycleNode::SharedPtr& node)
     {
-      node->get_parameter_or(ns + "plugin_lib_names", plugin_lib_names, std::vector<std::string>{});
+      node->get_parameter_or(ns + "default_plugin_lib_names", default_plugin_lib_names,
+                             std::vector<std::string>{});
       node->get_parameter_or(ns + "default_bt_xml_filename", default_bt_xml_filename,
                              ament_index_cpp::get_package_share_directory("man2_bt_operator") +
                                  std::string("/tree/default_bt_xml_filename.xml"));
       node->get_parameter_or(ns + "print_bt_status", print_bt_status, false);
+      node->get_parameter_or(ns + "connect_to_groot2", connect_to_groot2, false);
 
-      RCLCPP_INFO(node->get_logger(),
-                  "loadRosParameters: plugin_lib_names: %s, default_bt_xml_filename: %s",
-                  rclcpp::Parameter("plugin_lib_names").value_to_string().c_str(),
+      std::string prefix_plugin = "customized_plugin_lib_names.";
+      auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
+      for (const auto& param : all_params)
+      {
+        std::size_t i = param.first.find(prefix_plugin);
+        if (i != std::string::npos)
+        {
+          std::string tmp = param.first;
+          tmp.erase(i, prefix_plugin.length());
+          if (param.second.get_type() == rclcpp::PARAMETER_STRING_ARRAY)
+          {
+            customized_plugin_lib_names[tmp] = node->get_parameter(param.first).as_string_array();
+          }
+          else
+          {
+            customized_plugin_lib_names[tmp].push_back(node->get_parameter(param.first).as_string());
+          }
+        }
+      }
+
+      RCLCPP_INFO(LOGGER, "loadRosParameters: default plugins: %s, default_bt_xml_filename: %s",
+                  node->get_parameter("default_plugin_lib_names").value_to_string().c_str(),
                   default_bt_xml_filename.c_str());
     }
 
-    bool setParameter(const nav2_util::LifecycleNode::SharedPtr& node,
+    void setParameter(const nav2_util::LifecycleNode::SharedPtr& node,
                       const std::string& parameter_name)
     {
       node->set_parameter(rclcpp::Parameter(parameter_name));
@@ -137,6 +176,8 @@ protected:
   std::shared_ptr<RosParameters> parameters_;
 
   rclcpp::Time start_time_;
+
+  rclcpp::Node::SharedPtr client_node_;
 };
 
 }  // namespace man2_bt_operator

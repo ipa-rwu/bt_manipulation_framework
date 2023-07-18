@@ -1,15 +1,23 @@
 #include "man2_bt_operator/bt_operator.hpp"
+#include "behaviortree_cpp/bt_factory.h"
 
 using namespace std::chrono_literals;
 
 namespace man2_bt_operator
 {
-static const rclcpp::Logger LOGGER = rclcpp::get_logger("man2_bt_operator");
-
 BTOperator::BTOperator()
   : nav2_util::LifecycleNode("bt_operator", "", rclcpp::NodeOptions()), start_time_(now())
 {
   parameters_ = std::make_shared<RosParameters>();
+
+  auto options = rclcpp::NodeOptions().arguments(
+      { "--ros-args", "-r",
+        std::string("__node:=") + std::string(this->get_name()) + "_" + "client" + "_rclcpp_node",
+        "-p",
+        "use_sim_time:=" +
+            std::string(this->get_parameter("use_sim_time").as_bool() ? "true" : "false"),
+        "--" });
+  client_node_ = client_node_ = std::make_shared<rclcpp::Node>("_", options);
 }
 
 BTOperator::~BTOperator()
@@ -31,7 +39,12 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
                                      std::bind(&BTOperator::startApplication, this));
 
   // Create the class that registers our custom nodes and executes the BT
-  bt_ = std::make_unique<ros2_behavior_tree::ROS2BehaviorTreeEngine>(parameters_->plugin_lib_names);
+  bt_ = std::make_unique<ros2_behavior_tree::ROS2BehaviorTreeEngine>();
+
+  // Load default plugins
+  bt_->loadDefaultPlugins(parameters_->default_plugin_lib_names);
+
+  bt_->loadAbsolutePlugins(parameters_->customized_plugin_lib_names);
 
   // add items to blackboard
   // Create the blackboard that will be shared by all of the nodes in the tree
@@ -39,10 +52,7 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
 
   // Put items on the blackboard
   blackboard_->set<int>("number_recoveries", 0);
-
-#ifdef ZMQ_FOUND
-  BT::PublisherZMQ publisher_zmq(tree_);
-#endif
+  blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_);
 
   return nav2_util::CallbackReturn::SUCCESS;
 }
@@ -80,6 +90,7 @@ nav2_util::CallbackReturn BTOperator::on_cleanup(const rclcpp_lifecycle::State& 
   action_server_.reset();
   tree_.haltTree();
   bt_.reset();
+  client_node_.reset();
 
   RCLCPP_INFO(LOGGER, "Completed Cleaning up");
   return nav2_util::CallbackReturn::SUCCESS;
@@ -96,6 +107,7 @@ bool BTOperator::loadBehaviorTree(const std::string& bt_xml_filename)
   // Use previous BT if it is the existing one
   if (parameters_->current_bt_xml_filename == bt_xml_filename)
   {
+    RCLCPP_INFO(LOGGER, "Current BT is as same as request BT");
     return true;
   }
 
@@ -114,10 +126,11 @@ bool BTOperator::loadBehaviorTree(const std::string& bt_xml_filename)
   RCLCPP_INFO(LOGGER, "Behavior Tree file: '%s'", bt_xml_filename.c_str());
   RCLCPP_INFO(LOGGER, "Behavior Tree XML: %s", xml_string.c_str());
 
-  // Create the Behavior Tree from the XML input
   tree_ = bt_->createTreeFromText(xml_string, blackboard_);
+
   parameters_->current_bt_xml_filename = bt_xml_filename;
   parameters_->setParameter(shared_from_this(), "current_bt_xml_filename");
+
   return true;
 }
 
@@ -126,13 +139,13 @@ void BTOperator::startApplication()
   auto is_canceling = [this]() {
     if (action_server_ == nullptr)
     {
-      RCLCPP_DEBUG(LOGGER, "Action server unavailable. Canceling.");
+      RCLCPP_INFO(LOGGER, "Action server unavailable. Canceling.");
       return true;
     }
 
     if (!action_server_->is_server_active())
     {
-      RCLCPP_DEBUG(LOGGER, "Action server is inactive. Canceling.");
+      RCLCPP_INFO(LOGGER, "Action server is inactive. Canceling.");
       return true;
     }
 
@@ -176,13 +189,11 @@ void BTOperator::startApplication()
     action_server_->publish_feedback(feedback_msg);
   };
 
-  // This logger prints state changes on console
-  if (parameters_->print_bt_status)
-    BT::StdCoutLogger logger_cout(tree_);
   // Execute the BT that was previously created in the configure step
 
   start_time_ = now();
-  ros2_behavior_tree::BtStatus rc = bt_->run_loop(&tree_, on_loop, is_canceling);
+  ros2_behavior_tree::BtStatus rc =
+      bt_->run_loop(&tree_, on_loop, is_canceling, std::chrono::milliseconds(2000));
   // Make sure that the Bt is not in a running state from a previous execution
   // note: if all the ControlNodes are implemented correctly, this is not needed.
   tree_.haltTree();
