@@ -7,7 +7,9 @@ import yaml
 from yaml import SafeLoader
 
 document = """
-    behavior_tree_filename: ""
+    behavior_tree_filename: "simple_tree.xml" # absolute path
+    run_in_loop: true
+    sleep: 2000
     """
 
 

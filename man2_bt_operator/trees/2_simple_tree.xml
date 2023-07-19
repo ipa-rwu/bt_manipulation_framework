@@ -1,15 +1,16 @@
-<?xml version="1.0"?>
-<root main_tree_to_execute="CheckStatus">
-    <!-- ////////// -->
-    <BehaviorTree ID="CheckStatus">
+ <root BTCPP_format="4">
+     <BehaviorTree ID="MainTree">
         <Sequence>
+            <PrintValue message="start"/>
             <SetBlackboard output_key="eee" value="world"/>
+            <PrintValue message="sleep completed"/>
+            <DetectArucoMarker marker_id="42"/>
+            <Fallback>
+                <Timeout msec="1500">
+                   <SetBlackboard output_key="eee" value="world"/>
+                </Timeout>
+                <PrintValue message="sleep aborted"/>
+            </Fallback>
         </Sequence>
-    </BehaviorTree>
-    <!-- ////////// -->
-    <TreeNodesModel>
-        <Action ID="CheckBattery"/>
-        <Action ID="CheckTemperature"/>
-    </TreeNodesModel>
-    <!-- ////////// -->
-</root>
+     </BehaviorTree>
+ </root>
