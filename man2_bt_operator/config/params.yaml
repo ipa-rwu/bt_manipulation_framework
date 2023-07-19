@@ -1,0 +1,10 @@
+/bt_operator:
+  ros__parameters:
+    # default_bt_xml_filename: "simple_tree.xml"
+    print_bt_status: false
+    default_plugin_lib_names:
+      - util_plugin_print_value
+    connect_to_groot2: true
+    customized_plugin_lib_names:
+      man2_bt_skills:
+        - detect_aruco_marker_skill
