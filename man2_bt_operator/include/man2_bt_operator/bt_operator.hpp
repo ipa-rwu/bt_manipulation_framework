@@ -156,14 +156,16 @@ protected:
    */
   bool loadBehaviorTree(const std::string& bt_xml_filename);
 
+  void startApplication();
+
+  bool validateGoal(const std::shared_ptr<const man2_msgs::action::RunApplication_Goal> goal);
+
   using Action = man2_msgs::action::RunApplication;
 
   using ActionServer = nav2_util::SimpleActionServer<Action>;
 
   // Our action server implements the NavigateToPose action
   std::unique_ptr<ActionServer> action_server_;
-
-  void startApplication();
 
   // The wrapper class for the BT functionality
   std::unique_ptr<ros2_behavior_tree::ROS2BehaviorTreeEngine> bt_;

@@ -94,7 +94,7 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(BT::Tree* tree,
       }
       groot_publisher_.flush();
       logger_cout.flush();
-      tree->rootNode()->executeTick();
+      result = tree->rootNode()->executeTick();
 
       onLoop();
 
@@ -139,7 +139,7 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run(BT::Tree* tree,
       groot_publisher_.flush();
       logger_cout.flush();
 
-      tree->tickWhileRunning();
+      result = tree->rootNode()->executeTick();
 
       onLoop();
 

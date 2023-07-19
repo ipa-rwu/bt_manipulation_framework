@@ -148,6 +148,11 @@ void BTOperator::startApplication()
       RCLCPP_INFO(LOGGER, "Action server is inactive. Canceling.");
       return true;
     }
+    if (!validateGoal(action_server_->get_current_goal()))
+    {
+      RCLCPP_INFO(LOGGER, "Goal is invalid");
+      return true;
+    }
 
     return action_server_->is_cancel_requested();
   };
@@ -192,8 +197,17 @@ void BTOperator::startApplication()
   // Execute the BT that was previously created in the configure step
 
   start_time_ = now();
-  ros2_behavior_tree::BtStatus rc =
-      bt_->run_loop(&tree_, on_loop, is_canceling, std::chrono::milliseconds(2000));
+  ros2_behavior_tree::BtStatus rc;
+  if (action_server_->get_current_goal()->run_in_loop)
+  {
+    rc = bt_->run_loop(&tree_, on_loop, is_canceling,
+                       std::chrono::milliseconds(action_server_->get_current_goal()->sleep));
+  }
+  else
+  {
+    rc = bt_->run(&tree_, on_loop, is_canceling);
+  }
+
   // Make sure that the Bt is not in a running state from a previous execution
   // note: if all the ControlNodes are implemented correctly, this is not needed.
   tree_.haltTree();
@@ -215,6 +229,20 @@ void BTOperator::startApplication()
       action_server_->terminate_all();
       break;
   }
+}
+
+bool BTOperator::validateGoal(
+    const std::shared_ptr<const man2_msgs::action::RunApplication_Goal> goal)
+{
+  if (goal->run_in_loop)
+  {
+    if (goal->sleep == 0)
+    {
+      RCLCPP_ERROR(LOGGER, "Please set sleep time in goal if the application runs repeatedly");
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace man2_bt_operator

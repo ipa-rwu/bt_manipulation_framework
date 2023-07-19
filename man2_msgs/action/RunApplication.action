@@ -1,5 +1,7 @@
 # goal
 string behavior_tree_filename
+bool run_in_loop
+int16 sleep
 ---
 #result
 bool success
