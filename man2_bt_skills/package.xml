@@ -12,7 +12,6 @@
   <depend>pluginlib</depend>
   <depend>aruco_msgs</depend>
   <depend>behaviortree_cpp</depend>
-  <build_depend>man2_plugin_base</build_depend>
 
   <build_depend>visualization_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>

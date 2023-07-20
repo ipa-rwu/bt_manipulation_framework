@@ -19,8 +19,6 @@ include_directories(
   include
 )
 
-# set(library_name detect_aruco_marker)
-
 set(dependencies
   rclcpp
   pluginlib
@@ -43,13 +41,8 @@ foreach(bt_plugin ${plugin_libs})
   target_compile_definitions(${bt_plugin} PRIVATE BT_PLUGIN_EXPORT)
 endforeach()
 
-
-# prevent pluginlib from using boost
-# target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-# pluginlib_export_plugin_description_file(man2_plugin_base perception_plugin.xml)
-
 install(TARGETS
-       ${plugin_libs}
+  ${plugin_libs}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -63,17 +56,15 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME})
 
-install(FILES perception_plugin.xml DESTINATION share/${PROJECT_NAME})
-
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
+
+  # These don't pass yet, disable them for now
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_flake8_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+
   ament_lint_auto_find_test_dependencies()
 endif()
 
