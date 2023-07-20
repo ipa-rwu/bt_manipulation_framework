@@ -1,6 +1,23 @@
+// Copyright (c) 2018 Intel Corporation
+// Copyright (c) 2020 Florian Gramss
+// Copyright (c) 2023 Ruichao Wu
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef MAN2_BT_OPERATOR__BT_OPERATOR_HPP_
 #define MAN2_BT_OPERATOR__BT_OPERATOR_HPP_
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -9,11 +26,10 @@
 
 #include "behaviortree_cpp/loggers/bt_cout_logger.h"
 #include "man2_behavior_tree/behavior_tree_engine.hpp"
-#include "nav2_util/lifecycle_node.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include "man2_msgs/action/run_application.hpp"
+#include "nav2_util/lifecycle_node.hpp"
 #include "nav2_util/simple_action_server.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 #ifdef ZMQ_FOUND
 #endif
@@ -39,7 +55,7 @@ class BTOperator : public nav2_util::LifecycleNode
 
     std::string ns = "";
 
-    void declareRosParameters(const nav2_util::LifecycleNode::SharedPtr& node)
+    void declareRosParameters(const nav2_util::LifecycleNode::SharedPtr & node)
     {
       node->declare_parameter(ns + "current_bt_xml_filename", rclcpp::PARAMETER_STRING);
       node->declare_parameter(ns + "default_bt_xml_filename", rclcpp::PARAMETER_STRING);
@@ -48,11 +64,9 @@ class BTOperator : public nav2_util::LifecycleNode
       node->declare_parameter(ns + "connect_to_groot2", rclcpp::PARAMETER_BOOL);
       std::string prefix_plugin = "customized_plugin_lib_names.";
       auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
-      for (const auto& param : all_params)
-      {
+      for (const auto & param : all_params) {
         std::size_t i = param.first.find(prefix_plugin);
-        if (i != std::string::npos)
-        {
+        if (i != std::string::npos) {
           std::string tmp = param.first;
           tmp.erase(i, prefix_plugin.length());
           node->declare_parameter(param.first.c_str(), param.second);
@@ -61,43 +75,41 @@ class BTOperator : public nav2_util::LifecycleNode
       }
     }
 
-    void loadRosParameters(const nav2_util::LifecycleNode::SharedPtr& node)
+    void loadRosParameters(const nav2_util::LifecycleNode::SharedPtr & node)
     {
-      node->get_parameter_or(ns + "default_plugin_lib_names", default_plugin_lib_names,
-                             std::vector<std::string>{});
-      node->get_parameter_or(ns + "default_bt_xml_filename", default_bt_xml_filename,
-                             ament_index_cpp::get_package_share_directory("man2_bt_operator") +
-                                 std::string("/tree/default_bt_xml_filename.xml"));
+      node->get_parameter_or(
+        ns + "default_plugin_lib_names", default_plugin_lib_names, std::vector<std::string>{});
+      node->get_parameter_or(
+        ns + "default_bt_xml_filename", default_bt_xml_filename,
+        ament_index_cpp::get_package_share_directory("man2_bt_operator") +
+          std::string("/tree/default_bt_xml_filename.xml"));
       node->get_parameter_or(ns + "print_bt_status", print_bt_status, false);
       node->get_parameter_or(ns + "connect_to_groot2", connect_to_groot2, false);
 
       std::string prefix_plugin = "customized_plugin_lib_names.";
       auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
-      for (const auto& param : all_params)
-      {
+      for (const auto & param : all_params) {
         std::size_t i = param.first.find(prefix_plugin);
-        if (i != std::string::npos)
-        {
+        if (i != std::string::npos) {
           std::string tmp = param.first;
           tmp.erase(i, prefix_plugin.length());
-          if (param.second.get_type() == rclcpp::PARAMETER_STRING_ARRAY)
-          {
+          if (param.second.get_type() == rclcpp::PARAMETER_STRING_ARRAY) {
             customized_plugin_lib_names[tmp] = node->get_parameter(param.first).as_string_array();
-          }
-          else
-          {
-            customized_plugin_lib_names[tmp].push_back(node->get_parameter(param.first).as_string());
+          } else {
+            customized_plugin_lib_names[tmp].push_back(
+              node->get_parameter(param.first).as_string());
           }
         }
       }
 
-      RCLCPP_INFO(LOGGER, "loadRosParameters: default plugins: %s, default_bt_xml_filename: %s",
-                  node->get_parameter("default_plugin_lib_names").value_to_string().c_str(),
-                  default_bt_xml_filename.c_str());
+      RCLCPP_INFO(
+        LOGGER, "loadRosParameters: default plugins: %s, default_bt_xml_filename: %s",
+        node->get_parameter("default_plugin_lib_names").value_to_string().c_str(),
+        default_bt_xml_filename.c_str());
     }
 
-    void setParameter(const nav2_util::LifecycleNode::SharedPtr& node,
-                      const std::string& parameter_name)
+    void setParameter(
+      const nav2_util::LifecycleNode::SharedPtr & node, const std::string & parameter_name)
     {
       node->set_parameter(rclcpp::Parameter(parameter_name));
     }
@@ -121,31 +133,31 @@ protected:
    * @brief do something during lifecycle node configuration
    *
    */
-  nav2_util::CallbackReturn on_configure(const rclcpp_lifecycle::State& /*state*/) override;
+  nav2_util::CallbackReturn on_configure(const rclcpp_lifecycle::State & /*state*/) override;
 
   /**
    * @brief do something during lifecycle node activation
    *
    */
-  nav2_util::CallbackReturn on_activate(const rclcpp_lifecycle::State& /*state*/) override;
+  nav2_util::CallbackReturn on_activate(const rclcpp_lifecycle::State & /*state*/) override;
 
   /**
    * @brief do something during lifecycle node deactivation
    *
    */
-  nav2_util::CallbackReturn on_deactivate(const rclcpp_lifecycle::State& /*state*/) override;
+  nav2_util::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & /*state*/) override;
 
   /**
    * @brief do something during lifecycle node cleaning up
    *
    */
-  nav2_util::CallbackReturn on_cleanup(const rclcpp_lifecycle::State& /*state*/) override;
+  nav2_util::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & /*state*/) override;
 
   /**
    * @brief do something during lifecycle node shutdown
    *
    */
-  nav2_util::CallbackReturn on_shutdown(const rclcpp_lifecycle::State& /*state*/) override;
+  nav2_util::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & /*state*/) override;
 
   /**
    * @brief load a behavior tree xml
@@ -154,7 +166,7 @@ protected:
    * @return true
    * @return false
    */
-  bool loadBehaviorTree(const std::string& bt_xml_filename);
+  bool loadBehaviorTree(const std::string & bt_xml_filename);
 
   void startApplication();
 
