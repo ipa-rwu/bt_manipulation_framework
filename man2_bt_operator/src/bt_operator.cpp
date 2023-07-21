@@ -28,9 +28,7 @@ BTOperator::BTOperator()
   parameters_ = std::make_shared<RosParameters>();
 
   auto options = rclcpp::NodeOptions().arguments(
-    {"--ros-args", "-r",
-     std::string("__node:=") + std::string(this->get_name()) + "_" + "client" + "_rclcpp_node",
-     "-p",
+    {"--ros-args", "-r", std::string("__node:=") + std::string(this->get_name()) + "_", "-p",
      "use_sim_time:=" +
        std::string(this->get_parameter("use_sim_time").as_bool() ? "true" : "false"),
      "--"});
