@@ -4,7 +4,7 @@
             <PrintValue message="start"/>
             <SetBlackboard output_key="eee" value="world"/>
             <PrintValue message="sleep completed"/>
-            <!-- <DetectArucoMarker marker_id="42"/> -->
+            <DetectArucoMarker marker_id="42" sub_topic_name="/marker" pub_topic_name="/marker/repub" timeout="5000" frame="world"/>
             <Fallback>
                 <Timeout msec="1500">
                    <SetBlackboard output_key="eee" value="world"/>

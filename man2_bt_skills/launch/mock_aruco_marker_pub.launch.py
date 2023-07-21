@@ -24,12 +24,12 @@ document = """
     header:
       stamp:
         sec: 0
-      frame_id: test
+      frame_id: world
     markers:
       - header:
           stamp:
             sec: 0
-          frame_id: test
+          frame_id: world
         id: 42
         pose:
           pose:
