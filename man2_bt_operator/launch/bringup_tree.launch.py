@@ -71,6 +71,7 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time},
             params_file,
         ],
+        # prefix=["xterm -e gdb -ex run --args"],
     )
 
     # Create the launch description and populate
