@@ -42,6 +42,13 @@ ros2 lifecycle set /bt_operator 3
 # start action client from launch file
 ros2 launch man2_bt_operator call_start_application.launch.py
 ```
+
+* Test detect_aruco_marker_skill
+```
+# mocking publishing markers' position
+ros2 launch man2_bt_skills mock_aruco_marker_pub.launch.py
+```
+
 ## Contributing
 This repository uses pre-commit for code formatting. This program has to be setup locally and installed inside the repository. For this execute in the repository folder following commands:
 ```bash

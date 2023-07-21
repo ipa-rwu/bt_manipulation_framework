@@ -4,7 +4,6 @@
             <PrintValue message="start"/>
             <SetBlackboard output_key="eee" value="world"/>
             <PrintValue message="sleep completed"/>
-            <DetectArucoMarker marker_id="42"/>
             <Fallback>
                 <Timeout msec="1500">
                    <SetBlackboard output_key="eee" value="world"/>
