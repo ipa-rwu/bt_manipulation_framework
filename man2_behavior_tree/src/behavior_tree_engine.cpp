@@ -83,7 +83,7 @@ ros2_behavior_tree::BtStatus ROS2BehaviorTreeEngine::run_loop(
       }
       groot_publisher_.flush();
       logger_cout.flush();
-      result = tree->rootNode()->executeTick();
+      result = tree->tickWhileRunning();
 
       onLoop();
 
