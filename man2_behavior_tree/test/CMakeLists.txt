@@ -1,0 +1,4 @@
+find_package(test_msgs REQUIRED)
+
+ament_add_gtest(test_bt_action_client_node test_bt_action_client_node.cpp)
+ament_target_dependencies(test_bt_action_client_node ${dependencies} test_msgs)
