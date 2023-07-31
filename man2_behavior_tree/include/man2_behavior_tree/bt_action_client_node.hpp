@@ -37,7 +37,7 @@ class BtActionClientNode : public BT::ActionNodeBase
 {
 public:
   /**
-   * @brief A nav2_behavior_tree::BtActionClientNode constructor
+   * @brief A ros2_behavior_tree::BtActionClientNode constructor
    * @param xml_tag_name Name for the XML tag for this node
    * @param action_name Action name this node creates a client for
    * @param conf BT node configuration

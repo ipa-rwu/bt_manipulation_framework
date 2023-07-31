@@ -301,7 +301,7 @@ TEST_F(BTActionNodeTestFixture, test_server_timeout_failure)
 
   // setting a server timeout smaller than the time the action server will take to accept the goal
   // to simulate a server timeout scenario
-  config_->blackboard->set<std::chrono::milliseconds>("server_timeout", 90ms);
+  config_->blackboard->set<std::chrono::milliseconds>("server_timeout", 92ms);
   config_->blackboard->set<std::chrono::milliseconds>("bt_loop_duration", 10ms);
 
   tree_ = std::make_shared<BT::Tree>(factory_->createTreeFromText(xml_txt, config_->blackboard));
