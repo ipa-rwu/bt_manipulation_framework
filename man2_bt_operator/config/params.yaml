@@ -6,5 +6,5 @@
       - util_plugin_print_value
     connect_to_groot2: true
     customized_plugin_lib_names:
-      man2_bt_skills:
+      man2_bt_perception_skills:
         - detect_aruco_marker_skill

@@ -21,7 +21,7 @@
     default_plugin_lib_names:
       - util_plugin_print_value # plugins created in "man2_bt_operator" package
     customized_plugin_lib_names: # Plugins created in other packages
-      man2_bt_skills:  # package name
+      man2_bt_perception_skills:  # package name
         - detect_aruco_marker_skill # plugin name
 
 ```
@@ -46,7 +46,7 @@ ros2 launch man2_bt_operator call_start_application.launch.py
 * Test detect_aruco_marker_skill
 ```
 # mocking publishing markers' position
-ros2 launch man2_bt_skills mock_aruco_marker_pub.launch.py
+ros2 launch man2_bt_perception_skills mock_aruco_marker_pub.launch.py
 ```
 
 ## Contributing

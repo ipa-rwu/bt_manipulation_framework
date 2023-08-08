@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAN2_BEHAVIOR_TREE__UTIL_PLUGINS__PRINT_VALUE_HPP_
-#define MAN2_BEHAVIOR_TREE__UTIL_PLUGINS__PRINT_VALUE_HPP_
+#include <memory>
 
-#include <string>
+#include "detect_aruco_marker_skill/detect_aruco_marker_action_server.hpp"
+#include "rclcpp/rclcpp.hpp"
 
-#include "behaviortree_cpp/bt_factory.h"
-
-namespace util_plugins
+int main(int argc, char ** argv)
 {
-class PrintValue : public BT::SyncActionNode
-{
-public:
-  PrintValue(const std::string & name, const BT::NodeConfig & config);
+  rclcpp::init(argc, argv);
+  auto action_name = "detect_aruco_marker";
+  auto node_option = rclcpp::NodeOptions();
+  auto node =
+    std::make_shared<perception_skills::DetectArucoMarkerActionServer>(action_name, node_option);
+  rclcpp::spin(node->get_node_base_interface());
+  rclcpp::shutdown();
 
-  BT::NodeStatus tick() override;
-
-  static BT::PortsList providedPorts();
-};
-}  // namespace util_plugins
-
-#endif  // MAN2_BEHAVIOR_TREE__UTIL_PLUGINS__PRINT_VALUE_HPP_
+  return 0;
+}

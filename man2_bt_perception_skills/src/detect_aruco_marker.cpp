@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "man2_bt_skills/detect_aruco_marker.hpp"
+#include "man2_bt_perception_skills/detect_aruco_marker.hpp"
 
 namespace perception_skills
 {
