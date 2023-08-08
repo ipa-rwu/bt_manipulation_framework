@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -26,6 +27,7 @@ set(dependencies
   rclcpp_action
   rclcpp_lifecycle
   behaviortree_cpp
+  geometry_msgs
 )
 
 add_library(${library_name} SHARED
