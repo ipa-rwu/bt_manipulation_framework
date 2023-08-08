@@ -21,28 +21,9 @@ import yaml
 from yaml import SafeLoader
 
 document = """
-    header:
-      stamp:
-        sec: 0
-      frame_id: world
-    markers:
-      - header:
-          stamp:
-            sec: 0
-          frame_id: world
-        id: 42
-        pose:
-          pose:
-            position:
-              x: 1
-              y: 1
-              z: 1
-            orientation:
-              x: 1
-              y: 1
-              z: 1
-              w: 1
-        confidence: 100.0
+    behavior_tree_filename: "/root/bt_ws/src/bt_manipulation_framework/man2_bt_bringup/trees/simple_tree.xml" # absolute path
+    run_in_loop: true
+    sleep: 2000
     """
 
 
@@ -51,7 +32,9 @@ def generate_launch_description():
 
     req = yaml.load(document, Loader=SafeLoader)
 
-    cmd_str = 'topic pub -r 10 /marker aruco_msgs/msg/MarkerArray "{}"'.format(str(req))
+    cmd_str = 'action send_goal --feedback /start_application man2_msgs/action/RunApplication "{}"'.format(
+        str(req)
+    )
 
     ld.add_action(
         ExecuteProcess(cmd=[[FindExecutable(name="ros2"), " {}".format(cmd_str)]], shell=True)

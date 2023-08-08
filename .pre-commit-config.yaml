@@ -37,6 +37,9 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
+        types: [file]
+        files: \.(launch.py|py)$
+        args: ['--line-length=100']
 
   - repo: local
     hooks:
