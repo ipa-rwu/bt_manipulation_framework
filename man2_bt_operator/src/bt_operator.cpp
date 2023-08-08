@@ -25,14 +25,6 @@ namespace man2_bt_operator
 BTOperator::BTOperator()
 : nav2_util::LifecycleNode("bt_operator", "", rclcpp::NodeOptions()), start_time_(now())
 {
-  parameters_ = std::make_shared<RosParameters>();
-
-  auto options = rclcpp::NodeOptions().arguments(
-    {"--ros-args", "-r", std::string("__node:=") + std::string(this->get_name()) + "_", "-p",
-     "use_sim_time:=" +
-       std::string(this->get_parameter("use_sim_time").as_bool() ? "true" : "false"),
-     "--"});
-  client_node_ = client_node_ = std::make_shared<rclcpp::Node>("_", options);
 }
 
 BTOperator::~BTOperator() {}
@@ -41,6 +33,17 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
 {
   RCLCPP_INFO(LOGGER, "Configuring");
   auto node = shared_from_this();
+
+  auto options = rclcpp::NodeOptions().arguments(
+    {"--ros-args", "-r", std::string("__node:=") + std::string(this->get_name()) + "client_", "-p",
+     "use_sim_time:=" +
+       std::string(this->get_parameter("use_sim_time").as_bool() ? "true" : "false"),
+     "--"});
+
+  client_node_ = std::make_shared<rclcpp::Node>("_", options);
+
+  parameters_ = std::make_shared<RosParameters>();
+
   parameters_->declareRosParameters(node);
 
   parameters_->loadRosParameters(node);
@@ -89,7 +92,7 @@ nav2_util::CallbackReturn BTOperator::on_activate(const rclcpp_lifecycle::State 
 nav2_util::CallbackReturn BTOperator::on_deactivate(const rclcpp_lifecycle::State & /*state*/)
 {
   RCLCPP_INFO(LOGGER, "Deactivating");
-
+  tree_.haltTree();
   action_server_->deactivate();
 
   // destroy bond connection
@@ -105,7 +108,7 @@ nav2_util::CallbackReturn BTOperator::on_cleanup(const rclcpp_lifecycle::State &
   parameters_.reset();
   blackboard_.reset();
   action_server_.reset();
-  tree_.haltTree();
+  // tree_.initialize();
   bt_.reset();
   client_node_.reset();
 
