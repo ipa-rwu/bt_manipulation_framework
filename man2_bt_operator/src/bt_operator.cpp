@@ -45,6 +45,9 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
 
   parameters_->loadRosParameters(node);
 
+  bt_loop_duration_ = std::chrono::milliseconds(parameters_->bt_loop_duration);
+  default_server_timeout_ = std::chrono::milliseconds(parameters_->server_timeout);
+
   action_server_ = std::make_unique<ActionServer>(
     get_node_base_interface(), get_node_clock_interface(), get_node_logging_interface(),
     get_node_waitables_interface(), "start_application",
@@ -65,6 +68,8 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
   // Put items on the blackboard
   blackboard_->set<int>("number_recoveries", 0);
   blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_);
+  blackboard_->set<std::chrono::milliseconds>("bt_loop_duration", bt_loop_duration_);
+  blackboard_->set<std::chrono::milliseconds>("server_timeout", default_server_timeout_);
 
   return nav2_util::CallbackReturn::SUCCESS;
 }
