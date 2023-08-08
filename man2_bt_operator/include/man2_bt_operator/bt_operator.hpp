@@ -51,17 +51,35 @@ class BTOperator : public nav2_util::LifecycleNode
     std::string default_bt_xml_filename;
     std::string current_bt_xml_filename;
     bool print_bt_status;
-    bool connect_to_groot2;
+    int bt_loop_duration;  //milliseconds
+    int server_timeout;    //milliseconds
 
     std::string ns = "";
 
     void declareRosParameters(const nav2_util::LifecycleNode::SharedPtr & node)
     {
-      node->declare_parameter(ns + "current_bt_xml_filename", rclcpp::PARAMETER_STRING);
-      node->declare_parameter(ns + "default_bt_xml_filename", rclcpp::PARAMETER_STRING);
-      node->declare_parameter(ns + "default_plugin_lib_names", rclcpp::PARAMETER_STRING_ARRAY);
-      node->declare_parameter(ns + "print_bt_status", rclcpp::PARAMETER_BOOL);
-      node->declare_parameter(ns + "connect_to_groot2", rclcpp::PARAMETER_BOOL);
+      if (!node->has_parameter("bt_loop_duration")) {
+        node->declare_parameter("bt_loop_duration", 10);
+      }
+      if (!node->has_parameter("server_timeout")) {
+        node->declare_parameter("server_timeout", 10);
+      }
+      if (!node->has_parameter("current_bt_xml_filename")) {
+        node->declare_parameter(
+          "current_bt_xml_filename",
+          ament_index_cpp::get_package_share_directory("man2_bt_operator") +
+            std::string("/tree/default_bt_xml_filename.xml"));
+      }
+      if (!node->has_parameter("current_bt_xml_filename")) {
+        node->declare_parameter("current_bt_xml_filename", rclcpp::PARAMETER_STRING);
+      }
+      if (!node->has_parameter("default_plugin_lib_names")) {
+        node->declare_parameter("default_plugin_lib_names", std::vector<std::string>{});
+      }
+      if (!node->has_parameter("print_bt_status")) {
+        node->declare_parameter("print_bt_status", false);
+      }
+
       std::string prefix_plugin = "customized_plugin_lib_names.";
       auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
       for (const auto & param : all_params) {
@@ -69,7 +87,9 @@ class BTOperator : public nav2_util::LifecycleNode
         if (i != std::string::npos) {
           std::string tmp = param.first;
           tmp.erase(i, prefix_plugin.length());
-          node->declare_parameter(param.first.c_str(), param.second);
+          if (!node->has_parameter(param.first.c_str())) {
+            node->declare_parameter(param.first.c_str(), param.second);
+          }
           customized_plugin_lib_names[tmp] = std::vector<std::string>{};
         }
       }
@@ -77,14 +97,11 @@ class BTOperator : public nav2_util::LifecycleNode
 
     void loadRosParameters(const nav2_util::LifecycleNode::SharedPtr & node)
     {
-      node->get_parameter_or(
-        ns + "default_plugin_lib_names", default_plugin_lib_names, std::vector<std::string>{});
-      node->get_parameter_or(
-        ns + "default_bt_xml_filename", default_bt_xml_filename,
-        ament_index_cpp::get_package_share_directory("man2_bt_operator") +
-          std::string("/tree/default_bt_xml_filename.xml"));
-      node->get_parameter_or(ns + "print_bt_status", print_bt_status, false);
-      node->get_parameter_or(ns + "connect_to_groot2", connect_to_groot2, false);
+      node->get_parameter(ns + "default_plugin_lib_names", default_plugin_lib_names);
+      node->get_parameter(ns + "default_bt_xml_filename", default_bt_xml_filename);
+      node->get_parameter(ns + "print_bt_status", print_bt_status);
+      node->get_parameter(ns + "bt_loop_duration", bt_loop_duration);
+      node->get_parameter(ns + "server_timeout", server_timeout);
 
       std::string prefix_plugin = "customized_plugin_lib_names.";
       auto all_params = node->get_node_parameters_interface()->get_parameter_overrides();
@@ -192,6 +209,9 @@ protected:
   rclcpp::Time start_time_;
 
   rclcpp::Node::SharedPtr client_node_;
+
+  std::chrono::milliseconds bt_loop_duration_;
+  std::chrono::milliseconds default_server_timeout_;
 };
 
 }  // namespace man2_bt_operator
