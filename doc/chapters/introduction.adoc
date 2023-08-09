@@ -1,0 +1,76 @@
+:imagesdir: ./images
+
+== Basic Concepts of BehaviorTree-based Application Framework
+
+The framework is based on Behavior Tree.
+Behavior Tree is a tree of hierarchical nodes that controls the flow of execution of "tasks".
+
+=== Introduction to BTs
+==== Basic Concepts of Behavior Tree
+
+* A signal called "__tick__" is sent to the root of the tree
+and propagates through the tree until it reaches a leaf node.
+
+* Any TreeNode that receives a __tick__ signal executes its callback.
+  This callback must return either
+
+    ** **SUCCESS**
+    ** **FAILURE**
+    ** **RUNNING**
+* RUNNING means that the action needs
+more time to return a valid result.
+
+* If a TreeNode has one or more children, it is its
+responsibility to propagate the tick; each Node type may
+have different rules about if, when, and how many times children are ticked.
+
+* The __LeafNodes__, those TreeNodes which don't have any children,
+   are the actual commands, i.e. the Nodes where the behavior tree
+   interacts with the rest of the system.
+   __Action__ nodes are the most common type of LeafNodes.
+
+==== Types of nodes
+|===
+|Type of TreeNode  |Children Count | Notes
+
+|ControlNode
+|1...N
+|Usually, ticks a child based on the result of its siblings or/and its own state.
+
+|DecoratorNode
+|1
+|Among other things, it may alter the result of its child or tick it multiple times.
+
+|ConditionNode
+|0
+|Should not alter the system. Shall not return RUNNING.
+
+|ActionNode
+|0
+|This is the Node that "does something"
+|===
+
+==== SubTree
+We can build large-scale behavior by inserting smaller and reusable behaviors into larger ones.
+
+In other words, we want to create hierarchical behavior trees and make our trees composable.
+
+This can be achieved by defining multiple trees in the XML and using the node __SubTree__ to include one tree into the other.
+
+=== Reference Application Architecture​
+
+From application perspevtive,
+an application composes of skills and tasks as shown in <<ref_app_arch>>.
+It is defined in BehaviorTree xml.
+The skill is __ActionNode__ in the BehaviorTree.
+The task is  __SubTree__.
+
+The terms *skill* and *task* are frequently used in this framework.
+The definitions of these two terms will be adopted throughout this framework as follow:
+
+* *Skill*: provides access to functionalities realized by components for the usage within tasks​
+* *Task*: tasks describe how a robot does something in an abstract and independent manner​
+
+[#ref_app_arch]
+.Reference Application Architecture​
+image::reference_application_architecture​.png[align=center, pdfwidth=80%, scaledwidth=80%]

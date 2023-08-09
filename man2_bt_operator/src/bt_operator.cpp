@@ -35,7 +35,7 @@ nav2_util::CallbackReturn BTOperator::on_configure(const rclcpp_lifecycle::State
   auto node = shared_from_this();
 
   auto options = rclcpp::NodeOptions().arguments(
-    {"--ros-args", "-r", std::string("__node:=") + std::string(this->get_name()) + "client_", "-p",
+    {"--ros-args", "-r", std::string("__node:=") + "bt_skill_client_", "-p",
      "use_sim_time:=" +
        std::string(this->get_parameter("use_sim_time").as_bool() ? "true" : "false"),
      "--"});
