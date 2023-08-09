@@ -6,6 +6,7 @@ variables:
   DEFAULT_ROS_DISTROS: humble
   ROS_DISTROS: humble rolling
   STABLE_BRANCH: ros2
+  DOC_NAME: bt_manipulation_framework_guide
 
 .common:
   tags: &ipa_runner
@@ -44,6 +45,41 @@ framework:
       - ROS_DISTRO:
         - humble
 
+doc:
+  image: "asciidoctor/docker-asciidoctor"
+  tags:
+    - intranet
+  stage: doc
+  before_script:
+    - apk add graphicsmagick-dev ruby-dev musl-dev gcc
+    - gem install prawn-gmagick asciidoctor-diagram
+  script:
+    - asciidoctor-pdf -a pdf-style=doc/theme.yml -r asciidoctor-diagram -v --failure-level=INFO "doc/${DOC_NAME}.adoc" -o "${DOC_NAME}.pdf"
+    - asciidoctor -r asciidoctor-diagram -v --failure-level=INFO "doc/${DOC_NAME}.adoc" -o "index.html" -D html
+    - cp -r doc/images html
+  artifacts:
+    paths:
+      - ${DOC_NAME}.pdf
+      - html/
+    expire_in: 1 hour
+
+
+pages:
+  tags:
+    - intranet
+  stage: deploy
+  dependencies:
+    - doc
+  script:
+    - mv html public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "ros2"'
+
 stages:
   - precommit
   - build
+  - doc
+  - deploy
