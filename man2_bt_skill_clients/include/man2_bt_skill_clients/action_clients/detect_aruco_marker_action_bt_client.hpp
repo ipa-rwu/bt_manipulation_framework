@@ -19,7 +19,7 @@
 #include "man2_behavior_tree/bt_action_client_node.hpp"
 #include "man2_behavior_tree/bt_conversions.hpp"
 
-namespace man2_bt_skill_clinets
+namespace man2_bt_skill_clients
 {
 class DetectArucoMarkerActionClient : public ros2_behavior_tree::BtActionClientNode<
                                         detect_aruco_marker_skill::action::ArucoMarkerDetection>
@@ -58,6 +58,6 @@ public:
     });
   }
 };
-}  // namespace man2_bt_skill_clinets
+}  // namespace man2_bt_skill_clients
 
 #endif  //MAN2_BT_SKILL_CLIENTS__DETECT_ARUCO_MARKER_ACTION_CLIENT_HPP_
