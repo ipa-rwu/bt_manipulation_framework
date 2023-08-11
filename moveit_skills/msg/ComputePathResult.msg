@@ -1,0 +1,9 @@
+# Note: The expected priority order of the error should match the message order
+uint16 UNKNOWN=720
+uint16 TIMEOUT=721
+uint16 PLANNING_FAIL=722
+uint16 INVALID_INPUT=723
+uint16 NONE=0
+
+uint16 error_code_id
+moveit_msgs/RobotTrajectory trajectory
