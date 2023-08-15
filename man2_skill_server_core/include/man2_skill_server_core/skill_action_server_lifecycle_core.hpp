@@ -41,8 +41,9 @@ public:
  * @param options rosnode option setting
  */
   explicit SkillActionServerLifecycleCore(
-    const std::string & action_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
-  : nav2_util::LifecycleNode(action_name, "", rclcpp::NodeOptions()), action_name_(action_name)
+    const std::string & node_name, const std::string & action_name,
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : nav2_util::LifecycleNode(node_name, "", rclcpp::NodeOptions()), action_name_(action_name)
   {
   }
 

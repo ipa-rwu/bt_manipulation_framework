@@ -14,7 +14,7 @@
 
 #include "man2_bt_skill_clients/action_clients/detect_aruco_marker_action_bt_client.hpp"
 
-namespace man2_bt_skill_clinets
+namespace man2_bt_skill_clients
 {
 void DetectArucoMarkerActionClient::on_tick()
 {
@@ -61,14 +61,14 @@ BT::NodeStatus DetectArucoMarkerActionClient::on_success()
   return BT::NodeStatus::SUCCESS;
 }
 
-}  // namespace man2_bt_skill_clinets
+}  // namespace man2_bt_skill_clients
 
 #include "behaviortree_cpp/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
   factory.registerBuilder(
-    BT::CreateManifest<man2_bt_skill_clinets::DetectArucoMarkerActionClient>(
+    BT::CreateManifest<man2_bt_skill_clients::DetectArucoMarkerActionClient>(
       "DetectArucoMarkerClient",
-      man2_bt_skill_clinets::DetectArucoMarkerActionClient::providedPorts()),
-    BT::CreateBuilder<man2_bt_skill_clinets::DetectArucoMarkerActionClient>());
+      man2_bt_skill_clients::DetectArucoMarkerActionClient::providedPorts()),
+    BT::CreateBuilder<man2_bt_skill_clients::DetectArucoMarkerActionClient>());
 }

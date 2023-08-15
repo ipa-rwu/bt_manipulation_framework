@@ -252,7 +252,7 @@ BT::NodeStatus DetectArucoMarker::onRunning()
   } else {
     return BT::NodeStatus::RUNNING;
   }
-}  // namespace perception_skills
+}
 
 void DetectArucoMarker::onHalted()
 {

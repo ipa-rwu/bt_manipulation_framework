@@ -19,7 +19,7 @@ namespace perception_skills
 DetectArucoMarkerActionServer::DetectArucoMarkerActionServer(
   const std::string & action_name, const rclcpp::NodeOptions & options)
 : ros2_skill_server_core::SkillActionServerLifecycleCore<
-    detect_aruco_marker_skill::action::ArucoMarkerDetection>(action_name, options),
+    detect_aruco_marker_skill::action::ArucoMarkerDetection>(action_name, action_name, options),
   action_name_(action_name)
 {
   logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger(this->get_name()));
