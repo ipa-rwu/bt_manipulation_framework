@@ -24,6 +24,7 @@
 #include "moveit/moveit_cpp/moveit_cpp.h"
 #include "moveit/moveit_cpp/planning_component.h"
 #include "moveit/trajectory_processing/time_optimal_trajectory_generation.h"
+#include "moveit_skills/action/action_server_utils.hpp"
 #include "moveit_skills/action/utils.hpp"
 #include "nav2_util/lifecycle_node.hpp"
 #include "nav2_util/simple_action_server.hpp"

@@ -43,8 +43,6 @@ ComputePathToPointActionServer::ComputePathToPointActionServer(
 
 ComputePathToPointActionServer::~ComputePathToPointActionServer() {}
 
-void ComputePathToPointActionServer::initial() {}
-
 void ComputePathToPointActionServer::execution()
 {
   auto goal = getCurrentGoal();

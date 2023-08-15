@@ -43,8 +43,6 @@ ComputePathToStateActionServer::ComputePathToStateActionServer(
 
 ComputePathToStateActionServer::~ComputePathToStateActionServer() {}
 
-void ComputePathToStateActionServer::initial() {}
-
 void ComputePathToStateActionServer::execution()
 {
   auto goal = getCurrentGoal();
