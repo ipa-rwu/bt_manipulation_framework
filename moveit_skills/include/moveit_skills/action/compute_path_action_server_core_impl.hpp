@@ -307,52 +307,6 @@ bool ComputePathActionServerCore<ActionT>::getJointStateGoal(
 }
 
 template <class ActionT>
-bool ComputePathActionServerCore<ActionT>::getRobotTipForFrame(
-  const planning_scene::PlanningSceneConstPtr & scene, const moveit::core::JointModelGroup * jmg,
-  const moveit::core::LinkModel *& robot_link, Eigen::Isometry3d & tip_in_global_frame,
-  const std::string ik_frame_id)
-{
-  auto get_tip = [&jmg]() -> const moveit::core::LinkModel * {
-    // determine IK frame from group
-    std::vector<const moveit::core::LinkModel *> tips;
-    jmg->getEndEffectorTips(tips);
-    if (tips.size() != 1) {
-      return nullptr;
-    }
-    return tips[0];
-  };
-
-  if (ik_frame_id.empty()) {
-    robot_link = get_tip();
-    if (!robot_link) {
-      return false;
-    }
-    // transfer of tip (tip pose) in planning frame
-    tip_in_global_frame = scene->getCurrentState().getGlobalLinkTransform(robot_link);
-  } else {
-    robot_link = nullptr;
-    bool found = false;
-    // if found, get transfer ik_frame_id (ik_frame pose) in planning frame
-    auto ref_frame = scene->getCurrentState().getFrameInfo(ik_frame_id, robot_link, found);
-    if (!found && !ik_frame_id.empty()) {
-      return false;
-    }
-    if (!robot_link) robot_link = get_tip();
-    if (!robot_link) {
-      return false;
-    }
-
-    if (found) {  // use robot link's frame as reference by default
-      tip_in_global_frame = ref_frame;
-    } else {
-      tip_in_global_frame = scene->getCurrentState().getGlobalLinkTransform(robot_link);
-    }
-  }
-
-  return true;
-}
-
-template <class ActionT>
 bool ComputePathActionServerCore<ActionT>::getPoseGoal(
   const boost::any & goal, const planning_scene::PlanningSceneConstPtr & scene,
   Eigen::Isometry3d & target)
