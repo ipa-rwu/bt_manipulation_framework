@@ -161,7 +161,7 @@ void DetectArucoMarkerActionServer::execution()
 
 void DetectArucoMarkerActionServer::timerCallback()
 {
-  RCLCPP_INFO(*logger_, "Just timeout");
+  RCLCPP_DEBUG(*logger_, "Just timeout");
   timeout_flag_.store(true);
   wait_set_->remove_subscription(sub_markers_);
   wait_set_->remove_timer(timer_);
@@ -182,6 +182,9 @@ void DetectArucoMarkerActionServer::processMsg(
     marker_posestamped.pose = res->pose.pose;
     res_markers_.push_back(marker_posestamped);
     counter_++;
+    RCLCPP_DEBUG(
+      *logger_, "Marker [%d] pose: %s", marker_id,
+      geometry_msgs::msg::to_yaml(marker_posestamped).c_str());
     RCLCPP_INFO(*logger_, "Counter: %d", counter_.load());
   }
   if (required_pose_num == counter_.load()) {
@@ -194,19 +197,19 @@ void DetectArucoMarkerActionServer::processMsg(
 geometry_msgs::msg::PoseStamped DetectArucoMarkerActionServer::getAveragePosition(
   std::vector<geometry_msgs::msg::PoseStamped> poses)
 {
-  geometry_msgs::msg::PoseStamped average_pose = std::accumulate(
-    poses.begin(), poses.end(), geometry_msgs::msg::PoseStamped(),
-    [](geometry_msgs::msg::PoseStamped & a, geometry_msgs::msg::PoseStamped & b) {
-      a.pose.position.x += b.pose.position.x;
-      a.pose.position.y += b.pose.position.y;
-      a.pose.position.z += b.pose.position.z;
+  geometry_msgs::msg::PoseStamped average_pose;
+  average_pose.pose.orientation.w = 0.0;
+  for (std::vector<geometry_msgs::msg::PoseStamped>::iterator b = poses.begin(); b != poses.end();
+       ++b) {
+    average_pose.pose.position.x += b->pose.position.x;
+    average_pose.pose.position.y += b->pose.position.y;
+    average_pose.pose.position.z += b->pose.position.z;
 
-      a.pose.orientation.x += b.pose.orientation.x;
-      a.pose.orientation.y += b.pose.orientation.y;
-      a.pose.orientation.z += b.pose.orientation.z;
-      a.pose.orientation.w += b.pose.orientation.w;
-      return a;
-    });
+    average_pose.pose.orientation.x += b->pose.orientation.x;
+    average_pose.pose.orientation.y += b->pose.orientation.y;
+    average_pose.pose.orientation.z += b->pose.orientation.z;
+    average_pose.pose.orientation.w += b->pose.orientation.w;
+  }
 
   average_pose.header = poses[0U].header;
   average_pose.pose.position.x /= poses.size();
