@@ -60,6 +60,13 @@ ament_target_dependencies(execute_trajectory_client
   ${compute_path_dependencies}
 )
 
+add_library(get_current_ik_frame_pose_client SHARED
+  src/action_clients/get_current_ik_frame_pose_action_bt_client.cpp)
+list(APPEND plugin_libs get_current_ik_frame_pose_client)
+ament_target_dependencies(get_current_ik_frame_pose_client
+  ${compute_path_dependencies}
+)
+
 add_library(set_path_constraints_client SHARED
 src/service_clients/set_path_constraints_bt_client.cpp)
 list(APPEND plugin_libs set_path_constraints_client)
