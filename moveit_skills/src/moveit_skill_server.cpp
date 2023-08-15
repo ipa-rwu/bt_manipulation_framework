@@ -53,6 +53,8 @@ nav2_util::CallbackReturn MoveitSkillServer::on_configure(const rclcpp_lifecycle
     shared_from_this(), "execute_trajectory", moveit_cpp_ptr_);
   compute_path_to_pose_action_ = std::make_unique<ComputePathToPoseActionServer>(
     shared_from_this(), "compute_path_to_pose", moveit_cpp_ptr_, psm_);
+  get_current_ik_frame_pose_action_ = std::make_unique<GetCurrentIKFramePoseActionServer>(
+    shared_from_this(), "get_current_ik_frame_pose", psm_);
 
   return nav2_util::CallbackReturn::SUCCESS;
 }
@@ -65,6 +67,7 @@ nav2_util::CallbackReturn MoveitSkillServer::on_activate(const rclcpp_lifecycle:
   compute_path_to_point_action_->activate();
   execute_trajectory_action_->activate();
   compute_path_to_pose_action_->activate();
+  get_current_ik_frame_pose_action_->activate();
 
   createBond();
   return nav2_util::CallbackReturn::SUCCESS;

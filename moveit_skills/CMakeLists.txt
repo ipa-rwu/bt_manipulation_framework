@@ -39,7 +39,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "action/ComputePathToPoint.action"
   "action/ComputePathToPose.action"
   "action/ExecuteTrajectory.action"
-  "action/GetCurrentEndEffctorPose.action"
+  "action/GetCurrentIKFramePose.action"
   "srv/SetPathConstrains.srv"
   "msg/PlanConfig.msg"
   "msg/ComputePathResult.msg"
@@ -92,6 +92,14 @@ ament_target_dependencies(execute_trajectory_action_server
 target_link_libraries(execute_trajectory_action_server "${cpp_typesupport_target}")
 list(APPEND libs execute_trajectory_action_server)
 
+add_library(get_current_ik_frame_pose_action_server SHARED
+src/action/get_current_ik_frame_pose_action_server.cpp)
+ament_target_dependencies(get_current_ik_frame_pose_action_server
+  ${dependencies}
+)
+target_link_libraries(get_current_ik_frame_pose_action_server "${cpp_typesupport_target}")
+list(APPEND libs get_current_ik_frame_pose_action_server)
+
 add_library(set_path_constrains_skill SHARED
 src/service/set_path_constrains.cpp)
 ament_target_dependencies(set_path_constrains_skill
@@ -109,7 +117,8 @@ target_link_libraries(moveit_skill_server
 compute_path_to_state_action_server
 compute_path_to_point_action_server
 execute_trajectory_action_server
-compute_path_to_pose_action_server)
+compute_path_to_pose_action_server
+get_current_ik_frame_pose_action_server)
 list(APPEND libs moveit_skill_server)
 
 add_executable(${executable_name} src/main_moveit_skill_server.cpp)
