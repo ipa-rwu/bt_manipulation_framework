@@ -3,6 +3,8 @@
         <Sequence>
             <ComputePathToState target_group="arm" named_state="detect" trajectory="{trajectory}"/>
             <ExecuteTrajectory target_group="arm" trajectory="{trajectory}"/>
+            <GetCurrentIKFramePose group_name="arm" ik_frame="tool_tip" pose="{tool_tip_pose}"/>
+            <PrintValue msg_pose="{tool_tip_pose}"/>
             <DetectArucoMarkerClient marker_id="42" sub_topic_name="/marker" timeout="5000" marker_pose="{marker_pose}" error_code_id="{detect_marker_error_code}"/>
             <PrintValue msg_posestamped="{marker_pose}"/>
             <SetPathConstrains service_name="/set_path_constrains" file_path="/root/bt_ws/src/bt_manipulation_framework/man2_bt_bringup/config/path_constraints.yaml" path_constraints="{path_constraints}"/>

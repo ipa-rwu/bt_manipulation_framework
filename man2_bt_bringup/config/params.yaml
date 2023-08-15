@@ -11,6 +11,7 @@
         - compute_path_to_point_client
         - execute_trajectory_client
         - set_path_constraints_client
+        - get_current_ik_frame_pose_client
         - print_value
 
 /detect_aruco_marker_action_server:
