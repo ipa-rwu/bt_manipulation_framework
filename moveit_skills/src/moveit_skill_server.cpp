@@ -49,6 +49,10 @@ nav2_util::CallbackReturn MoveitSkillServer::on_configure(const rclcpp_lifecycle
     shared_from_this(), "compute_path_to_state", moveit_cpp_ptr_, psm_);
   compute_path_to_point_action_ = std::make_unique<ComputePathToPointActionServer>(
     shared_from_this(), "compute_path_to_point", moveit_cpp_ptr_, psm_);
+  execute_trajectory_action_ = std::make_unique<ExecuteTrajectoryActionServer>(
+    shared_from_this(), "execute_trajectory", moveit_cpp_ptr_);
+  compute_path_to_pose_action_ = std::make_unique<ComputePathToPoseActionServer>(
+    shared_from_this(), "compute_path_to_pose", moveit_cpp_ptr_, psm_);
 
   return nav2_util::CallbackReturn::SUCCESS;
 }
@@ -56,8 +60,13 @@ nav2_util::CallbackReturn MoveitSkillServer::on_configure(const rclcpp_lifecycle
 nav2_util::CallbackReturn MoveitSkillServer::on_activate(const rclcpp_lifecycle::State & /*state*/)
 {
   RCLCPP_INFO(*logger_, "Activate...");
+
   compute_path_to_state_action_->activate();
   compute_path_to_point_action_->activate();
+  execute_trajectory_action_->activate();
+  compute_path_to_pose_action_->activate();
+
+  createBond();
   return nav2_util::CallbackReturn::SUCCESS;
 }
 
@@ -66,6 +75,10 @@ nav2_util::CallbackReturn MoveitSkillServer::on_deactivate(
 {
   compute_path_to_state_action_->deactivate();
   compute_path_to_point_action_->deactivate();
+  execute_trajectory_action_->deactivate();
+  compute_path_to_pose_action_->deactivate();
+
+  destroyBond();
   return nav2_util::CallbackReturn::SUCCESS;
 }
 
@@ -73,6 +86,10 @@ nav2_util::CallbackReturn MoveitSkillServer::on_cleanup(const rclcpp_lifecycle::
 {
   client_node_.reset();
   moveit_cpp_ptr_.reset();
+  compute_path_to_state_action_.reset();
+  compute_path_to_point_action_.reset();
+  execute_trajectory_action_.reset();
+  compute_path_to_pose_action_.reset();
   return nav2_util::CallbackReturn::SUCCESS;
 }
 

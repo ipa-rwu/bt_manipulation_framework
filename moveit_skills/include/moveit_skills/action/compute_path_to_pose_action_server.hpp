@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOVEIT_SKILLS__COMPUTE_PATH_TO_POINT_ACTION_SERVER_HPP_
-#define MOVEIT_SKILLS__COMPUTE_PATH_TO_POINT_ACTION_SERVER_HPP_
+#ifndef MOVEIT_SKILLS__COMPUTE_PATH_TO_POSE_ACTION_SERVER_HPP_
+#define MOVEIT_SKILLS__COMPUTE_PATH_TO_POSE_ACTION_SERVER_HPP_
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -21,23 +21,23 @@
 #include <utility>
 #include <vector>
 
-#include "moveit_skills/action/compute_path_to_point.hpp"
-#include "moveit_skills/compute_path_action_server_core.hpp"
+#include "moveit_skills/action/compute_path_action_server_core.hpp"
+#include "moveit_skills/action/compute_path_to_pose.hpp"
 
 namespace moveit_skills
 {
-class ComputePathToPointActionServer
-: public moveit_skills::ComputePathActionServerCore<moveit_skills::action::ComputePathToPoint>
+class ComputePathToPoseActionServer
+: public moveit_skills::ComputePathActionServerCore<moveit_skills::action::ComputePathToPose>
 {
 public:
-  using ActionT = moveit_skills::action::ComputePathToPoint;
+  using ActionT = moveit_skills::action::ComputePathToPose;
 
-  ComputePathToPointActionServer(
+  ComputePathToPoseActionServer(
     const nav2_util::LifecycleNode::WeakPtr & parent, const std::string & action_name,
     moveit_cpp::MoveItCppPtr & moveit_cpp_ptr, planning_scene_monitor::PlanningSceneMonitorPtr psm,
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  ~ComputePathToPointActionServer();
+  ~ComputePathToPoseActionServer();
 
   void execution();
 
@@ -51,4 +51,4 @@ protected:
 
 }  // namespace moveit_skills
 
-#endif  // MOVEIT_SKILLS__COMPUTE_PATH_TO_POINT_ACTION_SERVER_HPP_
+#endif  // MOVEIT_SKILLS__COMPUTE_PATH_TO_POSE_ACTION_SERVER_HPP_

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "moveit_skills/compute_path_action_server_core.hpp"
+#include "moveit_skills/action/compute_path_action_server_core.hpp"
 
 namespace moveit_skills
 {
@@ -172,8 +172,8 @@ bool ComputePathActionServerCore<ActionT>::computePath(
   moveit_cpp::PlanningComponent::PlanRequestParameters & plan_params, const std::string & group,
   const boost::any & goal, planning_scene_monitor::PlanningSceneMonitorPtr psm,
   double goal_joint_tolerance, double goal_orientation_tolerance, double goal_position_tolerance,
-  robot_trajectory::RobotTrajectoryPtr & robot_trajectory, const std::string & ik_frame_id,
-  const moveit_msgs::msg::Constraints & path_constraints)
+  robot_trajectory::RobotTrajectoryPtr & robot_trajectory,
+  const moveit_msgs::msg::Constraints & path_constraints, const std::string & ik_frame_id)
 {
   const moveit::core::JointModelGroup * jmg =
     planning_scene_monitor::LockedPlanningSceneRO(psm)->getRobotModel()->getJointModelGroup(group);

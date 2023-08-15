@@ -1,2 +1,4 @@
 string planning_pipeline
 string planner_id
+moveit_msgs/Constraints path_constraints
+string ik_frame
