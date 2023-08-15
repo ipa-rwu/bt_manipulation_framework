@@ -39,11 +39,9 @@ public:
 
   ~ComputePathToPoseActionServer();
 
-  void execution();
+  void execution() override;
 
 protected:
-  void initial();
-
   std::string action_name_;
   moveit_cpp::MoveItCppPtr moveit_cpp_ptr_;
   planning_scene_monitor::PlanningSceneMonitorPtr psm_;

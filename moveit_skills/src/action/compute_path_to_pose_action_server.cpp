@@ -43,8 +43,6 @@ ComputePathToPoseActionServer::ComputePathToPoseActionServer(
 
 ComputePathToPoseActionServer::~ComputePathToPoseActionServer() {}
 
-void ComputePathToPoseActionServer::initial() {}
-
 void ComputePathToPoseActionServer::execution()
 {
   auto goal = getCurrentGoal();

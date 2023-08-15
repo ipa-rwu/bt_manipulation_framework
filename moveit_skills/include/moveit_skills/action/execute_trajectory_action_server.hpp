@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "moveit/moveit_cpp/moveit_cpp.h"
+#include "moveit_skills/action/action_server_utils.hpp"
 #include "moveit_skills/action/execute_trajectory.hpp"
 #include "nav2_util/lifecycle_node.hpp"
 #include "nav2_util/simple_action_server.hpp"
@@ -29,10 +30,10 @@
 namespace moveit_skills
 {
 class ExecuteTrajectoryActionServer
+: public ActionServerUtils<moveit_skills::action::ExecuteTrajectory>
 {
 public:
   using ActionT = moveit_skills::action::ExecuteTrajectory;
-  using ActionServer = nav2_util::SimpleActionServer<ActionT>;
 
   ExecuteTrajectoryActionServer(
     const nav2_util::LifecycleNode::WeakPtr & parent, const std::string & action_name,
@@ -41,53 +42,12 @@ public:
 
   ~ExecuteTrajectoryActionServer();
 
-  void execution();
-
-  /**
- * @brief Activate action server
- *
- */
-  void activate() { action_server_->activate(); }
-
-  /**
- * @brief Deactivate action server
- *
- */
-  void deactivate() { action_server_->deactivate(); }
+  void execution() override;
 
 protected:
-  /**
-   * @brief Wrapper function to get current goal
-   * @return Shared pointer to current action goal
-   */
-  const std::shared_ptr<const typename ActionT::Goal> getCurrentGoal() const
-  {
-    return action_server_->get_current_goal();
-  }
-
-  /**
-   * @brief Wrapper function to send succeeded goal
-   */
-  void terminatePendingGoal() { action_server_->terminate_pending_goal(); }
-
-  void sendSucceededResult(const std::shared_ptr<typename ActionT::Result> result)
-  {
-    action_server_->succeeded_current(result);
-  }
-
-  /**
-   * @brief Wrapper function to terminate current goal by sending failed result
-   */
-  void sendFaildResult(const std::shared_ptr<typename ActionT::Result> result)
-  {
-    action_server_->terminate_current(result);
-  }
-
   std::string action_name_;
   moveit_cpp::MoveItCppPtr moveit_cpp_ptr_;
-  std::shared_ptr<ActionServer> action_server_;
   std::shared_ptr<rclcpp::Logger> logger_;
-  rclcpp::Node::SharedPtr node_;
 
   robot_trajectory::RobotTrajectoryPtr traj_;
 };
