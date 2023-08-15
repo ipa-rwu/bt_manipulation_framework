@@ -1,16 +1,13 @@
  <root BTCPP_format="4">
      <BehaviorTree ID="MainTree">
         <Sequence>
-            <PrintValue message="start"/>
-            <SetBlackboard output_key="eee" value="world"/>
-            <PrintValue message="sleep completed"/>
+            <ComputePathToState target_group="arm" named_state="detect" trajectory="{trajectory}"/>
+            <ExecuteTrajectory target_group="arm" trajectory="{trajectory}"/>
             <DetectArucoMarkerClient marker_id="42" sub_topic_name="/marker" timeout="5000" marker_pose="{marker_pose}" error_code_id="{detect_marker_error_code}"/>
-            <Fallback>
-                <Timeout msec="1500">
-                   <SetBlackboard output_key="eee" value="world"/>
-                </Timeout>
-                <PrintValue message="sleep aborted"/>
-            </Fallback>
+            <PrintValue msg_posestamped="{marker_pose}"/>
+            <SetPathConstrains service_name="/set_path_constrains" file_path="/root/bt_ws/src/bt_manipulation_framework/man2_bt_bringup/config/path_constraints.yaml" path_constraints="{path_constraints}"/>
+            <ComputePathToPose target_group="arm" target_pose="{marker_pose}" trajectory="{trajectory}" path_constraints="{path_constraints}" ik_frame="tool_tip"/>
+            <ExecuteTrajectory target_group="arm" trajectory="{trajectory}"/>
         </Sequence>
      </BehaviorTree>
  </root>

@@ -22,7 +22,7 @@ from yaml import SafeLoader
 
 document = """
     behavior_tree_filename: "/root/bt_ws/src/bt_manipulation_framework/man2_bt_bringup/trees/simple_tree.xml" # absolute path
-    run_in_loop: true
+    run_in_loop: false
     sleep: 2000
     """
 

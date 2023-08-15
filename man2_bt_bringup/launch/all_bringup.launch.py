@@ -20,6 +20,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from moveit_configs_utils import MoveItConfigsBuilder
 
 
 def generate_launch_description():
@@ -31,7 +32,21 @@ def generate_launch_description():
     params_file = LaunchConfiguration("params_file")
     default_bt_xml_filename = LaunchConfiguration("default_bt_xml_filename")
 
-    lifecycle_nodes = ["bt_operator", "detect_aruco_marker_action_server"]
+    lifecycle_nodes = [
+        "bt_operator",
+        "detect_aruco_marker_action_server",
+        "moveit_skill_server",
+        "set_path_constrains_server",
+    ]
+
+    moveit_config = (
+        MoveItConfigsBuilder("ur5e_workcell", package_name="ur5e_cell_moveit_config")
+        .robot_description(file_path="config/ur5e_workcell.urdf.xacro")
+        .moveit_cpp(
+            file_path=get_package_share_directory("man2_bt_bringup") + "/config/moveitcpp.yaml"
+        )
+        .to_moveit_configs()
+    )
 
     return LaunchDescription(
         [
@@ -92,6 +107,28 @@ def generate_launch_description():
                     {"autostart": autostart},
                     {"node_names": lifecycle_nodes},
                 ],
+            ),
+            Node(
+                package="moveit_skills",
+                executable="moveit_skill_server_node",
+                name="moveit_skill_server",
+                output="screen",
+                parameters=[
+                    {"use_sim_time": use_sim_time},
+                    params_file,
+                    moveit_config.to_dict(),
+                ],
+                # prefix=["xterm -e gdb -ex run --args"],
+            ),
+            Node(
+                package="moveit_skills",
+                executable="set_path_constrains",
+                name="set_path_constrains_server",
+                output="screen",
+                parameters=[
+                    {"use_sim_time": use_sim_time},
+                ],
+                # prefix=["xterm -e gdb -ex run --args"],
             ),
         ]
     )
