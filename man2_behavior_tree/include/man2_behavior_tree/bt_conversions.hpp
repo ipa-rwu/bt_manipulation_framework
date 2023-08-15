@@ -20,6 +20,7 @@
 
 #include "behaviortree_cpp/behavior_tree.h"
 #include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "rclcpp/time.hpp"
@@ -89,6 +90,24 @@ template <>
 inline std::chrono::milliseconds convertFromString<std::chrono::milliseconds>(const StringView key)
 {
   return std::chrono::milliseconds(std::stoul(key.data()));
+}
+
+template <>
+inline geometry_msgs::msg::PointStamped convertFromString(const StringView key)
+{
+  // three real numbers separated by semicolons
+  auto parts = BT::splitString(key, ';');
+  if (parts.size() != 5) {
+    throw std::runtime_error("invalid number of fields for point attribute)");
+  } else {
+    geometry_msgs::msg::PointStamped point_stamped;
+    point_stamped.header.stamp = rclcpp::Time(BT::convertFromString<int64_t>(parts[0]));
+    point_stamped.header.frame_id = BT::convertFromString<std::string>(parts[1]);
+    point_stamped.point.x = BT::convertFromString<double>(parts[2]);
+    point_stamped.point.y = BT::convertFromString<double>(parts[3]);
+    point_stamped.point.z = BT::convertFromString<double>(parts[4]);
+    return point_stamped;
+  }
 }
 
 }  // namespace BT
