@@ -1,0 +1,10 @@
+string file_path
+---
+moveit_msgs/Constraints path_constraints
+
+uint16 UNKNOWN=720
+uint16 LOADING_FAIL=721
+uint16 INVALID_INPUT=722
+uint16 NONE=0
+
+uint16 error_code_id

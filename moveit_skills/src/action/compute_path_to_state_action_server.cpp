@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "moveit_skills/compute_path_to_point_action_server.hpp"
+#include "moveit_skills/action/compute_path_to_state_action_server.hpp"
 
 namespace moveit_skills
 {
-ComputePathToPointActionServer::ComputePathToPointActionServer(
+ComputePathToStateActionServer::ComputePathToStateActionServer(
   const nav2_util::LifecycleNode::WeakPtr & parent, const std::string & action_name,
   moveit_cpp::MoveItCppPtr & moveit_cpp_ptr, planning_scene_monitor::PlanningSceneMonitorPtr psm,
   const rclcpp::NodeOptions & /*options*/)
-: ComputePathActionServerCore<moveit_skills::action::ComputePathToPoint>(),
+: ComputePathActionServerCore<moveit_skills::action::ComputePathToState>(),
   action_name_(action_name),
   moveit_cpp_ptr_(moveit_cpp_ptr),
   psm_(psm)
@@ -37,18 +37,30 @@ ComputePathToPointActionServer::ComputePathToPointActionServer(
   psm_->providePlanningSceneService(parameters_->get_planning_scene_service_name);
 
   action_server_ = std::make_unique<ActionServer>(
-    node, action_name_, std::bind(&ComputePathToPointActionServer::execution, this), nullptr,
+    node, action_name_, std::bind(&ComputePathToStateActionServer::execution, this), nullptr,
     std::chrono::milliseconds(500), true);
 }
 
-ComputePathToPointActionServer::~ComputePathToPointActionServer() {}
+ComputePathToStateActionServer::~ComputePathToStateActionServer() {}
 
-void ComputePathToPointActionServer::initial() {}
+void ComputePathToStateActionServer::initial() {}
 
-void ComputePathToPointActionServer::execution()
+void ComputePathToStateActionServer::execution()
 {
   auto goal = getCurrentGoal();
   auto result = std::make_shared<ActionT::Result>();
+
+  RCLCPP_INFO(
+    *logger_, "from parameter: planner id: %s, planning pipeline: %s",
+    parameters_->planner_id.c_str(), parameters_->planning_pipeline.c_str());
+
+  RCLCPP_INFO(
+    *logger_, "from goal: planner id: %s, planning pipeline: %s", goal->config.planner_id.c_str(),
+    goal->config.planning_pipeline.c_str());
+
+  RCLCPP_INFO(
+    *logger_, "from plan_params: planner id: %s, planning pipeline: %s",
+    plan_params_->planner_id.c_str(), plan_params_->planning_pipeline.c_str());
 
   initPlanComponentParameters(*plan_params_, *parameters_);
 
@@ -56,10 +68,14 @@ void ComputePathToPointActionServer::execution()
 
   robot_trajectory::RobotTrajectoryPtr robot_trajectory;
 
+  moveit_msgs::msg::Constraints path_constraints;
+  path_constraints = goal->config.path_constraints;
+
   if (computePath(
-        moveit_cpp_ptr_, *plan_params_, goal->target_group, goal->target_point, psm_,
+        moveit_cpp_ptr_, *plan_params_, goal->target_group, goal->named_state, psm_,
         parameters_->goal_joint_tolerance, parameters_->goal_orientation_tolerance,
-        parameters_->goal_position_tolerance, robot_trajectory)) {
+        parameters_->goal_position_tolerance, robot_trajectory, goal->config.path_constraints,
+        goal->config.ik_frame)) {
     trajectoryTimeParametrization(robot_trajectory, *plan_params_);
 
     robot_trajectory->getRobotTrajectoryMsg(result->plan_result.trajectory);

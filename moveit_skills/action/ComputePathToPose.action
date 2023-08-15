@@ -1,0 +1,11 @@
+#goal definition
+string target_group
+geometry_msgs/PoseStamped target_pose
+PlanConfig config
+
+---
+#result definition
+
+ComputePathResult plan_result
+---
+#feedback definition

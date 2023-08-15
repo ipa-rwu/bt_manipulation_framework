@@ -20,8 +20,10 @@
 #include <string>
 
 #include "moveit/moveit_cpp/moveit_cpp.h"
-#include "moveit_skills/compute_path_to_point_action_server.hpp"
-#include "moveit_skills/compute_path_to_state_action_server.hpp"
+#include "moveit_skills/action/compute_path_to_point_action_server.hpp"
+#include "moveit_skills/action/compute_path_to_pose_action_server.hpp"
+#include "moveit_skills/action/compute_path_to_state_action_server.hpp"
+#include "moveit_skills/action/execute_trajectory_action_server.hpp"
 #include "nav2_util/lifecycle_node.hpp"
 
 namespace moveit_skills
@@ -53,6 +55,9 @@ protected:
 
   std::unique_ptr<ComputePathToStateActionServer> compute_path_to_state_action_;
   std::unique_ptr<ComputePathToPointActionServer> compute_path_to_point_action_;
+  std::unique_ptr<ComputePathToPoseActionServer> compute_path_to_pose_action_;
+
+  std::unique_ptr<ExecuteTrajectoryActionServer> execute_trajectory_action_;
 };
 }  // namespace moveit_skills
 

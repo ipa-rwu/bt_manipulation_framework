@@ -227,8 +227,9 @@ public:
     moveit_cpp::PlanningComponent::PlanRequestParameters & plan_params, const std::string & group,
     const boost::any & goal, planning_scene_monitor::PlanningSceneMonitorPtr psm,
     double goal_joint_tolerance, double goal_orientation_tolerance, double goal_position_tolerance,
-    robot_trajectory::RobotTrajectoryPtr & robot_trajectory, const std::string & ik_frame_id = "",
-    const moveit_msgs::msg::Constraints & path_constraints = moveit_msgs::msg::Constraints());
+    robot_trajectory::RobotTrajectoryPtr & robot_trajectory,
+    const moveit_msgs::msg::Constraints & path_constraints = moveit_msgs::msg::Constraints(),
+    const std::string & ik_frame_id = "");
 
   bool getRobotTipForFrame(
     const planning_scene::PlanningSceneConstPtr & scene, const moveit::core::JointModelGroup * jmg,
@@ -254,6 +255,6 @@ protected:
 };
 }  // namespace moveit_skills
 
-#include "moveit_skills/compute_path_action_server_core_impl.hpp"
+#include "moveit_skills/action/compute_path_action_server_core_impl.hpp"
 
 #endif  //MOVEIT_SKILLS__COMPUTE_PATH_UTIL_HPP_
