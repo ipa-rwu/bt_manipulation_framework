@@ -14,6 +14,9 @@
   <exec_depend>nav2_lifecycle_manager</exec_depend>
   <exec_depend>man2_bt_operator</exec_depend>
   <exec_depend>detect_aruco_marker_skill</exec_depend>
+  <exec_depend>moveit_configs_utils</exec_depend>
+  <!-- <exec_depend>ur5e_cell_moveit_config</exec_depend> -->
+
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>

@@ -48,14 +48,14 @@ def generate_launch_description():
         description="Full path to the ROS2 parameters file to use for all launched nodes",
     )
 
-    # moveit_config = (
-    #     MoveItConfigsBuilder("ur5e_workcell", package_name="ur5e_cell_moveit_config")
-    #     .robot_description(file_path="config/ur5e_workcell.urdf.xacro")
-    #     .moveit_cpp(
-    #         file_path=get_package_share_directory("man2_bt_bringup") + "/config/moveitcpp.yaml"
-    #     )
-    #     .to_moveit_configs()
-    # )
+    moveit_config = (
+        MoveItConfigsBuilder("ur5e_workcell", package_name="ur5e_cell_moveit_config")
+        .robot_description(file_path="config/ur5e_workcell.urdf.xacro")
+        .moveit_cpp(
+            file_path=get_package_share_directory("man2_bt_bringup") + "/config/moveitcpp.yaml"
+        )
+        .to_moveit_configs()
+    )
 
     # Specify the actions
     start_server = Node(
@@ -66,7 +66,7 @@ def generate_launch_description():
         parameters=[
             {"use_sim_time": use_sim_time},
             params_file,
-            # moveit_config.to_dict(), # pass moveit config parameters, e.g. robot_decription
+            moveit_config.to_dict(),
         ],
         # prefix=["xterm -e gdb -ex run --args"],
     )
