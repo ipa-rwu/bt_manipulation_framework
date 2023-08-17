@@ -1,0 +1,15 @@
+/bt_operator:
+  ros__parameters:
+    # default_bt_xml_filename: "simple_tree.xml"
+    default_plugin_lib_names:
+      - util_plugin_print_value
+    customized_plugin_lib_names:
+      man2_bt_skill_clients:
+        - detect_aruco_marker_client
+
+/detect_aruco_marker_action_server:
+  ros__parameters:
+    sub_marker_topic: "/marker"
+    required_pose_num: 2
+    sub_rate: 10
+    timeout: 5000

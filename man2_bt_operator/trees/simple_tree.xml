@@ -1,0 +1,16 @@
+ <root BTCPP_format="4">
+     <BehaviorTree ID="MainTree">
+        <Sequence>
+            <PrintValue message="start"/>
+            <SetBlackboard output_key="eee" value="world"/>
+            <PrintValue message="sleep completed"/>
+            <DetectArucoMarker marker_id="42" sub_topic_name="/marker" pub_topic_name="/marker/repub" timeout="5000" frame="world"/>
+            <Fallback>
+                <Timeout msec="1500">
+                   <SetBlackboard output_key="eee" value="world"/>
+                </Timeout>
+                <PrintValue message="sleep aborted"/>
+            </Fallback>
+        </Sequence>
+     </BehaviorTree>
+ </root>

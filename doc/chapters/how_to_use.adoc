@@ -1,0 +1,67 @@
+:imagesdir: ./images
+
+== How to use BehaviorTree-based Application Framework
+
+=== Preparation
+To run an application, you need to do:
+* Create a launch file to start "__bt_operator__" and all needed skill servers. "__bt_operator__" that is an action server and waiting for a call with target Behavior tree xml absolute path (<<bt_operator>>[the detail of "bt_operator"]).
+https://gitlab.cc-asp.fraunhofer.de/ipa326/demonstrator/bt_based_application_framework/-/blob/ros2/man2_bt_bringup/launch/all_bringup.launch.py[An example of the launch file]
+
+* Create a parameter file. It includes parameters for "__bt_operator__" and all needed skill servers.
+    [source, yaml]
+    ----
+    /bt_operator:
+    ros__parameters:
+        # default_bt_xml_filename: "simple_tree.xml"
+        default_plugin_lib_names:
+        - util_plugin_print_value
+        customized_plugin_lib_names: <1>
+        man2_bt_skill_clients: <2>
+            - detect_aruco_marker_client <3>
+
+    /detect_aruco_marker_action_server: <4>
+    ros__parameters:
+        sub_marker_topic: "/marker"
+        required_pose_num: 2
+        sub_rate: 10
+        timeout: 5000
+    ----
+    <1> You can define skill clients here.
+    <2> The package of skill clients
+    <3> The name of a skill client. It should be as same as the library name you defined in Cmakelist.txt
+    <4> You can define parameters for a skill server as this example
+
+    For example, it uses https://gitlab.cc-asp.fraunhofer.de/ipa326/demonstrator/bt_based_application_framework/-/blob/ros2/man2_bt_bringup/config/params.yaml[the parameter file] in the launch file example.
+
+    [source]
+    ----
+    bringup_dir = get_package_share_directory("man2_bt_bringup")
+
+    ...
+
+    DeclareLaunchArgument(
+                    "params_file",
+                    default_value=os.path.join(bringup_dir, "config", "params.yaml"),
+                    description="Full path to the ROS2 parameters file to use",
+                )
+    ----
+
+* Create a Behavior tree xml. It describes how an application should be execute. https://gitlab.cc-asp.fraunhofer.de/ipa326/demonstrator/bt_based_application_framework/-/blob/ros2/man2_bt_bringup/trees/simple_tree.xml[An example of Behavior tree xml file]
+
+=== Run an application
+* Start "__bt_operator__" and skill servers
+```
+ros2 launch man2_bt_bringup all_bringup.launch.py
+```
+
+* Test detect_aruco_marker_skill server
+```
+# mocking publishing markers' position
+ros2 launch detect_aruco_marker_skill mock_aruco_marker_pub.launch.py
+```
+
+* Start an application
+```
+# start action client from launch file, you need to give absolute path of a Behavior tree xml.
+ros2 launch man2_bt_bringup call_start_application.launch.py
+```

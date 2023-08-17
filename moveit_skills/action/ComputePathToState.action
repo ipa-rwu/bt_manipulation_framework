@@ -1,0 +1,11 @@
+#goal definition
+string target_group
+string named_state
+PlanConfig config
+
+---
+#result definition
+
+ComputePathResult plan_result
+---
+#feedback definition

@@ -1,0 +1,27 @@
+:toc:
+:toclevels: 5
+:toc-title:
+:toc2:
+:numbered:
+:sectnumlevels: 5
+:xrefstyle: short
+:imagesdir: ./images
+:umldir: ./plantuml
+:icons: font
+:source-highlighter: pygments
+:pygments-style: default
+:source-highlighter: coderay
+
+= A Guide to Using and Developing BehaviorTree-based Application Framework
+
+<<<
+
+include::chapters/introduction.adoc[]
+
+<<<
+
+include::chapters/how_to_use.adoc[]
+
+<<<
+
+include::chapters/how_to_contribute.adoc[]

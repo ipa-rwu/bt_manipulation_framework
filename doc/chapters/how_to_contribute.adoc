@@ -1,0 +1,42 @@
+:imagesdir: ./images
+
+== Contribute to developing BehaviorTree-based Application Framework
+
+=== BehaviorTree-based Application Framework Architecture
+
+[#ref_framework_arch]
+.Framework Architecture​
+image::framework_architecture.png[align=center, pdfwidth=80%, scaledwidth=80%]
+
+[#bt_operator]
+==== Operator
+The node "bt_operator" from ros package "man2_bt_operator" has an action server for running a target BehaviorTree.
+It accepets an action call as defined in <<app_action_call>>.
+
+[#app_action_call]
+[source, align=center]
+----
+# goal
+string behavior_tree_filename <1>
+bool run_in_loop  <2>
+int16 sleep <3>
+---
+#result
+bool success
+---
+#feedback
+----
+<1> The absolute path of a behavior tree xml
+<2> true: the application runs in loops; false: the application only run once
+<3> If the application runs in loops, user can define sleep time in milliseconds between each loop
+
+==== Creating a skill server
+A skill server can be either ROS action server or ROS service server. If you want to start skill servers in a certain sequence, you can wrap it into a lifecycle node by deriving from the abstract class "__skill_action_server_lifecycle_core​__" or abstract class "__skill_service_server_lifecycle_core​__" from package "__man2_skill_server_core__".
+
+You can find an example of a skill server as ROS action server within a lifecycle node https://gitlab.cc-asp.fraunhofer.de/ipa326/demonstrator/bt_based_application_framework/-/tree/ros2/detect_aruco_marker_skill[here].
+
+==== Creating a skill client
+A skill client can be either ROS action client or ROS service client. A skill client is also an __ActionNode__ in the BehaviorTree. It sends call or request to a skill server and gets results.
+You can create a skill client by deriving from the abstract class "__bt_action_client_node__" or abstract class "__bt_server_client_node__" from package "__man2_behavior_tree__".
+
+You can find an example of a skill client as ROS action client https://gitlab.cc-asp.fraunhofer.de/ipa326/demonstrator/bt_based_application_framework/-/blob/ros2/man2_bt_skill_clients/include/man2_bt_skill_clients/action_clients/detect_aruco_marker_action_bt_client.hpp[here].
