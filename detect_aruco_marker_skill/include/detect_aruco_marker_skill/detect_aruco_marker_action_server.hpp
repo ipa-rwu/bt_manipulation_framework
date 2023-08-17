@@ -88,7 +88,7 @@ public:
   void execution() override;
 
 protected:
-  void getMarkerCallback(const aruco_msgs::msg::MarkerArray & msg){};
+  void getMarkerCallback(const aruco_msgs::msg::MarkerArray & /*msg*/){};
 
   void initial();
 

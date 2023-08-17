@@ -34,14 +34,31 @@ document = """
         pose:
           pose:
             position:
-              x: 1
-              y: 1
-              z: 1
+              x: -0.17
+              y: 0.16
+              z: 1.05
             orientation:
-              x: 1
-              y: 1
-              z: 1
-              w: 1
+              x: 0.710063
+              y: 0.704136
+              z: -0.00170857
+              w: 0.000328001
+        confidence: 100.0
+      - header:
+          stamp:
+            sec: 0
+          frame_id: world
+        id: 41
+        pose:
+          pose:
+            position:
+              x: -0.17
+              y: -0.10
+              z: 1.05
+            orientation:
+              x: 0.710063
+              y: 0.704136
+              z: -0.00170857
+              w: 0.000328001
         confidence: 100.0
     """
 
