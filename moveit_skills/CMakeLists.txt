@@ -17,6 +17,7 @@ find_package(moveit_ros_planning REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
+find_package(yaml_cpp_vendor REQUIRED)
 
 include_directories(
   include
@@ -27,6 +28,7 @@ set(dependencies
   geometry_msgs
   moveit_ros_planning
   nav2_util
+  yaml_cpp_vendor
 )
 
 set(executable_name moveit_skill_server_node)
@@ -35,6 +37,10 @@ set(library_name ${executable_name}_core)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/ComputePathToState.action"
   "action/ComputePathToPoint.action"
+  "action/ComputePathToPose.action"
+  "action/ExecuteTrajectory.action"
+  "action/GetCurrentEndEffctorPose.action"
+  "srv/SetPathConstrains.srv"
   "msg/PlanConfig.msg"
   "msg/ComputePathResult.msg"
   DEPENDENCIES
@@ -55,7 +61,7 @@ endforeach()
 rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 
 add_library(compute_path_to_state_action_server SHARED
-src/compute_path_to_state_action_server.cpp)
+src/action/compute_path_to_state_action_server.cpp)
 ament_target_dependencies(compute_path_to_state_action_server
   ${dependencies}
 )
@@ -63,12 +69,36 @@ target_link_libraries(compute_path_to_state_action_server "${cpp_typesupport_tar
 list(APPEND libs compute_path_to_state_action_server)
 
 add_library(compute_path_to_point_action_server SHARED
-src/compute_path_to_point_action_server.cpp)
+src/action/compute_path_to_point_action_server.cpp)
 ament_target_dependencies(compute_path_to_point_action_server
   ${dependencies}
 )
 target_link_libraries(compute_path_to_point_action_server "${cpp_typesupport_target}")
 list(APPEND libs compute_path_to_point_action_server)
+
+add_library(compute_path_to_pose_action_server SHARED
+src/action/compute_path_to_pose_action_server.cpp)
+ament_target_dependencies(compute_path_to_pose_action_server
+  ${dependencies}
+)
+target_link_libraries(compute_path_to_pose_action_server "${cpp_typesupport_target}")
+list(APPEND libs compute_path_to_pose_action_server)
+
+add_library(execute_trajectory_action_server SHARED
+src/action/execute_trajectory_action_server.cpp)
+ament_target_dependencies(execute_trajectory_action_server
+  ${dependencies}
+)
+target_link_libraries(execute_trajectory_action_server "${cpp_typesupport_target}")
+list(APPEND libs execute_trajectory_action_server)
+
+add_library(set_path_constrains_skill SHARED
+src/service/set_path_constrains.cpp)
+ament_target_dependencies(set_path_constrains_skill
+  ${dependencies}
+)
+target_link_libraries(set_path_constrains_skill "${cpp_typesupport_target}")
+list(APPEND libs set_path_constrains_skill)
 
 add_library(moveit_skill_server SHARED
 src/moveit_skill_server.cpp)
@@ -77,12 +107,18 @@ ament_target_dependencies(moveit_skill_server
 )
 target_link_libraries(moveit_skill_server
 compute_path_to_state_action_server
-compute_path_to_point_action_server)
+compute_path_to_point_action_server
+execute_trajectory_action_server
+compute_path_to_pose_action_server)
 list(APPEND libs moveit_skill_server)
 
 add_executable(${executable_name} src/main_moveit_skill_server.cpp)
 target_link_libraries(${executable_name}
 moveit_skill_server)
+
+add_executable(set_path_constrains src/main_set_path_constrains.cpp)
+target_link_libraries(set_path_constrains
+set_path_constrains_skill)
 
 install(DIRECTORY include/
   DESTINATION include/
@@ -97,6 +133,7 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS ${executable_name}
+  set_path_constrains
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
