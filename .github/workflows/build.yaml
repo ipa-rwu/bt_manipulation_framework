@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  push
+
+jobs:
+  industrial_ci:
+    strategy:
+      matrix:
+        env:
+          - ROS_DISTRO: humble
+            NOT_TEST_BUILD: false
+            UPSTREAM_WORKSPACE: file
+            ROSINSTALL_FILENAME: upstream.repos
+    env:
+      CCACHE_DIR: "${{ github.workspace }}/.ccache"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
+          restore-keys: |
+            ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-
+      - uses: 'ros-industrial/industrial_ci@master'
+        env: ${{matrix.env}}
